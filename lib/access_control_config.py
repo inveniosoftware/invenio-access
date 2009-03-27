@@ -180,7 +180,8 @@ DEF_ACTIONS = (
                ('usealerts', 'use alerts', '', 'no'),
                ('usemessages', 'use messages', '', 'no'),
                ('viewholdings', 'view holdings', 'collection', 'yes'),
-               ('viewstatistics', 'view statistics', 'collection', 'yes')
+               ('viewstatistics', 'view statistics', 'collection', 'yes'),
+               ('runbibcirculation', 'run BibCirculation', '', 'no'),
               )
 
 # Default authorizations
