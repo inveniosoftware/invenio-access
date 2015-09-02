@@ -1,0 +1,360 @@
+# Italian translations for invenio-access.
+# Copyright (C) 2015 CERN
+# This file is distributed under the same license as the invenio-access
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: invenio-access 0.1.0.dev20150000\n"
+"Report-Msgid-Bugs-To: info@invenio-software.org\n"
+"POT-Creation-Date: 2015-09-02 09:13+0200\n"
+"PO-Revision-Date: 2015-09-02 09:13+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: it <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+#: invenio_access/admin_lib.py:3842
+#, python-format
+msgid "Your account on '%(x_name)s' has been activated"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3845
+#, python-format
+msgid "Your account earlier created on '%(x_name)s' has been activated:"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3848 invenio_access/admin_lib.py:3866
+#: invenio_access/admin_lib.py:3903
+msgid "Username/Email:"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3849 invenio_access/admin_lib.py:3867
+msgid "Password:"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3863
+#, python-format
+msgid "Account created on '%(x_name)s'"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3864
+#, python-format
+msgid "An account has been created for you on '%(x_name)s':"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3882
+#, python-format
+msgid "Account rejected on '%(x_name)s'"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3883
+#, python-format
+msgid "Your request for an account has been rejected on '%(x_name)s':"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3886
+#, python-format
+msgid "Username/Email: %(x_email)s"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3900
+#, python-format
+msgid "Account deleted on '%(x_name)s'"
+msgstr ""
+
+#: invenio_access/admin_lib.py:3901
+#, python-format
+msgid "Your account on '%(x_name)s' has been deleted:"
+msgstr ""
+
+#: invenio_access/local_config.py:222
+msgid "Run Record Editor"
+msgstr ""
+
+#: invenio_access/local_config.py:223
+msgid "Run Document File Manager"
+msgstr ""
+
+#: invenio_access/local_config.py:224
+msgid "Run Record Merger"
+msgstr ""
+
+#: invenio_access/local_config.py:225
+msgid "Configure BibKnowledge"
+msgstr ""
+
+#: invenio_access/local_config.py:226
+msgid "Configure OAI Harvest"
+msgstr ""
+
+#: invenio_access/local_config.py:227
+msgid "Configure WebAccess"
+msgstr ""
+
+#: invenio_access/local_config.py:228
+msgid "Configure WebComment"
+msgstr ""
+
+#: invenio_access/local_config.py:229
+msgid "Run Person/Author Manager"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:22
+#: invenio_access/templates/access/admin/userarea_base.html:22
+msgid "Action Administrator"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:25
+#: invenio_access/templates/access/admin/userarea_base.html:25
+msgid "administration with actions as access point"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:45
+#: invenio_access/templates/access/admin/rolearea_base.html:44
+#: invenio_access/templates/access/admin/showroledetails_base.html:36
+#: invenio_access/templates/access/admin/userarea_base.html:43
+msgid "go here to add a new role."
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:46
+#: invenio_access/templates/access/admin/rolearea_base.html:45
+#: invenio_access/templates/access/admin/showroledetails_base.html:37
+#: invenio_access/templates/access/admin/userarea_base.html:44
+msgid "Create new role"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:53
+#: invenio_access/templates/access/admin/rolearea_base.html:53
+#: invenio_access/templates/access/admin/rolearea_base.html:76
+#: invenio_access/templates/access/admin/userarea_base.html:51
+msgid "Authorizations"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:53
+#: invenio_access/templates/access/admin/rolearea_base.html:55
+#: invenio_access/templates/access/admin/userarea_base.html:51
+msgid "Roles"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:54
+#: invenio_access/templates/access/admin/rolearea_base.html:54
+#: invenio_access/templates/access/admin/userarea_base.html:52
+msgid ""
+"these terms means almost the same, but an authorization is a connection "
+"between a role and an action (possibly) containing arguments."
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:55
+#: invenio_access/templates/access/admin/rolearea_base.html:53
+#: invenio_access/templates/access/admin/rolearea_base.html:76
+#: invenio_access/templates/access/admin/showroledetails_base.html:84
+#: invenio_access/templates/access/admin/userarea_base.html:53
+msgid "Actions"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:56
+#: invenio_access/templates/access/admin/userarea_base.html:54
+msgid "see all the information attached to an action."
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:71
+#: invenio_access/templates/access/admin/rolearea_base.html:72
+#: invenio_access/templates/access/admin/userarea_base.html:69
+msgid "name"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:72
+#: invenio_access/templates/access/admin/rolearea_base.html:73
+#: invenio_access/templates/access/admin/userarea_base.html:70
+msgid "authorizations"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:72
+#: invenio_access/templates/access/admin/rolearea_base.html:73
+#: invenio_access/templates/access/admin/userarea_base.html:70
+msgid "roles"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:73
+#: invenio_access/templates/access/admin/userarea_base.html:71
+msgid "Action"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:79
+#: invenio_access/templates/access/admin/rolearea_base.html:83
+#: invenio_access/templates/access/admin/userarea_base.html:77
+msgid "Delete Selected"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:87
+#: invenio_access/templates/access/admin/userarea_base.html:85
+msgid "No actions"
+msgstr ""
+
+#: invenio_access/templates/access/admin/actionarea_base.html:100
+#: invenio_access/templates/access/admin/userarea_base.html:98
+msgid "Delete"
+msgstr ""
+
+#: invenio_access/templates/access/admin/index_base.html:21
+msgid "WebAccess Admin"
+msgstr ""
+
+#: invenio_access/templates/access/admin/index_base.html:24
+msgid "selection for WebAccess Admin"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:22
+msgid "Role Administrator"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:26
+msgid "administration with roles as access point"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:51
+#: invenio_access/templates/access/admin/rolearea_base.html:75
+#: invenio_access/templates/access/admin/showroledetails_base.html:63
+msgid "Users"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:52
+msgid "add or remove users from the access to a role and its priviliges."
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:56
+msgid ""
+"see all the information attached to a role and decide if you want to "
+"delete it."
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:71
+msgid "id"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:74
+msgid "firewall like role definition"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:77
+msgid "Role"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:91
+msgid "No roles"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:110
+#: invenio_access/templates/access/admin/rolearea_base.html:118
+msgid "add"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:113
+#: invenio_access/templates/access/admin/rolearea_base.html:124
+#: invenio_access/templates/access/admin/rolearea_base.html:132
+msgid "delete"
+msgstr ""
+
+#: invenio_access/templates/access/admin/rolearea_base.html:121
+#: invenio_access/templates/access/admin/rolearea_base.html:129
+msgid "modify"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:41
+#, python-format
+msgid "connect a user to role %(x_name)s."
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:42
+msgid "Connect user"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:50
+msgid "Role details"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:52
+msgid "Id"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:54
+msgid "Name"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:56
+msgid "Description"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:58
+msgid "Firewall like role definition"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:73
+msgid "disconnect from role"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:94
+msgid "disconnect action with all arguments from role"
+msgstr ""
+
+#: invenio_access/templates/access/admin/showroledetails_base.html:112
+msgid "disconnect argument list from role"
+msgstr ""
+
+#: invenio_access/views/admin.py:51
+msgid "WebAccess"
+msgstr ""
+
+#: invenio_access/views/admin.py:56
+msgid "Role Area"
+msgstr ""
+
+#: invenio_access/views/admin.py:57
+msgid "Main area to configure administration rights and authorization rules."
+msgstr ""
+
+#: invenio_access/views/admin.py:60
+msgid "Action Area"
+msgstr ""
+
+#: invenio_access/views/admin.py:61
+msgid "Configure administration rights with the actions as starting point."
+msgstr ""
+
+#: invenio_access/views/admin.py:64
+msgid "User Area"
+msgstr ""
+
+#: invenio_access/views/admin.py:65
+msgid "Configure administration rights with the users as starting point."
+msgstr ""
+
+#: invenio_access/views/admin.py:68
+msgid "Reset Area"
+msgstr ""
+
+#: invenio_access/views/admin.py:69
+msgid "Reset roles, actions and authorizations."
+msgstr ""
+
+#: invenio_access/views/admin.py:71
+msgid "Manage Accounts Area"
+msgstr ""
+
+#: invenio_access/views/admin.py:72
+msgid "Manage user accounts."
+msgstr ""
+
+#: invenio_access/views/admin.py:74
+msgid "Delegate Rights - With Restrictions"
+msgstr ""
+
+#: invenio_access/views/admin.py:75
+msgid "Delegate your rights for some roles."
+msgstr ""
+
