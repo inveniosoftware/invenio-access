@@ -115,6 +115,12 @@ setup(
     zip_safe=False,
     include_package_data=True,
     platforms='any',
+    entry_points={
+        'console_scripts': [
+            'webaccessadmin ='
+            ' invenio_access.scripts.webaccessadmin:main',
+        ],
+    },
     install_requires=requirements,
     extras_require={
         'docs': [
