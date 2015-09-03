@@ -34,16 +34,29 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 requirements = [
+    'blinker>=1.3.0',
+    'Flask-Breadcrumbs>=0.2',
+    'Flask-Login>=0.2.7',
+    'Flask-Menu>=0.2',
+    'Flask-Registry>=0.2',
     'Flask>=0.10.1',
+    'mock>=1.0.1',
     'six>=1.7.2',
-    'Invenio>=2.0.3',
+    'SQLAlchemy-Utils[encrypted]>=0.30.1',
+    'SQLAlchemy>=1.0',
+    'wtforms-alchemy>=0.13.1',
+    'WTForms>=2.0.1',
+    'invenio-accounts>=0.1.2',
+    'invenio-upgrader>=0.1.0',
 ]
 
 test_requirements = [
-    'pytest>=2.7.0',
-    'pytest-cov>=1.8.0',
-    'pytest-pep8>=1.0.6',
+    'Flask-Testing>=0.4.1',
     'coverage>=3.7.1',
+    'pytest-cov>=1.8.1',
+    'pytest-pep8>=1.0.6',
+    'pytest>=2.7.0',
+    'unittest2>=1.1.0',
 ]
 
 
