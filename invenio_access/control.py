@@ -30,21 +30,22 @@ from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.ext import principal
 from invenio.ext.sqlalchemy import db
 from invenio.legacy.dbquery import run_sql, truncate_table
-from invenio_access.firerole import (
-    acc_firerole_check_user, compile_role_definition, deserialize,
-    load_role_definition, serialize
-)
-from invenio_access.local_config import (
-    CFG_ACC_ACTIVITIES_URLS, CFG_ACC_EMPTY_ROLE_DEFINITION_SER,
-    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DEF_AUTHS, DEF_ROLES, DEF_USERS,
-    DELEGATEADDUSERROLE, SUPERADMINROLE
-)
-from invenio_access.models import AccACTION, AccAuthorization, \
-    UserAccROLE
 
 from six import iteritems
 
 from sqlalchemy.exc import ProgrammingError
+
+from .firerole import (
+    acc_firerole_check_user, compile_role_definition, deserialize,
+    load_role_definition, serialize
+)
+from .local_config import (
+    CFG_ACC_ACTIVITIES_URLS, CFG_ACC_EMPTY_ROLE_DEFINITION_SER,
+    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DEF_AUTHS, DEF_ROLES, DEF_USERS,
+    DELEGATEADDUSERROLE, SUPERADMINROLE
+)
+from .models import AccACTION, AccAuthorization, \
+    UserAccROLE
 
 
 def acc_add_action(name_action='', description='', optional='no',

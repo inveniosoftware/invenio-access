@@ -26,10 +26,9 @@ from datetime import datetime, timedelta
 from invenio.ext.passlib.hash import mysql_aes_decrypt, mysql_aes_encrypt
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio_access.local_config import CFG_ACC_ACTIVITIES_URLS, \
-    SUPERADMINROLE
-from invenio_accounts.models import User
 from invenio.utils.hash import md5
+
+from invenio_accounts.models import User
 
 from random import random
 
@@ -37,6 +36,8 @@ from sqlalchemy.orm import validates
 
 from .errors import InvenioWebAccessMailCookieDeletedError, \
     InvenioWebAccessMailCookieError
+from .local_config import CFG_ACC_ACTIVITIES_URLS, \
+    SUPERADMINROLE
 
 
 class AccACTION(db.Model):

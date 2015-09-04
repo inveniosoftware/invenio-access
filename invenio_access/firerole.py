@@ -30,16 +30,15 @@ import time
 from invenio.base.globals import cfg
 from invenio.ext.logging import register_exception
 from invenio.legacy.dbquery import blob_to_string, run_sql
-from invenio_access.local_config import \
-    CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ, \
-    CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
-    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
-
 from six.moves import cPickle
 
 from zlib import compress, decompress
 
 from .errors import InvenioWebAccessFireroleError
+from .local_config import \
+    CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ, \
+    CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
+    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
 
 
 __revision__ = "$Id$"

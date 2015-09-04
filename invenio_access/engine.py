@@ -23,13 +23,12 @@ from flask_login import current_user
 
 from invenio.ext.login import UserInfo
 
-from invenio_access.firerole import acc_firerole_extract_emails, \
-    load_role_definition
-
 from urllib import quote
 
 from .control import acc_find_possible_roles, acc_get_roles_emails, \
     acc_is_user_in_any_role
+from .firerole import acc_firerole_extract_emails, \
+    load_role_definition
 from .local_config import CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS
 
 
