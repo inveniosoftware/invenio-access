@@ -258,7 +258,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
     Given a user_info dictionary, it matches the rules inside the deserialized
     compiled definition in order to discover if the current user match the roles
     corresponding to this definition.
-    :param user_info: a dict produced by collect_user_info which contains every
+    :param user_info: a dict produced by UserInfo(uid) which contains every
     info about a user
     :param firerole_def_obj: a compiled deserialized definition produced by
     compile_role_defintion
