@@ -25,8 +25,8 @@ __revision__ = \
 # pylint: disable=C0301
 
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_RECORD, CFG_SITE_ADMIN_EMAIL
-from invenio.base.i18n import _
-from invenio.base.globals import cfg as config
+from invenio_base.i18n import _
+from invenio_base.globals import cfg as config
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py modules.access.control.py webaccessadmin_lib.py

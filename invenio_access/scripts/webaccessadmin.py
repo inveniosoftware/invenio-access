@@ -1,6 +1,6 @@
 # This file is part of Invenio.
 # Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-# 2012, 2013, 2014 CERN.
+# 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 import getopt
 import sys
 
-from invenio.base.helpers import with_app_context
+from invenio_base.helpers import with_app_context
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -56,7 +56,7 @@ def main():
     from invenio_access.firerole import repair_role_definitions
     from invenio_access.control import (acc_add_default_settings,
                                                 acc_reset_default_settings)
-    from invenio.base.globals import cfg
+    from invenio_base.globals import cfg
     from invenio.legacy.bibsched.bibtask import authenticate
 
     DEF_DEMO_USER_ROLES = cfg.get('DEF_DEMO_USER_ROLES', tuple())

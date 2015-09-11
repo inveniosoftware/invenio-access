@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 
-from invenio.base.wrappers import lazy_import
+from invenio_base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 acc_firerole_check_user = lazy_import('invenio_access.firerole:acc_firerole_check_user')

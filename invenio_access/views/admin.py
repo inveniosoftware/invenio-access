@@ -27,8 +27,8 @@ from flask_breadcrumbs import register_breadcrumb
 
 from flask_login import login_required
 
-from invenio.base.decorators import sorted_by, templated
-from invenio.base.i18n import _
+from invenio_base.decorators import sorted_by, templated
+from invenio_base.i18n import _
 from invenio.ext.principal import permission_required
 from invenio_access.models import AccACTION, AccROLE
 from invenio_accounts.models import User
