@@ -57,7 +57,6 @@ def main():
     from invenio_access.control import (acc_add_default_settings,
                                                 acc_reset_default_settings)
     from invenio_base.globals import cfg
-    from invenio.legacy.bibsched.bibtask import authenticate
 
     DEF_DEMO_USER_ROLES = cfg.get('DEF_DEMO_USER_ROLES', tuple())
     DEF_DEMO_ROLES = cfg.get('DEF_DEMO_ROLES', tuple())
@@ -127,5 +126,3 @@ def main():
 ### okay, here we go:
 if __name__ == '__main__':
     main()
-
-
