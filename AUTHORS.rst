@@ -63,6 +63,7 @@ Invenio module for common role based access control.
 - Radoslav Ivanov <radoslav.ivanov@cern.ch>
 - Raquel Jimenez Encinar <raquel.jimenez.encinar@cern.ch>
 - Roman Chyla <roman.chyla@cern.ch>
+- Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
 - Samuele Kaplun <samuele.kaplun@cern.ch>
 - Theodoropoulos Theodoros <theod@lib.auth.gr>
 - Thomas Baron <thomas.baron@cern.ch>
