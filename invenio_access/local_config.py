@@ -188,7 +188,7 @@ DEF_ACTIONS = (
               )
 
 
-from invenio.ext.principal.wrappers import Action
+from invenio_ext.principal.wrappers import Action
 
 for action in DEF_ACTIONS:
     type(action[0], (Action, ), {

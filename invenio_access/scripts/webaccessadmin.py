@@ -118,7 +118,7 @@ def main():
         else:
             usage(1, "You must specify at least one command")
     except StandardError as e:
-        from invenio.ext.logging import register_exception
+        from invenio_ext.logging import register_exception
         register_exception()
         usage(e)
     return

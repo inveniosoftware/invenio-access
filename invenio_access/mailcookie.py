@@ -27,7 +27,7 @@ derive from the base class and add specific bits.
 
 from datetime import datetime, timedelta
 
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 
 from .errors import InvenioWebAccessMailCookieError
 from .models import AccMAILCOOKIE, User

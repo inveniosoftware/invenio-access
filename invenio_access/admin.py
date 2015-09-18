@@ -23,8 +23,8 @@ from __future__ import unicode_literals
 
 from flask_admin.form.fields import DateTimeField
 
-from invenio.ext.admin.views import ModelView
-from invenio.ext.sqlalchemy import db
+from invenio_ext.admin.views import ModelView
+from invenio_ext.sqlalchemy import db
 
 from wtforms.fields import IntegerField
 from wtforms.validators import DataRequired

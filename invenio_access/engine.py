@@ -21,7 +21,7 @@ import cgi
 
 from flask_login import current_user
 
-from invenio.ext.login import UserInfo
+from invenio_ext.login import UserInfo
 
 from urllib import quote
 
@@ -42,7 +42,7 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False,
     authorization will be granted.
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
-    from invenio.ext.login import UserInfo
+    from invenio_ext.login import UserInfo
     from werkzeug.local import LocalProxy
     if isinstance(req, LocalProxy):
         req = req._get_current_object()

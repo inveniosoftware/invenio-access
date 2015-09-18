@@ -28,7 +28,7 @@ import sys
 import time
 
 from invenio_base.globals import cfg
-from invenio.ext.logging import register_exception
+from invenio_ext.logging import register_exception
 from invenio.legacy.dbquery import blob_to_string, run_sql
 from six.moves import cPickle
 

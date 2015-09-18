@@ -23,9 +23,9 @@ from cPickle import dumps, loads
 
 from datetime import datetime, timedelta
 
-from invenio.ext.passlib.hash import mysql_aes_decrypt, mysql_aes_encrypt
-from invenio.ext.sqlalchemy import db
-from invenio.ext.sqlalchemy.utils import session_manager
+from invenio_ext.passlib.hash import mysql_aes_decrypt, mysql_aes_encrypt
+from invenio_ext.sqlalchemy import db
+from invenio_ext.sqlalchemy.utils import session_manager
 from invenio.utils.hash import md5
 
 from invenio_accounts.models import User

@@ -72,7 +72,7 @@ def AclFactory(obj=''):
                 will have access to the file.
 
             :param user_info: an instance of
-                :class:`~invenio.ext.login.legacy_user.UserInfo`
+                :class:`~invenio_ext.login.legacy_user.UserInfo`
                 (default: :class:`flask_login.current_user`)
             :return: a tuple, of the form `(auth_code, auth_message)` where
                 `auth_code` is 0 if the authorization is granted and greater

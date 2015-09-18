@@ -27,8 +27,8 @@ import urlparse
 from intbitset import intbitset
 
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
-from invenio.ext import principal
-from invenio.ext.sqlalchemy import db
+from invenio_ext import principal
+from invenio_ext.sqlalchemy import db
 from invenio.legacy.dbquery import run_sql, truncate_table
 
 from six import iteritems
@@ -1801,7 +1801,7 @@ def acc_delete_all_settings():
     simply remove all data affiliated with webaccess by truncating
     tables accROLE, accACTION, accARGUMENT and those connected.
     """
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
     db.session.commit()
 
     truncate_table("accROLE")

@@ -36,7 +36,7 @@ class AccessControlFireRoleTest(InvenioTestCase):
 
     def setUp(self):
         """setting up helper variables for tests"""
-        from invenio.ext.login import UserInfo
+        from invenio_ext.login import UserInfo
         self.user_info = {'email' : 'foo.bar@cern.ch', 'uid': 1000,
             'group' : ['patata', 'cetriolo'], 'remote_ip' : '127.0.0.1',
             'guest' : '0'}

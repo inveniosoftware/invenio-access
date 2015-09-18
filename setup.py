@@ -48,6 +48,7 @@ requirements = [
     'WTForms>=2.0.1',
     'invenio-accounts>=0.1.2',
     'invenio-base>=0.2.1',
+    'invenio-ext>=0.1.0',
     'invenio-upgrader>=0.1.0',
 ]
 
