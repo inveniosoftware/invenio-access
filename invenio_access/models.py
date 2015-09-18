@@ -23,14 +23,14 @@ from cPickle import dumps, loads
 
 from datetime import datetime, timedelta
 
+from random import random
+
 from invenio.ext.passlib.hash import mysql_aes_decrypt, mysql_aes_encrypt
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.utils.hash import md5
 
 from invenio_accounts.models import User
-
-from random import random
 
 from sqlalchemy.orm import validates
 
@@ -103,7 +103,7 @@ class AccMAILCOOKIE(db.Model):
     @classmethod
     def get(cls, cookie, delete=False):
         """Get cookie if it is valid."""
-        password = cookie[:16]+cookie[-16:]
+        password = cookie[:16] + cookie[-16:]
         cookie_id = int(cookie[16:-16], 16)
 
         obj, data = db.session.query(
@@ -142,7 +142,7 @@ class AccMAILCOOKIE(db.Model):
         db.session.add(cookie)
         db.session.commit()
         db.session.refresh(cookie)
-        return password[:16]+hex(cookie.id)[2:-1]+password[-16:]
+        return password[:16] + hex(cookie.id)[2:-1] + password[-16:]
 
     @classmethod
     @session_manager
@@ -225,6 +225,7 @@ class UserAccROLE(db.Model):
 
     user = db.relationship(User, backref='roles')
     role = db.relationship(AccROLE, backref='users')
+
 
 User.active_roles = db.relationship(
     UserAccROLE,
