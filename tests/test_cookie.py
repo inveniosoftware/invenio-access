@@ -20,7 +20,7 @@
 """Unit tests for Access Mail Cookies."""
 
 from invenio_base.wrappers import lazy_import
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+from invenio_testsuite import InvenioTestCase
 
 Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
 
@@ -70,9 +70,3 @@ class TestAccMailCookie(InvenioTestCase):
         assert isinstance(load_cookie.id, long)
 
         self.delete_objects([cookie])
-
-
-TEST_SUITE = make_test_suite(TestAccMailCookie)
-
-if __name__ == '__main__':
-    run_test_suite(TEST_SUITE)

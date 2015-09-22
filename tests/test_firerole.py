@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 
 from invenio_base.wrappers import lazy_import
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio_testing import InvenioTestCase
 
 acc_firerole_check_user = lazy_import('invenio_access.firerole:acc_firerole_check_user')
 compile_role_definition = lazy_import('invenio_access.firerole:compile_role_definition')
@@ -201,8 +201,3 @@ class AccessControlFireRoleTest(InvenioTestCase):
             compile_role_definition("deny guest '1'\ndeny all")))
         self.assertEqual(False, acc_firerole_check_user(self.user_info,
             compile_role_definition("deny guest '0'\ndeny all")))
-
-TEST_SUITE = make_test_suite(AccessControlFireRoleTest,)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
