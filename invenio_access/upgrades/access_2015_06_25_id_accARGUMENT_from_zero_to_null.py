@@ -19,7 +19,7 @@
 
 """Replace zero value for id_accARGUMENT with NULL."""
 
-from invenio.legacy.dbquery import run_sql
+from invenio_ext.sqlalchemy import db
 
 
 depends_on = [u'access_2015_05_06_accROLE_accACTION_accARGUMENT_id']
@@ -32,7 +32,7 @@ def info():
 
 def do_upgrade():
     """Implement your upgrades here."""
-    run_sql("""
+    db.engine.execute("""
         UPDATE "accROLE_accACTION_accARGUMENT"
         SET "id_accARGUMENT" = NULL
         WHERE "id_accARGUMENT" = 0
@@ -41,10 +41,10 @@ def do_upgrade():
 
 def estimate():
     """Estimate running time of upgrade in seconds (optional)."""
-    total = run_sql("""
+    total = db.engine.execute("""
         SELECT count(*) FROM "accROLE_accACTION_accARGUMENT"
         WHERE "id_accARGUMENT" = 0
-    """)
+    """).fetchall()
     return total[0][0] // 1000 + 1
 
 

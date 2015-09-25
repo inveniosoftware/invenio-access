@@ -22,12 +22,14 @@
 import warnings
 
 from invenio_ext.sqlalchemy import db
-from invenio.legacy.dbquery import run_sql
+
 from invenio_upgrader.api import op
 
+from sqlalchemy import exc
 from sqlalchemy.engine import reflection
 
-depends_on = ['invenio_release_1_2_0']
+
+depends_on = []
 
 
 def exists_id_column():
@@ -57,6 +59,18 @@ def do_upgrade():
     # table accROLE_accACTION_accARGUMENT
 
     # - drop primary key
+    try:
+        db.engine.execute(
+            """
+            SET SESSION sql_mode = ANSI_QUOTES;
+            ALTER TABLE "accROLE_accACTION_accARGUMENT"
+            DROP PRIMARY KEY;
+            """)
+    except exc.DatabaseError:
+        warnings.warn(
+            """No primary key in accROLE_accACTION_accARGUMENT table."""
+        )
+
     # - add "id" column int(15) unsigned
     # - set "id" as primary key, autoincrement
     # - column id_accROLE, id_accACTION, id_accARGUMENT, argumentlistid server
@@ -70,15 +84,15 @@ def do_upgrade():
         CHANGE COLUMN "id_accARGUMENT" "id_accARGUMENT" INT(15) NULL ,
         CHANGE COLUMN "argumentlistid" "argumentlistid" MEDIUMINT(8) NULL ,
         ADD COLUMN "id" INT(15) UNSIGNED NOT NULL AUTO_INCREMENT,
-        DROP PRIMARY KEY,
         ADD PRIMARY KEY ("id");
         """)
 
 
 def estimate():
     """Estimate running time of upgrade in seconds (optional)."""
-    total = run_sql(
-        """SELECT count(*) FROM "accROLE_accACTION_accARGUMENT" """)
+    total = db.engine.execute(
+        """SELECT count(*) FROM "accROLE_accACTION_accARGUMENT" """
+    ).fetchall()
     return int(float(int(total[0][0])) / 1000) + 1
 
 
