@@ -70,7 +70,9 @@ def do_upgrade():
         CHANGE COLUMN "id_accARGUMENT" "id_accARGUMENT" INT(15) NULL ,
         CHANGE COLUMN "argumentlistid" "argumentlistid" MEDIUMINT(8) NULL ,
         ADD COLUMN "id" INT(15) UNSIGNED NOT NULL AUTO_INCREMENT,
-        DROP PRIMARY KEY,
+        DROP KEY id_accROLE,
+        DROP KEY id_accACTION,
+        DROP KEY id_accARGUMENT,
         ADD PRIMARY KEY ("id");
         """)
 
