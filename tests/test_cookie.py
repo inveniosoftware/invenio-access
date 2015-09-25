@@ -20,7 +20,8 @@
 """Unit tests for Access Mail Cookies."""
 
 from invenio_base.wrappers import lazy_import
-from invenio_testsuite import InvenioTestCase
+
+from invenio_testing import InvenioTestCase
 
 Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
 

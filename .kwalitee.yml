@@ -20,10 +20,11 @@
 min_reviewers: 2
 
 components:
-- global
 - access
+- global
 - i18n
 - installation
 - kwalitee
 - legacy
+- tests
 - travis
