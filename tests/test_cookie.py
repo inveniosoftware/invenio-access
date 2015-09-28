@@ -19,26 +19,12 @@
 
 """Unit tests for Access Mail Cookies."""
 
-from invenio_base.wrappers import lazy_import
-
 from invenio_testing import InvenioTestCase
-
-Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
-
-TEST_PACKAGE = 'invenio_access.testsuite'
 
 
 class TestAccMailCookie(InvenioTestCase):
 
     """Test Mail cookie."""
-
-    def setUp(self):
-        """Set up."""
-        pass
-
-    def tearDown(self):
-        """Tear down."""
-        pass
 
     def test_mail_cookie(self):
         """Test mail cookie creation."""
