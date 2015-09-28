@@ -23,7 +23,7 @@ from invenio_base.wrappers import lazy_import
 
 from invenio_testing import InvenioTestCase
 
-Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
+Model_parser = lazy_import('invenio_jsonalchemy.parser:ModelParser')
 
 TEST_PACKAGE = 'invenio_access.testsuite'
 
