@@ -24,7 +24,7 @@ __revision__ = \
 
 # pylint: disable=C0301
 
-from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_RECORD, CFG_SITE_ADMIN_EMAIL
+from invenio_base.globals import cfg
 from invenio_base.i18n import _
 from invenio_base.globals import cfg as config
 
@@ -219,24 +219,24 @@ DEF_AUTHS = (('loanusers', 'useloans', {}),
 
 # Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit' : (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibdocfile' : (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibmerge' : (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'cfgbibknowledge' : (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
-    'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
-    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % CFG_SITE_URL)
+    'runbibedit' : (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (cfg['CFG_SITE_URL'], cfg['CFG_SITE_RECORD'])),
+    'runbibdocfile' : (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (cfg['CFG_SITE_URL'], cfg['CFG_SITE_RECORD'])),
+    'runbibmerge' : (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (cfg['CFG_SITE_URL'], cfg['CFG_SITE_RECORD'])),
+    'cfgbibknowledge' : (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % cfg['CFG_SITE_URL']),
+    'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % cfg['CFG_SITE_URL']),
+    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % cfg['CFG_SITE_URL']),
+    'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % cfg['CFG_SITE_URL']),
+    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % cfg['CFG_SITE_URL'])
 }
 
 CFG_WEBACCESS_MSGS = {
-    0: 'Try to <a href="%s/youraccount/login?referer=%%s">login</a> with another account.' % (CFG_SITE_SECURE_URL),
-    1: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
-    2: '<br />If you have any questions, please write to <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
-    3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % CFG_SITE_SECURE_URL,
+    0: 'Try to <a href="%s/youraccount/login?referer=%%s">login</a> with another account.' % (cfg['CFG_SITE_SECURE_URL']),
+    1: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (cfg['CFG_SITE_SUPPORT_EMAIL'], cfg['CFG_SITE_SUPPORT_EMAIL']),
+    2: '<br />If you have any questions, please write to <a href="mailto:%s">%s</a>' % (cfg['CFG_SITE_SUPPORT_EMAIL'], cfg['CFG_SITE_SUPPORT_EMAIL']),
+    3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % cfg['CFG_SITE_SECURE_URL'],
     4: 'The site is temporarily closed for maintenance.  Please come back soon.',
     5: 'Authorization failure',
-    6: '%s temporarily closed' % CFG_SITE_NAME,
+    6: '%s temporarily closed' % cfg['CFG_SITE_NAME'],
     7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
     8: 'Functionality temporarily closed',
     9: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>',
@@ -267,6 +267,6 @@ CFG_WEBACCESS_WARNING_MSGS = {
     20: """No roles are authorized to perform action %s with the given parameters.""",
     21: """Verification cancelled""",
     22: """Verification failed. Please try again or use another provider to login""",
-    23: """Verification failed. It is probably because the configuration isn't set properly. Please contact with the <a href="mailto:%s">administator</a>""" % CFG_SITE_ADMIN_EMAIL
+    23: """Verification failed. It is probably because the configuration isn't set properly. Please contact with the <a href="mailto:%s">administator</a>""" % cfg['CFG_SITE_ADMIN_EMAIL']
 }
 
