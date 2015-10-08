@@ -1837,7 +1837,7 @@ def acc_add_default_settings(superusers=(),
             user = [user]
         DEF_USERS.append(user[0])
     if cfg['CFG_SITE_ADMIN_EMAIL'] not in DEF_USERS:
-        DEF_USERS.append(cfg['CFG_SITE_ADMIN_EMAIL')
+        DEF_USERS.append(cfg['CFG_SITE_ADMIN_EMAIL'])
 
     # add data
 
