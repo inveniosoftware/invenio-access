@@ -38,8 +38,6 @@ from sqlalchemy.orm import validates
 
 from .errors import InvenioWebAccessMailCookieDeletedError, \
     InvenioWebAccessMailCookieError
-from .local_config import CFG_ACC_ACTIVITIES_URLS, \
-    SUPERADMINROLE
 
 
 class AccACTION(db.Model):
@@ -237,9 +235,10 @@ User.active_roles = db.relationship(
     )
 )
 
-User.has_admin_role = property(
-    lambda self:
-    self.has_super_admin_role or db.object_session(self).query(
+
+def __user_has_admin_role(self):
+    from .local_config import CFG_ACC_ACTIVITIES_URLS
+    return self.has_super_admin_role or db.object_session(self).query(
         db.func.count(User.id) > 0
     ).join(
         User.active_roles,
@@ -253,18 +252,21 @@ User.has_admin_role = property(
         ),
         User.id == self.id
     ).scalar()
-)
 
-User.has_super_admin_role = property(
-    lambda self:
-    db.object_session(self).query(db.func.count(User.id) > 0).join(
+User.has_admin_role = property(__user_has_admin_role)
+
+
+def __user_has_super_admin_role(self):
+    from .local_config import SUPERADMINROLE
+    return db.object_session(self).query(db.func.count(User.id) > 0).join(
         User.active_roles,
         UserAccROLE.role
     ).filter(
         AccROLE.name == SUPERADMINROLE,
         User.id == self.id
     ).scalar()
-)
+
+User.has_super_admin_role = property(__user_has_super_admin_role)
 
 __all__ = ('AccACTION',
            'AccARGUMENT',
