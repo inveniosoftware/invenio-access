@@ -21,6 +21,7 @@
     waive the privileges and immunities granted to it by virtue of its status
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+
 Authors
 =======
 
@@ -40,6 +41,7 @@ Invenio module for common role based access control.
 - Henning Weiler <henning.weiler@cern.ch>
 - Jan Aage Lavik <jan.age.lavik@cern.ch>
 - Jan Stypka <jan.stypka@cern.ch>
+- Javier Delgado Fernandez <javier.delgado.fernandez@cern.ch>
 - Javier Martin Montull <javier.martin.montull@cern.ch>
 - Jerome Caffaro <jerome.caffaro@cern.ch>
 - Jiri Kuncar <jiri.kuncar@cern.ch>

@@ -46,4 +46,4 @@ Invenio module for common role based access control.
 *This is an experimental developer preview release.*
 
 * Free software: GPLv2 license
-* Documentation: https://invenio-access.readthedocs.org.
+* Documentation: https://pythonhosted.org/invenio-access/

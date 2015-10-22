@@ -22,12 +22,36 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Version information for Invenio Access.
-
-This file is imported by ``invenio_access.__init__``,
-and parsed by ``setup.py``.
-"""
+"""Invenio module for common role based access control."""
 
 from __future__ import absolute_import, print_function
 
-__version__ = "1.0.0.dev20151105"
+import pkg_resources
+
+from .cli import access as access_cli
+
+
+class InvenioAccess(object):
+    """Invenio Access extension."""
+
+    def __init__(self, app=None, **kwargs):
+        """Extension initialization."""
+        self.actions = set()
+        self.kwargs = kwargs
+        if app:
+            self.init_app(app, **kwargs)
+
+    def init_app(self, app, entrypoint_name='invenio_access.actions',
+                 **kwargs):
+        """Flask application initialization."""
+        self.kwargs.update(kwargs)
+        app.cli.add_command(access_cli, 'access')
+        app.extensions['invenio-access'] = self
+
+        if entrypoint_name:
+            for base_entry in pkg_resources.iter_entry_points(entrypoint_name):
+                self.register_action(base_entry.load())
+
+    def register_action(self, action):
+        """Register an action to be showed in the actions list."""
+        self.actions.add(action)
