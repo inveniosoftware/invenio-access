@@ -60,8 +60,8 @@ before_install:
   - "requirements-builder --level=min setup.py > .travis-lowest-requirements.txt"
   - "requirements-builder --level=pypi setup.py > .travis-release-requirements.txt"
   - "requirements-builder --level=dev --req requirements-devel.txt setup.py > .travis-devel-requirements.txt"
-  - mysql -e "CREATE DATABASE IF NOT EXISTS travis;" -uroot
-  - psql -c 'CREATE DATABASE travis;' -U postgres
+  - "mysql -e 'CREATE DATABASE IF NOT EXISTS travis;' -uroot"
+  - "psql -c 'CREATE DATABASE travis;' -U postgres"
 
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"

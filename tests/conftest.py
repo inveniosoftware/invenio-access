@@ -47,8 +47,10 @@ def app(request):
     app = Flask('testapp')
     app.config.update(
         ACCOUNTS_USE_CELERY=False,
+        SECRET_KEY="CHANGE_ME",
+        SECURITY_PASSWORD_SALT="CHANGE_ME_ALSO",
         SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI', 'sqlite://'),
+            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
         TESTING=True,
     )
     FlaskCLI(app)
@@ -56,6 +58,7 @@ def app(request):
     Mail(app)
     InvenioDB(app)
     InvenioAccounts(app)
+
     with app.app_context():
         db.create_all()
 
@@ -70,59 +73,17 @@ def app(request):
 @pytest.fixture()
 def script_info(request):
     """Get ScriptInfo object for testing CLI."""
-    app = Flask('testapp')
-    app.config.update(
-        ACCOUNTS_USE_CELERY=False,
-        SECRET_KEY="CHANGE_ME",
-        SECURITY_PASSWORD_SALT="CHANGE_ME_ALSO",
-        SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI', 'sqlite://'),
-        TESTING=True,
-    )
-    FlaskCLI(app)
-    Babel(app)
-    Mail(app)
-    InvenioDB(app)
-    InvenioAccounts(app)
-    InvenioAccess(app)
-
-    with app.app_context():
-        db.create_all()
-
-    def teardown():
-        with app.app_context():
-            db.drop_all()
-
-    request.addfinalizer(teardown)
-    return ScriptInfo(create_app=lambda info: app)
+    app_ = app(request)
+    InvenioAccess(app_)
+    return ScriptInfo(create_app=lambda info: app_)
 
 
 @pytest.fixture()
 def script_info_cli_list(request):
     """Get ScriptInfo object for testing CLI list command."""
-    app = Flask('testapp')
-    app.config.update(
-        ACCOUNTS_USE_CELERY=False,
-        SECRET_KEY="CHANGE_ME",
-        SECURITY_PASSWORD_SALT="CHANGE_ME_ALSO",
-        SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI', 'sqlite://'),
-        TESTING=True,
-    )
-    FlaskCLI(app)
-    Babel(app)
-    Mail(app)
-    InvenioDB(app)
-    InvenioAccounts(app)
-    access = InvenioAccess(app)
+    app_ = app(request)
+    access = InvenioAccess(app_)
     access.register_action(ActionNeed('open'))
+    access.register_action(ActionNeed('read'))
 
-    with app.app_context():
-        db.create_all()
-
-    def teardown():
-        with app.app_context():
-            db.drop_all()
-
-    request.addfinalizer(teardown)
-    return ScriptInfo(create_app=lambda info: app)
+    return ScriptInfo(create_app=lambda info: app_)

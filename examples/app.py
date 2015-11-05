@@ -36,25 +36,34 @@ Create database and tables:
 Create some users:
 
 .. code-block:: console
-   $ flask -a app.py accounts usercreate -e info@invenio-software.org -a
-   $ flask -a app.py accounts usercreate -e reader@invenio-software.org -a
-   $ flask -a app.py accounts usercreate -e editor@invenio-software.org -a
-   $ flask -a app.py accounts usercreate -e admin@invenio-software.org -a
+
+   $ flask -a app.py users create -e info@invenio-software.org -a
+   $ flask -a app.py users create -e reader@invenio-software.org -a
+   $ flask -a app.py users create -e editor@invenio-software.org -a
+   $ flask -a app.py users create -e admin@invenio-software.org -a
 
 Add a role to a user:
-   $ flask -a app.py accounts rolecreate -n admin
-   $ flask -a app.py accounts roleadd -u admin@invenio-software.org -r admin
+
+.. code-block:: console
+
+   $ flask -a app.py roles create -n admin
+   $ flask -a app.py roles add -u info@invenio-software.org -r admin
+   $ flask -a app.py roles add -u admin@invenio-software.org -r admin
 
 Assign some allowed actions to this users:
 
 .. code-block:: console
+
    $ flask -a app.py access allow open -e editor@invenio-software.org
+   $ flask -a app.py access deny open -e info@invenio-software.org
    $ flask -a app.py access allow read -e reader@invenio-software.org
    $ flask -a app.py access allow open -r admin
    $ flask -a app.py access allow read -r admin
 
 
 Run the development server:
+
+.. code-block:: console
 
    $ flask -a app.py run
 
@@ -70,7 +79,9 @@ from flask import Flask, g, render_template
 from flask.ext.principal import ActionNeed, RoleNeed
 from flask_babelex import Babel
 from flask_cli import FlaskCLI
+from flask_login import current_user
 from flask_mail import Mail
+from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint
 
@@ -84,6 +95,7 @@ app.secret_key = 'ExampleApp'
 FlaskCLI(app)
 Babel(app)
 Mail(app)
+Menu(app)
 InvenioDB(app)
 InvenioAccounts(app)
 app.register_blueprint(blueprint)

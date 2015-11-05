@@ -36,18 +36,8 @@ from invenio_db import db
 from .models import ActionRoles, ActionUsers
 
 
-@click.group()
-def access():
-    """Account commands."""
-
-
-@access.command(name='allow')
-@click.argument('action')
-@click.option('-e', '--email', multiple=True, default=[])
-@click.option('-r', '--role', multiple=True, default=[])
-@with_appcontext
-def allow_action(action, email, role):
-    """Allow actions."""
+def _store_action(action, email, role, exclude=False, argument=None):
+    """Store actions."""
     if (len(email) == 0 and len(role) == 0):
         raise click.UsageError('You haven\'t specified any user or role.')
 
@@ -56,7 +46,9 @@ def allow_action(action, email, role):
         if not user:
             raise click.BadParameter('User with email \'%s\' not found.',
                                      email_item)
-        action_role = ActionUsers(action=action, user_id=user.id)
+        action_role = ActionUsers(
+            action=action, exclude=exclude, argument=argument, user=user
+        )
         db.session.add(action_role)
 
     for role_item in role:
@@ -64,9 +56,43 @@ def allow_action(action, email, role):
         if not role:
             raise click.BadParameter('Role with name \'%s\' not found.',
                                      role_item)
-        action_role = ActionRoles(action=action, role_id=role.id)
+        action_role = ActionRoles(
+            action=action, exclude=exclude, argument=argument, role=role
+        )
         db.session.add(action_role)
     db.session.commit()
+
+
+#
+# Access commands
+#
+@click.group()
+def access():
+    """Account commands."""
+
+
+@access.command(name='allow')
+@click.argument('action')
+@click.option('-a', '--argument', default=None)
+@click.option('-e', '--email', multiple=True, default=[])
+@click.option('-r', '--role', multiple=True, default=[])
+@with_appcontext
+def allow_action(action, argument, email, role):
+    """Allow actions."""
+    return _store_action(action, email, role, exclude=False,
+                         argument=argument)
+
+
+@access.command(name='deny')
+@click.argument('action')
+@click.option('-a', '--argument', default=None)
+@click.option('-e', '--email', multiple=True, default=[])
+@click.option('-r', '--role', multiple=True, default=[])
+@with_appcontext
+def deny_action(action, argument, email, role):
+    """Deny actions."""
+    return _store_action(action, email, role, exclude=True,
+                         argument=argument)
 
 
 @access.command(name='list')

@@ -24,44 +24,84 @@
 
 """Invenio module for permissions control."""
 
-from flask.ext.principal import RoleNeed, UserNeed
+from functools import partial
+from collections import namedtuple
+
 from flask_principal import Permission
 
 from invenio_access.models import ActionRoles, ActionUsers
 
+_Need = namedtuple('Need', ['method', 'value', 'argument'])
+
+ParameterizedActionNeed = partial(_Need, 'action')
+
+ParameterizedActionNeed.__doc__ = \
+    """A need with the method preset to `"action"` with parameter."""
+
 
 class DynamicPermission(Permission):
-    """Utility class providing lazy loading of identity provides."""
+    """Utility class providing lazy loading of permissions."""
+
+    NEEDS = False
+    EXCLUDES = True
 
     def __init__(self, *needs):
         """Default constructor."""
+        self._permissions = None
         self.explicit_needs = set(needs)
-        self.excludes = set()
+
+    def _load_permissions(self):
+        """Load permissions associated to actions."""
+        result = {
+            False: set(),
+            True: set(),
+        }
+
+        for explicit_need in self.explicit_needs:
+            if explicit_need.method == 'action':
+
+                actionsusers = ActionUsers.query_by_action(
+                    explicit_need
+                ).all()
+
+                for actionuser in actionsusers:
+                    result[actionuser.exclude].add(
+                        actionuser.need
+                    )
+
+                actionsroles = ActionRoles.query_by_action(
+                    explicit_need
+                ).join(
+                    ActionRoles.role
+                ).all()
+
+                for actionrole in actionsroles:
+                    result[actionrole.exclude].add(
+                        actionrole.need
+                    )
+            else:
+                result[self.NEEDS].add(explicit_need)
+
+        self._permissions = result
 
     @property
     def needs(self):
-        """
-        Load allowed actions for the user from database.
+        """Return allowed permissions from database.
 
         If there is no role or user assigned to an action, everyone is allowed
         too perform that action.
         """
-        result = set()
+        if not self._permissions:
+            self._load_permissions()
+        return self._permissions[self.NEEDS]
 
-        for explicit_need in self.explicit_needs:
-            if explicit_need.method == 'action':
-                actionsusers = ActionUsers.query.filter(
-                    ActionUsers.action == explicit_need.value).all()
-                for actionuser in actionsusers:
-                    result.add(UserNeed(actionuser.user_id))
+    @property
+    def excludes(self):
+        """Return denied permissions from database.
 
-                actionsroles = ActionRoles.query.join(
-                    ActionRoles.role).filter(
-                    ActionRoles.action == explicit_need.value).all()
-
-                for actionrole in actionsroles:
-                    result.add(RoleNeed(actionrole.role.name))
-            else:
-                result.add(explicit_need)
-
-        return result
+        If there is no role or user assigned to an action, everyone is allowed
+        too perform that action.
+        """
+        if not self._permissions:
+            self._load_permissions()  # pragma: no cover
+        return self._permissions[self.EXCLUDES]

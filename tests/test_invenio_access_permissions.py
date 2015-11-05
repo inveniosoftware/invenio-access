@@ -50,39 +50,73 @@ def test_invenio_access_permissions_deny(app):
         assert not permission.allows(fake_identity)
 
 
-def test_invenio_access_permission_allowed_action_user(app):
-    """User can access to an action allowed to the user"""
+def test_invenio_access_permission_for_users(app):
+    """User can access to an action allowed/denied to the user"""
     with app.test_request_context():
-        email = "test@test.test"
-        user = User(id=0, email=email)
-        db.session.add(user)
-        db.session.commit()
-        user = User.query.filter(User.email == "test@test.test").first()
-        action_role = ActionUsers(action='open', user_id=user.id)
-        db.session.add(action_role)
-        db.session.commit()
+        user_can_all = User(email='all@invenio-software.org')
+        user_can_read = User(email='read@invenio-software.org')
+        user_can_open = User(email='open@invenio-software.org')
 
-        permission = DynamicPermission(ActionNeed('open'))
+        db.session.add(user_can_all)
+        db.session.add(user_can_read)
+        db.session.add(user_can_open)
 
-        fake_identity = FakeIdentity(UserNeed(user.id))
+        db.session.add(ActionUsers(action='open', user=user_can_all))
+        db.session.add(ActionUsers(action='open', user=user_can_open))
 
-        assert permission.allows(fake_identity)
+        db.session.add(ActionUsers(action='read', user=user_can_all))
+        db.session.add(ActionUsers(action='read', user=user_can_read))
+
+        db.session.flush()
+
+        permission_open = DynamicPermission(ActionNeed('open'))
+        permission_read = DynamicPermission(ActionNeed('read'))
+
+        identity_all = FakeIdentity(UserNeed(user_can_all.id))
+        identity_read = FakeIdentity(UserNeed(user_can_read.id))
+        identity_open = FakeIdentity(UserNeed(user_can_open.id))
+
+        assert permission_open.allows(identity_all)
+        assert permission_read.allows(identity_all)
+
+        assert permission_open.allows(identity_open)
+        assert not permission_read.allows(identity_open)
+
+        assert not permission_open.allows(identity_read)
+        assert permission_read.allows(identity_read)
 
 
-def test_invenio_access_permission_allowed_action_role(app):
+def test_invenio_access_permission_for_roles(app):
     """User with a role can access to an action allowed to the role"""
     with app.test_request_context():
-        role_name = 'admin'
-        role = Role(id=0, name=role_name)
-        db.session.add(role)
-        db.session.commit()
-        role = Role.query.filter(Role.name == role_name).first()
-        action_role = ActionRoles(action='open', role_id=role.id)
-        db.session.add(action_role)
-        db.session.commit()
+        admin_role = Role(name='admin')
+        reader_role = Role(name='reader')
+        opener_role = Role(name='opener')
 
-        permission = DynamicPermission(ActionNeed('open'))
+        db.session.add(admin_role)
+        db.session.add(reader_role)
+        db.session.add(opener_role)
 
-        fake_identity = FakeIdentity(RoleNeed(role.name))
+        db.session.add(ActionRoles(action='open', role=admin_role))
+        db.session.add(ActionRoles(action='open', role=opener_role))
 
-        assert permission.allows(fake_identity)
+        db.session.add(ActionRoles(action='read', role=admin_role))
+        db.session.add(ActionRoles(action='read', role=reader_role))
+
+        db.session.flush()
+
+        permission_open = DynamicPermission(ActionNeed('open'))
+        permission_read = DynamicPermission(ActionNeed('read'))
+
+        identity_all = FakeIdentity(RoleNeed('admin'))
+        identity_read = FakeIdentity(RoleNeed('reader'))
+        identity_open = FakeIdentity(RoleNeed('opener'))
+
+        assert permission_open.allows(identity_all)
+        assert permission_read.allows(identity_all)
+
+        assert permission_open.allows(identity_open)
+        assert not permission_read.allows(identity_open)
+
+        assert not permission_open.allows(identity_read)
+        assert permission_read.allows(identity_read)

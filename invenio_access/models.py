@@ -26,36 +26,78 @@
 
 from __future__ import absolute_import, print_function
 
+from flask_principal import RoleNeed, UserNeed
+
 from invenio_accounts.models import Role, User
 
 from invenio_db import db
 
 
-class ActionUsers(db.Model):
+class ActionNeedMixin(object):
+    """Define common attributes for Action needs."""
+
+    action = db.Column(db.String(80), primary_key=True)
+    """Name of the action."""
+
+    exclude = db.Column(db.Boolean(), nullable=False, default=False,
+                        server_default="0")
+    """Deny associated objects."""
+
+    argument = db.Column(db.String(255), nullable=True)
+    """String value of action argument."""
+
+    @classmethod
+    def query_by_action(cls, action):
+        """Prepare query object with filtered action."""
+        query = cls.query.filter_by(action=action.value)
+        if getattr(action, 'argument', None) is not None:
+            query = query.filter(db.or_(
+                cls.argument == str(action.argument),
+                cls.argument.is_(None),
+            ))
+        else:
+            query = query.filter(cls.argument.is_(None))
+        return query
+
+    @property
+    def need(self):
+        """Abstract need."""
+        raise NotImplemented()  # pragma: no cover
+
+
+class ActionUsers(ActionNeedMixin, db.Model):
     """ActionRoles data model.
 
-    It relates an allowd accion with a user.
+    It relates an allowed action with a user.
     """
 
     __tablename__ = 'access_actionsusers'
 
-    action = db.Column(db.String(80), primary_key=True)
-
-    user_id = db.Column(db.Integer(), db.ForeignKey(User.id), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey(User.id),
+                        primary_key=True)
 
     user = db.relationship("User")
 
+    @property
+    def need(self):
+        """Return UserNeed instance."""
+        return UserNeed(self.user_id)
 
-class ActionRoles(db.Model):
+
+class ActionRoles(ActionNeedMixin, db.Model):
     """ActionRoles data model.
 
-    It relates an allowd accion with a role.
+    It relates an allowed action with a role.
     """
 
     __tablename__ = 'access_actionsroles'
 
-    action = db.Column(db.String(80), primary_key=True)
-
-    role_id = db.Column(db.Integer(), db.ForeignKey(Role.id), primary_key=True)
+    role_id = db.Column(db.Integer(), db.ForeignKey(Role.id),
+                        primary_key=True)
 
     role = db.relationship("Role")
+
+    @property
+    def need(self):
+        """Return RoleNeed instance."""
+        return RoleNeed(self.role.name)
