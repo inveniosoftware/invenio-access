@@ -2,7 +2,7 @@
  Invenio-Access v1.0.0
 =======================
 
-Invenio-Access v1.0.0 was released on TBD, 2015.
+Invenio-Access v1.0.0 was released on November 12, 2015.
 
 About
 -----
@@ -14,7 +14,7 @@ Invenio module for common role based access control.
 What's new
 ----------
 
-- Initial public release.
+- Major incompatible rewrite.
 
 Installation
 ------------

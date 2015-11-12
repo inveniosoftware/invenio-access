@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Version information for Invenio Access.
+"""Version information for Invenio-Access.
 
 This file is imported by ``invenio_access.__init__``,
 and parsed by ``setup.py``.
@@ -30,4 +30,4 @@ and parsed by ``setup.py``.
 
 from __future__ import absolute_import, print_function
 
-__version__ = "1.0.0.dev20151105"
+__version__ = "1.0.0a1"
