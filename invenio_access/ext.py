@@ -41,15 +41,16 @@ class InvenioAccess(object):
         if app:
             self.init_app(app, **kwargs)
 
-    def init_app(self, app, entrypoint_name='invenio_access.actions',
+    def init_app(self, app, entry_point_group='invenio_access.actions',
                  **kwargs):
         """Flask application initialization."""
         self.kwargs.update(kwargs)
         app.cli.add_command(access_cli, 'access')
         app.extensions['invenio-access'] = self
 
-        if entrypoint_name:
-            for base_entry in pkg_resources.iter_entry_points(entrypoint_name):
+        if entry_point_group:
+            for base_entry in pkg_resources.iter_entry_points(
+                    entry_point_group):
                 self.register_action(base_entry.load())
 
     def register_action(self, action):
