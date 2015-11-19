@@ -29,9 +29,10 @@ package.  It allows administrator to fine-tune access to various
 actions with parameters to a specific user or role.
 """
 
-from functools import partial
 from collections import namedtuple
+from functools import partial
 
+from flask import current_app
 from flask_principal import Permission
 
 from invenio_access.models import ActionRoles, ActionUsers
@@ -79,13 +80,28 @@ class DynamicPermission(Permission):
 
         for explicit_need in self.explicit_needs:
             if explicit_need.method == 'action':
+                cache = getattr(current_app.extensions['invenio-access'],
+                                'cache')
+                if cache:
+                    cache_key = 'DynamicPermission.action.{0}'.format(
+                        explicit_need.value)
+                    cached_result = cache.get(cache_key)
+                    if cached_result:
+                        result[True] |= cached_result[True]
+                        result[False] |= cached_result[False]
+                        continue
+
+                action = {
+                    False: set(),
+                    True: set(),
+                }
 
                 actionsusers = ActionUsers.query_by_action(
                     explicit_need
                 ).all()
 
                 for actionuser in actionsusers:
-                    result[actionuser.exclude].add(
+                    action[actionuser.exclude].add(
                         actionuser.need
                     )
 
@@ -96,12 +112,18 @@ class DynamicPermission(Permission):
                 ).all()
 
                 for actionrole in actionsroles:
-                    result[actionrole.exclude].add(
+                    action[actionrole.exclude].add(
                         actionrole.need
                     )
+
+                result[True] |= action[True]
+                result[False] |= action[False]
+
+                if cache:
+                    cache.set(cache_key, action)
+
             else:
                 result[self.NEEDS].add(explicit_need)
-
         self._permissions = result
 
     @property
@@ -109,7 +131,7 @@ class DynamicPermission(Permission):
         """Return allowed permissions from database.
 
         If there is no role or user assigned to an action, everyone is allowed
-        too perform that action.
+        to perform that action.
         """
         if not self._permissions:
             self._load_permissions()
@@ -120,7 +142,7 @@ class DynamicPermission(Permission):
         """Return denied permissions from database.
 
         If there is no role or user assigned to an action, everyone is allowed
-        too perform that action.
+        to perform that action.
         """
         if not self._permissions:
             self._load_permissions()  # pragma: no cover

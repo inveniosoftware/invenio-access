@@ -43,6 +43,8 @@ tests_require = [
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
+    'Werkzeug>=0.11.2',
+    'redis>=2.10.3'
 ]
 
 extras_require = {

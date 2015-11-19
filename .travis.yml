@@ -36,6 +36,7 @@ cache:
 services:
   - mysql
   - postgresql
+  - redis-server
 
 env:
   - REQUIREMENTS=lowest EXTRAS=all SQLALCHEMY_DATABASE_URI="sqlite:///test.db"

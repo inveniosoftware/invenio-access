@@ -26,10 +26,12 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import current_app
 from flask_principal import RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db
 from sqlalchemy import UniqueConstraint
+from sqlalchemy.event import listen
 
 
 class ActionNeedMixin(object):
@@ -134,3 +136,50 @@ class ActionRoles(ActionNeedMixin, db.Model):
     def need(self):
         """Return RoleNeed instance."""
         return RoleNeed(self.role.name)
+
+
+def removed_or_inserted_action(mapper, connection, target):
+    """Remove the action from cache when an item is inserted or deleted."""
+    del mapper, connection
+    remove_cache_item(target.action)
+
+
+def changed_action_action(target, value, oldvalue, initiator):
+    """Remove the action from cache when an action is updated.
+
+    Remove the action from cache when ActionRoles.action or ActionUsers.action
+    is updated.
+    """
+    del target, initiator
+    remove_cache_item(value)
+    remove_cache_item(oldvalue)
+
+
+def changed_owner_action(target, value, oldvalue, initiator):
+    """Remove the action from cache when the owner is updated.
+
+    Remove the action from cache when ActionRoles.role or ActionUsers.user
+    is updated.
+    """
+    del value, oldvalue, initiator
+    remove_cache_item(target.action)
+
+
+def remove_cache_item(action):
+    """Remove the action from cache."""
+    cache = current_app.extensions['invenio-access'].cache
+    if cache:
+        key = 'DynamicPermission.action.{0}'.format(action)
+        if cache.has(key):
+            cache.delete(key)
+
+
+listen(ActionUsers, 'after_insert', removed_or_inserted_action)
+listen(ActionUsers, 'after_delete', removed_or_inserted_action)
+listen(ActionUsers.action, 'set', changed_action_action)
+listen(ActionUsers.user, 'set', changed_owner_action)
+
+listen(ActionRoles, 'after_insert', removed_or_inserted_action)
+listen(ActionRoles, 'after_delete', removed_or_inserted_action)
+listen(ActionRoles.action, 'set', changed_action_action)
+listen(ActionRoles.role, 'set', changed_owner_action)

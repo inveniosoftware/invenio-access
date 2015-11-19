@@ -77,6 +77,11 @@ Dynamic permissions represent needs associated with ``ActionNeed`` or
 `'action'`. This consequently means that if the action is not attached to
 any user or role then it is **allowed** by default.
 
+The permissions are loaded from the database the first time you perform
+```needs``` or ```excludes``` in the DynamicPermission object and they are
+stored in the instance of DynamicPermission affected to be used in future
+calls.
+
 Action Needs
 ~~~~~~~~~~~~
 

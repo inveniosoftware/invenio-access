@@ -42,10 +42,11 @@ current_access = LocalProxy(
 class _AccessState(object):
     """Access state storing registered actions."""
 
-    def __init__(self, app, entry_point_group=None):
+    def __init__(self, app, entry_point_group=None, cache=None):
         """Initialize state."""
         self.app = app
         self.actions = {}
+        self.cache = cache
         if entry_point_group:
             self.load_entry_point_group(entry_point_group)
 
@@ -72,7 +73,8 @@ class InvenioAccess(object):
                  **kwargs):
         """Flask application initialization."""
         app.cli.add_command(access_cli, 'access')
-        state = _AccessState(app, entry_point_group=entry_point_group)
+        state = _AccessState(app, entry_point_group=entry_point_group,
+                             cache=kwargs.get('cache'))
         app.extensions['invenio-access'] = state
         return state
 

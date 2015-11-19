@@ -29,10 +29,11 @@ from __future__ import absolute_import, print_function
 
 from flask_principal import ActionNeed, RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
+from invenio_db import db
 
+from invenio_access import InvenioAccess
 from invenio_access.models import ActionRoles, ActionUsers
 from invenio_access.permissions import DynamicPermission
-from invenio_db import db
 
 
 class FakeIdentity(object):
@@ -43,6 +44,7 @@ class FakeIdentity(object):
 
 def test_invenio_access_permissions_deny(app):
     """User without any provides can't access to a place limited to user 0"""
+    InvenioAccess(app)
     with app.test_request_context():
         permission = DynamicPermission(UserNeed(0))
 
@@ -52,6 +54,7 @@ def test_invenio_access_permissions_deny(app):
 
 def test_invenio_access_permission_for_users(app):
     """User can access to an action allowed/denied to the user"""
+    InvenioAccess(app)
     with app.test_request_context():
         db.session.begin(nested=True)
         user_can_all = User(email='all@invenio-software.org')
@@ -88,7 +91,8 @@ def test_invenio_access_permission_for_users(app):
 
 def test_invenio_access_permission_for_roles(app):
     """User with a role can access to an action allowed to the role"""
-    with app.app_context():
+    InvenioAccess(app)
+    with app.test_request_context():
         admin_role = Role(name='admin')
         reader_role = Role(name='reader')
         opener_role = Role(name='opener')
