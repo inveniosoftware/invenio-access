@@ -25,6 +25,33 @@
 API Docs
 ========
 
-invenio_access
---------------
+.. automodule:: invenio_access.ext
+   :members:
+   :undoc-members:
 
+Permissions
+-----------
+
+.. automodule:: invenio_access.permissions
+   :members:
+   :undoc-members:
+
+.. autodata:: invenio_access.permissions.ParameterizedActionNeed
+
+Models
+------
+
+.. automodule:: invenio_access.models
+   :members:
+
+CLI
+---
+
+.. automodule:: invenio_access.cli
+   :members:
+
+.. autodata:: invenio_access.cli.allow_action
+
+.. autodata:: invenio_access.cli.deny_action
+
+.. autodata:: invenio_access.cli.list_actions

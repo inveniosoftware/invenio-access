@@ -47,6 +47,26 @@ class ActionNeedMixin(object):
     """String value of action argument."""
 
     @classmethod
+    def create(cls, action, **kwargs):
+        """Create new database instance from action need."""
+        assert action.method == 'action'
+        return cls(
+            action=action.value,
+            argument=getattr(action, 'argument', None),
+            **kwargs
+        )
+
+    @classmethod
+    def allow(cls, action, **kwargs):
+        """Allow given action need."""
+        return cls.create(action, exclude=False, **kwargs)
+
+    @classmethod
+    def deny(cls, action, **kwargs):
+        """Deny usage of given action need."""
+        return cls.create(action, exclude=True, **kwargs)
+
+    @classmethod
     def query_by_action(cls, action):
         """Prepare query object with filtered action."""
         query = cls.query.filter_by(action=action.value)

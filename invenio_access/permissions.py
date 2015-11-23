@@ -22,7 +22,12 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Invenio module for permissions control."""
+"""Invenio module for advanced permission control.
+
+Dynamic permission control is a core feature of *Invenio-Access*
+package.  It allows administrator to fine-tune access to various
+actions with parameters to a specific user or role.
+"""
 
 from functools import partial
 from collections import namedtuple
@@ -36,14 +41,29 @@ _Need = namedtuple('Need', ['method', 'value', 'argument'])
 ParameterizedActionNeed = partial(_Need, 'action')
 
 ParameterizedActionNeed.__doc__ = \
-    """A need with the method preset to `"action"` with parameter."""
+    """A need with the method preset to `"action"` with parameter.
+
+    If it is called with `argument=None` then this need is equivalent
+    to ``ActionNeed``.
+    """
 
 
 class DynamicPermission(Permission):
-    """Utility class providing lazy loading of permissions."""
+    """Utility class providing lazy loading of permissions.
+
+    .. warning::
+
+        If ``ActionNeed`` or ``ParameterizedActionNeed`` is not allowed or
+        restricted to any user or role then it is **ALLOWED** to anybody.
+        This is a major diference to standard ``Permission`` class.
+
+    """
 
     NEEDS = False
+    """Key value for associated role and user needs."""
+
     EXCLUDES = True
+    """Key value for excluded role and user needs."""
 
     def __init__(self, *needs):
         """Default constructor."""
