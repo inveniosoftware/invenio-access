@@ -36,7 +36,7 @@ from invenio_accounts import InvenioAccounts
 from mock import patch
 from pkg_resources import EntryPoint
 
-from invenio_access import InvenioAccess
+from invenio_access import InvenioAccess, current_access
 from invenio_db import InvenioDB
 
 
@@ -48,7 +48,7 @@ class MockEntryPoint(EntryPoint):
         return ActionNeed(self.name)
 
 
-def _mock_entry_points(name):
+def _mock_entry_points(group=None):
     """Mocking funtion of entrypoints."""
     data = {
         'invenio_access.actions': [MockEntryPoint('open',
@@ -56,7 +56,7 @@ def _mock_entry_points(name):
                                    MockEntryPoint('close',
                                                   'demo.actions')],
     }
-    names = data.keys() if name is None else [name]
+    names = data.keys() if group is None else [group]
     for key in names:
         for entry_point in data[key]:
             yield entry_point
@@ -99,11 +99,12 @@ def test_actions():
     Mail(app)
     InvenioDB(app)
     InvenioAccounts(app)
-    ext = InvenioAccess()
-    ext.register_action(ActionNeed('action_a'))
-    assert len(ext.actions) == 1
-    ext.register_action(ActionNeed('action_b'))
-    assert len(ext.actions) == 2
+    InvenioAccess(app)
+    with app.app_context():
+        current_access.register_action(ActionNeed('action_a'))
+        assert len(current_access.actions) == 1
+        current_access.register_action(ActionNeed('action_b'))
+        assert len(current_access.actions) == 2
 
 
 @patch('pkg_resources.iter_entry_points', _mock_entry_points)
@@ -113,5 +114,5 @@ def test_actions_entrypoint():
     FlaskCLI(app)
     ext = InvenioAccess(app)
     assert len(ext.actions) == 2
-    assert ActionNeed('open') in ext.actions
-    assert ActionNeed('close') in ext.actions
+    assert ActionNeed('open') in ext.actions.values()
+    assert ActionNeed('close') in ext.actions.values()

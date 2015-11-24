@@ -36,9 +36,10 @@ from flask_babelex import Babel
 from flask_cli import FlaskCLI, ScriptInfo
 from flask_mail import Mail
 from invenio_accounts import InvenioAccounts
+from invenio_db import InvenioDB, db
 
 from invenio_access import InvenioAccess
-from invenio_db import InvenioDB, db
+from invenio_access.permissions import ParameterizedActionNeed
 
 
 @pytest.fixture()
@@ -73,17 +74,24 @@ def app(request):
 @pytest.fixture()
 def script_info(request):
     """Get ScriptInfo object for testing CLI."""
+    action_open = ActionNeed('open')
+    action_edit = ParameterizedActionNeed('edit', None)
+
     app_ = app(request)
-    InvenioAccess(app_)
+    ext = InvenioAccess(app_)
+    ext.register_action(action_open)
+    ext.register_action(action_edit)
     return ScriptInfo(create_app=lambda info: app_)
 
 
 @pytest.fixture()
 def script_info_cli_list(request):
     """Get ScriptInfo object for testing CLI list command."""
+    action_open = ActionNeed('open')
+    action_edit = ParameterizedActionNeed('edit', None)
     app_ = app(request)
-    access = InvenioAccess(app_)
-    access.register_action(ActionNeed('open'))
-    access.register_action(ActionNeed('read'))
+    ext = InvenioAccess(app_)
+    ext.register_action(action_open)
+    ext.register_action(action_edit)
 
     return ScriptInfo(create_app=lambda info: app_)

@@ -38,7 +38,7 @@ from invenio_db import db
 class FakeIdentity(object):
     """Fake class to test DynamicPermission."""
     def __init__(self, *provides):
-        self.provides = provides
+        self.provides = set(provides)
 
 
 def test_invenio_access_permissions_deny(app):
@@ -53,6 +53,7 @@ def test_invenio_access_permissions_deny(app):
 def test_invenio_access_permission_for_users(app):
     """User can access to an action allowed/denied to the user"""
     with app.test_request_context():
+        db.session.begin(nested=True)
         user_can_all = User(email='all@invenio-software.org')
         user_can_read = User(email='read@invenio-software.org')
         user_can_open = User(email='open@invenio-software.org')
@@ -66,8 +67,7 @@ def test_invenio_access_permission_for_users(app):
 
         db.session.add(ActionUsers(action='read', user=user_can_all))
         db.session.add(ActionUsers(action='read', user=user_can_read))
-
-        db.session.flush()
+        db.session.commit()
 
         permission_open = DynamicPermission(ActionNeed('open'))
         permission_read = DynamicPermission(ActionNeed('read'))
@@ -88,7 +88,7 @@ def test_invenio_access_permission_for_users(app):
 
 def test_invenio_access_permission_for_roles(app):
     """User with a role can access to an action allowed to the role"""
-    with app.test_request_context():
+    with app.app_context():
         admin_role = Role(name='admin')
         reader_role = Role(name='reader')
         opener_role = Role(name='opener')
@@ -103,8 +103,9 @@ def test_invenio_access_permission_for_roles(app):
         db.session.add(ActionRoles(action='read', role=admin_role))
         db.session.add(ActionRoles(action='read', role=reader_role))
 
-        db.session.flush()
+        db.session.commit()
 
+    with app.app_context():
         permission_open = DynamicPermission(ActionNeed('open'))
         permission_read = DynamicPermission(ActionNeed('read'))
 

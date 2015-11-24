@@ -113,7 +113,7 @@ def test_access_cli_list(script_info_cli_list):
         obj=script_info_cli_list
     )
     assert result.exit_code == 0
-    assert result.output.find("\nopen\n") != -1
+    assert result.output.find("open") != -1
 
 
 def test_access_matrix(script_info_cli_list):
@@ -245,3 +245,61 @@ def test_access_matrix(script_info_cli_list):
             for can, actions in permissions.items():
                 for action in actions:
                     assert action.allows(identity) == can
+
+    result = runner.invoke(
+        access,
+        ['remove', 'edit'],
+        obj=script_info
+    )
+    assert result.exit_code == 2
+
+    result = runner.invoke(
+        access,
+        ['show', '-e', 'admin-edit@invenio-software.org'],
+        obj=script_info
+    )
+    assert result.exit_code == 0
+    assert 'user:admin-edit@invenio-software.org:edit::deny' in result.output
+
+    result = runner.invoke(
+        access,
+        ['show', '-r', 'editor'],
+        obj=script_info
+    )
+    assert 'role:editor:edit::allow\n' == result.output
+    assert result.exit_code == 0
+
+    #
+    # Remove all permissions.
+    #
+    for action, roles in action_roles.items():
+
+        result = runner.invoke(
+            access,
+            ['remove', action] + list(role_args(roles)),
+            obj=script_info
+            )
+        assert result.exit_code == 0
+
+    result = runner.invoke(
+        access,
+        ['remove', 'edit', '-e', 'admin-edit@invenio-software.org'],
+        obj=script_info
+    )
+    assert result.exit_code == 0
+
+    result = runner.invoke(
+        access,
+        ['remove', 'edit', '-a', '1', '-e', 'info@invenio-software.org'],
+        obj=script_info
+    )
+    assert result.exit_code == 0
+
+    # All authorizations should be removed.
+    result = runner.invoke(
+        access,
+        ['show', '-r', 'admin-edit@invenio-software.org'],
+        obj=script_info
+    )
+    assert result.exit_code == 0
+    assert result.output == ''

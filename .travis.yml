@@ -38,15 +38,15 @@ services:
   - postgresql
 
 env:
-  - REQUIREMENTS=lowest SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
-  - REQUIREMENTS=lowest SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
-  - REQUIREMENTS=lowest SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
-  - REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
-  - REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
-  - REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
-  - REQUIREMENTS=devel SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
-  - REQUIREMENTS=devel SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
-  - REQUIREMENTS=devel SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
+  - REQUIREMENTS=lowest EXTRAS=all SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
+  - REQUIREMENTS=lowest EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
+  - REQUIREMENTS=lowest EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
+  - REQUIREMENTS=release EXTRAS=all SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
+  - REQUIREMENTS=release EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
+  - REQUIREMENTS=release EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
+  - REQUIREMENTS=devel EXTRAS=all SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
+  - REQUIREMENTS=devel EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
+  - REQUIREMENTS=devel EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
 
 python:
   - "2.7"
@@ -65,7 +65,7 @@ before_install:
 
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
-  - "travis_retry pip install -e .[all]"
+  - "travis_retry pip install -e .[${EXTRAS}]"
 
 script:
   - "./run-tests.sh"

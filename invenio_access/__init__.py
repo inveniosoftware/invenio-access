@@ -140,12 +140,13 @@ True
 
 from __future__ import absolute_import, print_function
 
-from .ext import InvenioAccess
+from .ext import InvenioAccess, current_access
 from .version import __version__
 from .permissions import DynamicPermission, ParameterizedActionNeed
 
 __all__ = (
     '__version__',
+    'current_access',
     'DynamicPermission',
     'InvenioAccess',
     'ParameterizedActionNeed',

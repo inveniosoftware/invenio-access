@@ -26,9 +26,38 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import current_app
 import pkg_resources
+from werkzeug.local import LocalProxy
 
 from .cli import access as access_cli
+
+
+current_access = LocalProxy(
+    lambda: current_app.extensions['invenio-access']
+)
+"""Helper proxy to access state object."""
+
+
+class _AccessState(object):
+    """Access state storing registered actions."""
+
+    def __init__(self, app, entry_point_group=None):
+        """Initialize state."""
+        self.app = app
+        self.actions = {}
+        if entry_point_group:
+            self.load_entry_point_group(entry_point_group)
+
+    def register_action(self, action):
+        """Register an action to be showed in the actions list."""
+        assert action.value not in self.actions
+        self.actions[action.value] = action
+
+    def load_entry_point_group(self, entry_point_group):
+        """Load actions from an entry point group."""
+        for ep in pkg_resources.iter_entry_points(group=entry_point_group):
+            self.register_action(ep.load())
 
 
 class InvenioAccess(object):
@@ -36,23 +65,17 @@ class InvenioAccess(object):
 
     def __init__(self, app=None, **kwargs):
         """Extension initialization."""
-        self.actions = set()
-        self.kwargs = kwargs
         if app:
-            self.init_app(app, **kwargs)
+            self._state = self.init_app(app, **kwargs)
 
     def init_app(self, app, entry_point_group='invenio_access.actions',
                  **kwargs):
         """Flask application initialization."""
-        self.kwargs.update(kwargs)
         app.cli.add_command(access_cli, 'access')
-        app.extensions['invenio-access'] = self
+        state = _AccessState(app, entry_point_group=entry_point_group)
+        app.extensions['invenio-access'] = state
+        return state
 
-        if entry_point_group:
-            for base_entry in pkg_resources.iter_entry_points(
-                    entry_point_group):
-                self.register_action(base_entry.load())
-
-    def register_action(self, action):
-        """Register an action to be showed in the actions list."""
-        self.actions.add(action)
+    def __getattr__(self, name):
+        """Proxy to state object."""
+        return getattr(self._state, name, None)

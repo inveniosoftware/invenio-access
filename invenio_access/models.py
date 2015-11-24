@@ -27,32 +27,36 @@
 from __future__ import absolute_import, print_function
 
 from flask_principal import RoleNeed, UserNeed
-
 from invenio_accounts.models import Role, User
-
 from invenio_db import db
+from sqlalchemy import UniqueConstraint
 
 
 class ActionNeedMixin(object):
     """Define common attributes for Action needs."""
 
-    action = db.Column(db.String(80), primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    """Primary key to support nullable fields."""
+
+    action = db.Column(db.String(80), index=True)
     """Name of the action."""
 
-    exclude = db.Column(db.Boolean(), nullable=False, default=False,
-                        server_default="0")
+    exclude = db.Column(db.Boolean(), nullable=False,
+                        default=False, server_default="0")
     """Deny associated objects."""
 
-    argument = db.Column(db.String(255), nullable=True)
+    argument = db.Column(db.String(255), nullable=True, index=True)
     """String value of action argument."""
 
     @classmethod
     def create(cls, action, **kwargs):
         """Create new database instance from action need."""
         assert action.method == 'action'
+        argument = kwargs.pop('argument', None) or getattr(
+            action, 'argument', None)
         return cls(
             action=action.value,
-            argument=getattr(action, 'argument', None),
+            argument=argument,
             **kwargs
         )
 
@@ -67,12 +71,13 @@ class ActionNeedMixin(object):
         return cls.create(action, exclude=True, **kwargs)
 
     @classmethod
-    def query_by_action(cls, action):
+    def query_by_action(cls, action, argument=None):
         """Prepare query object with filtered action."""
         query = cls.query.filter_by(action=action.value)
-        if getattr(action, 'argument', None) is not None:
+        argument = argument or getattr(action, 'argument', None)
+        if argument is not None:
             query = query.filter(db.or_(
-                cls.argument == str(action.argument),
+                cls.argument == str(argument),
                 cls.argument.is_(None),
             ))
         else:
@@ -93,8 +98,12 @@ class ActionUsers(ActionNeedMixin, db.Model):
 
     __tablename__ = 'access_actionsusers'
 
-    user_id = db.Column(db.Integer(), db.ForeignKey(User.id),
-                        primary_key=True)
+    __table_args__ = (UniqueConstraint(
+        'action', 'exclude', 'argument', 'user_id',
+        name='access_actionsusers_unique'),
+    )
+
+    user_id = db.Column(db.Integer(), db.ForeignKey(User.id))
 
     user = db.relationship("User")
 
@@ -112,8 +121,12 @@ class ActionRoles(ActionNeedMixin, db.Model):
 
     __tablename__ = 'access_actionsroles'
 
-    role_id = db.Column(db.Integer(), db.ForeignKey(Role.id),
-                        primary_key=True)
+    __table_args__ = (UniqueConstraint(
+        'action', 'exclude', 'argument', 'role_id',
+        name='access_actionsroles_unique'),
+    )
+
+    role_id = db.Column(db.Integer(), db.ForeignKey(Role.id))
 
     role = db.relationship("Role")
 

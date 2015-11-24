@@ -50,25 +50,25 @@ extras_require = {
         "Sphinx>=1.3",
     ],
     'mysql': [
-        'pymysql>=0.6.7',
+        'invenio-db[mysql]>=1.0.0a5',
     ],
     'postgresql': [
-        'psycopg2>=2.6.1',
+        'invenio-db[postgresql]>=1.0.0a5',
     ],
     'tests': tests_require,
 }
 
 extras_require['all'] = []
-for reqs in extras_require.values():
+for name, reqs in extras_require.items():
+    if name.endswith('sql'):
+        continue
     extras_require['all'].extend(reqs)
 
 setup_requires = [
-    'invenio_db>=1.0.0a5'
 ]
 
 install_requires = [
-    'invenio-db>=1.0.0a5',
-    'invenio-accounts>=1.0.0a2'
+    'invenio-accounts>=1.0.0a4',
 ]
 
 packages = find_packages()
