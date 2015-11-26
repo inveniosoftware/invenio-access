@@ -34,13 +34,14 @@ from invenio_accounts.models import Role, User
 from invenio_db import db
 from werkzeug.contrib.cache import RedisCache, SimpleCache
 
-from invenio_access import InvenioAccess
+from invenio_access import InvenioAccess, current_access
 from invenio_access.models import ActionRoles, ActionUsers
 from invenio_access.permissions import DynamicPermission
 
 
 class FakeIdentity(object):
     """Fake class to test DynamicPermission."""
+
     def __init__(self, *provides):
         self.provides = provides
 
@@ -65,23 +66,21 @@ def test_invenio_access_permission_cache(app):
         identity_open = FakeIdentity(UserNeed(user_can_open.id))
 
         assert not permission_open.allows(identity_open)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1)]),
+            set([])
+        )
 
         db.session.add(ActionUsers(action='open', user=user_can_open))
         db.session.flush()
 
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_open)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
 
 
 def test_invenio_access_permission_cache_redis(app):
@@ -103,23 +102,21 @@ def test_invenio_access_permission_cache_redis(app):
 
         permission_open = DynamicPermission(ActionNeed('open'))
         assert not permission_open.allows(identity_open)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1)]),
+            set([])
+        )
 
         db.session.add(ActionUsers(action='open', user=user_can_open))
         db.session.flush()
 
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_open)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
 
 
 def test_intenio_access_cache_performance(app):
@@ -243,60 +240,53 @@ def test_invenio_access_permission_cache_users_updates(app):
         # this object.
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_user_1)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1)]),
+            set([])
+        )
 
         # Test if user 4 can write. In this case, the cache should have this
         # new object and the previous one (Open is allowed to user_1)
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_user_4)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='id', value=4)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='id', value=4)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1)]),
+            set([])
+        )
 
         # If we add a new user to the action open, the open action in cache
         # should be removed but it should still containing the write entry.
         db.session.add(ActionUsers(action='open', user=user_2))
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.open")
+        assert current_access.get_action_cache('open') is None
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_user_2)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='id', value=4)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='id', value=4)]),
+            set([])
+        )
 
         # Test if the new user is added to the action 'open'
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_user_4)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='id', value=4)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='id', value=4)]),
+            set([])
+        )
 
         # If we update an action swapping a user, the cache containing the
         # action, should be removed.
@@ -305,31 +295,27 @@ def test_invenio_access_permission_cache_users_updates(app):
             ActionUsers.user == user_4).first()
         user_4_action_write.user = user_3
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.write")
-        assert cache.has("DynamicPermission.action.open")
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') is None
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
 
         # Test if the user_3 can now write.
         permission_write = DynamicPermission(ActionNeed('write'))
         assert not permission_write.allows(identity_user_4)
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_user_3)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='id', value=3)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='id', value=3)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
 
         # If we remove a user from an action, the cache should clear the
         # action item.
@@ -338,72 +324,65 @@ def test_invenio_access_permission_cache_users_updates(app):
             ActionUsers.user == user_3).first()
         db.session.delete(user_3_action_write)
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.write")
+        assert current_access.get_action_cache('write') is None
         # If no one is allowed to perform an action then everybody is allowed.
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_user_3)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([]),
+            set([])
+        )
         db.session.add(ActionUsers(action='write', user=user_5))
         db.session.flush()
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_user_5)
         permission_write = DynamicPermission(ActionNeed('write'))
         assert not permission_write.allows(identity_user_3)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='id', value=5)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='id', value=5)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
 
         # If you update the name of an existing action, the previous action
         # and the new action should be remove from cache.
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_user_5)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='id', value=5)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='id', value=5)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
         user_5_action_write = ActionUsers.query.filter(
             ActionUsers.action == 'write' and
             ActionUsers.user == user_5).first()
         user_5_action_write.action = 'open'
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.write")
-        assert not cache.has("DynamicPermission.action.open")
+        assert current_access.get_action_cache('write') is None
+        assert current_access.get_action_cache('open') is None
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_user_1)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='id', value=1),
-                        Need(method='id', value=2),
-                        Need(method='id', value=5)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2),
+                 Need(method='id', value=5)]),
+            set([])
+        )
         db.session.add(ActionUsers(action='write', user=user_4))
         permission_write = DynamicPermission(ActionNeed('write'))
         assert not permission_write.allows(identity_user_5)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='id', value=4)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='id', value=4)]),
+            set([])
+        )
 
 
 def test_invenio_access_permission_cache_roles_updates(app):
@@ -441,60 +420,53 @@ def test_invenio_access_permission_cache_roles_updates(app):
         # this object.
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_fake_role_1)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name)]),
+            set([])
+        )
 
         # Test if role 4 can write. In this case, the cache should have this
         # new object and the previous one (Open is allowed to role_1)
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_fake_role_4)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='role', value=role_4.name)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='role', value=role_4.name)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name)]),
+            set([])
+        )
 
         # If we add a new role to the action open, the open action in cache
         # should be removed but it should still containing the write entry.
         db.session.add(ActionRoles(action='open', role=role_2))
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.open")
+        assert current_access.get_action_cache('open') is None
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_fake_role_2)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name),
-                        Need(method='role', value=role_2.name)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='role', value=role_4.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name)]),
+            set([])
+        )
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='role', value=role_4.name)]),
+            set([])
+        )
 
         # Test if the new role is added to the action 'open'
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_fake_role_4)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name),
-                        Need(method='role', value=role_2.name)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='role', value=role_4.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name)]),
+            set([])
+        )
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='role', value=role_4.name)]),
+            set([])
+        )
 
         # If we update an action swapping a role, the cache containing the
         # action, should be removed.
@@ -503,31 +475,28 @@ def test_invenio_access_permission_cache_roles_updates(app):
             ActionRoles.role == role_4).first()
         role_4_action_write.role = role_3
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.write")
-        assert cache.has("DynamicPermission.action.open")
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name),
-                        Need(method='role', value=role_2.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') is None
+        assert current_access.get_action_cache('open') is not None
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name)]),
+            set([])
+        )
 
         # Test if the role_3 can write now.
         permission_write = DynamicPermission(ActionNeed('write'))
         assert not permission_write.allows(identity_fake_role_4)
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_fake_role_3)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='role', value=role_3.name)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name),
-                        Need(method='role', value=role_2.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='role', value=role_3.name)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name)]),
+            set([])
+        )
 
         # If we remove a role from an action, the cache should clear the
         # action item.
@@ -536,69 +505,62 @@ def test_invenio_access_permission_cache_roles_updates(app):
             ActionRoles.role == role_3).first()
         db.session.delete(role_3_action_write)
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.write")
+        assert current_access.get_action_cache('write') is None
         # If no one is allowed to perform an action then everybody is allowed.
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_fake_role_3)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([]),
+            set([])
+        )
         db.session.add(ActionRoles(action='write', role=role_5))
         db.session.flush()
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_fake_role_5)
         permission_write = DynamicPermission(ActionNeed('write'))
         assert not permission_write.allows(identity_fake_role_3)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='role', value=role_5.name)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name),
-                        Need(method='role', value=role_2.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='role', value=role_5.name)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name)]),
+            set([])
+        )
 
         # If you update the name of an existing action, the previous action
         # and the new action should be remove from cache.
         permission_write = DynamicPermission(ActionNeed('write'))
         assert permission_write.allows(identity_fake_role_5)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='role', value=role_5.name)]),
-            True: set([])
-        }
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name),
-                        Need(method='role', value=role_2.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='role', value=role_5.name)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name)]),
+            set([])
+        )
         role_5_action_write = ActionRoles.query.filter(
             ActionRoles.action == 'write' and
             ActionRoles.role == role_5).first()
         role_5_action_write.action = 'open'
         db.session.flush()
-        assert not cache.has("DynamicPermission.action.write")
-        assert not cache.has("DynamicPermission.action.open")
+        assert current_access.get_action_cache('write') is None
+        assert current_access.get_action_cache('open') is None
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_fake_role_1)
-        assert cache.get(
-            "DynamicPermission.action.open") == {
-            False: set([Need(method='role', value=role_1.name),
-                        Need(method='role', value=role_2.name),
-                        Need(method='role', value=role_5.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name),
+                 Need(method='role', value=role_5.name)]),
+            set([])
+        )
         db.session.add(ActionRoles(action='write', role=role_4))
         permission_write = DynamicPermission(ActionNeed('write'))
         assert not permission_write.allows(identity_fake_role_5)
-        assert cache.get(
-            "DynamicPermission.action.write") == {
-            False: set([Need(method='role', value=role_4.name)]),
-            True: set([])
-        }
+        assert current_access.get_action_cache('write') == (
+            set([Need(method='role', value=role_4.name)]),
+            set([])
+        )

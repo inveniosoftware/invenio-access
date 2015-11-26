@@ -145,9 +145,10 @@ True
 
 from __future__ import absolute_import, print_function
 
-from .ext import InvenioAccess, current_access
-from .version import __version__
+from .ext import InvenioAccess
 from .permissions import DynamicPermission, ParameterizedActionNeed
+from .proxies import current_access
+from .version import __version__
 
 __all__ = (
     '__version__',

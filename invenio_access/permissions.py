@@ -31,11 +31,12 @@ actions with parameters to a specific user or role.
 
 from collections import namedtuple
 from functools import partial
+from itertools import chain
 
-from flask import current_app
 from flask_principal import Permission
 
-from invenio_access.models import ActionRoles, ActionUsers
+from .models import ActionRoles, ActionUsers
+from .proxies import current_access
 
 _Need = namedtuple('Need', ['method', 'value', 'argument'])
 
@@ -49,6 +50,15 @@ ParameterizedActionNeed.__doc__ = \
     """
 
 
+class _P(namedtuple('Permission', ['needs', 'excludes'])):
+    """Helper for simple permission updates."""
+
+    def update(self, permission):
+        """In-place update of permissions."""
+        self.needs.update(permission.needs)
+        self.excludes.update(permission.excludes)
+
+
 class DynamicPermission(Permission):
     """Utility class providing lazy loading of permissions.
 
@@ -60,12 +70,6 @@ class DynamicPermission(Permission):
 
     """
 
-    NEEDS = False
-    """Key value for associated role and user needs."""
-
-    EXCLUDES = True
-    """Key value for excluded role and user needs."""
-
     def __init__(self, *needs):
         """Default constructor."""
         self._permissions = None
@@ -73,57 +77,39 @@ class DynamicPermission(Permission):
 
     def _load_permissions(self):
         """Load permissions associated to actions."""
-        result = {
-            False: set(),
-            True: set(),
-        }
+        result = _P(needs=set(), excludes=set())
 
         for explicit_need in self.explicit_needs:
             if explicit_need.method == 'action':
-                cache = getattr(current_app.extensions['invenio-access'],
-                                'cache')
-                if cache:
-                    cache_key = 'DynamicPermission.action.{0}'.format(
-                        explicit_need.value)
-                    cached_result = cache.get(cache_key)
-                    if cached_result:
-                        result[True] |= cached_result[True]
-                        result[False] |= cached_result[False]
-                        continue
+                action = current_access.get_action_cache(
+                    explicit_need.value
+                )
+                if action is None:
+                    action = _P(needs=set(), excludes=set())
 
-                action = {
-                    False: set(),
-                    True: set(),
-                }
+                    actionsusers = ActionUsers.query_by_action(
+                        explicit_need
+                    ).all()
 
-                actionsusers = ActionUsers.query_by_action(
-                    explicit_need
-                ).all()
+                    actionsroles = ActionRoles.query_by_action(
+                        explicit_need
+                    ).join(
+                        ActionRoles.role
+                    ).all()
 
-                for actionuser in actionsusers:
-                    action[actionuser.exclude].add(
-                        actionuser.need
+                    for db_action in chain(actionsusers, actionsroles):
+                        if db_action.exclude:
+                            action.excludes.add(db_action.need)
+                        else:
+                            action.needs.add(db_action.need)
+
+                    current_access.set_action_cache(
+                        explicit_need.value, action
                     )
-
-                actionsroles = ActionRoles.query_by_action(
-                    explicit_need
-                ).join(
-                    ActionRoles.role
-                ).all()
-
-                for actionrole in actionsroles:
-                    action[actionrole.exclude].add(
-                        actionrole.need
-                    )
-
-                result[True] |= action[True]
-                result[False] |= action[False]
-
-                if cache:
-                    cache.set(cache_key, action)
-
+                # in-place update of results
+                result.update(action)
             else:
-                result[self.NEEDS].add(explicit_need)
+                result.needs.add(explicit_need)
         self._permissions = result
 
     @property
@@ -135,7 +121,7 @@ class DynamicPermission(Permission):
         """
         if not self._permissions:
             self._load_permissions()
-        return self._permissions[self.NEEDS]
+        return self._permissions.needs
 
     @property
     def excludes(self):
@@ -146,4 +132,4 @@ class DynamicPermission(Permission):
         """
         if not self._permissions:
             self._load_permissions()  # pragma: no cover
-        return self._permissions[self.EXCLUDES]
+        return self._permissions.excludes

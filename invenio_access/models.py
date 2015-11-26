@@ -26,12 +26,13 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import current_app
 from flask_principal import RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.event import listen
+
+from .proxies import current_access
 
 
 class ActionNeedMixin(object):
@@ -140,8 +141,7 @@ class ActionRoles(ActionNeedMixin, db.Model):
 
 def removed_or_inserted_action(mapper, connection, target):
     """Remove the action from cache when an item is inserted or deleted."""
-    del mapper, connection
-    remove_cache_item(target.action)
+    current_access.delete_action_cache(target.action)
 
 
 def changed_action_action(target, value, oldvalue, initiator):
@@ -150,9 +150,8 @@ def changed_action_action(target, value, oldvalue, initiator):
     Remove the action from cache when ActionRoles.action or ActionUsers.action
     is updated.
     """
-    del target, initiator
-    remove_cache_item(value)
-    remove_cache_item(oldvalue)
+    current_access.delete_action_cache(value)
+    current_access.delete_action_cache(oldvalue)
 
 
 def changed_owner_action(target, value, oldvalue, initiator):
@@ -161,17 +160,7 @@ def changed_owner_action(target, value, oldvalue, initiator):
     Remove the action from cache when ActionRoles.role or ActionUsers.user
     is updated.
     """
-    del value, oldvalue, initiator
-    remove_cache_item(target.action)
-
-
-def remove_cache_item(action):
-    """Remove the action from cache."""
-    cache = current_app.extensions['invenio-access'].cache
-    if cache:
-        key = 'DynamicPermission.action.{0}'.format(action)
-        if cache.has(key):
-            cache.delete(key)
+    current_access.delete_action_cache(target.action)
 
 
 listen(ActionUsers, 'after_insert', removed_or_inserted_action)

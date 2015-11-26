@@ -26,17 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import current_app
 import pkg_resources
-from werkzeug.local import LocalProxy
 
 from .cli import access as access_cli
-
-
-current_access = LocalProxy(
-    lambda: current_app.extensions['invenio-access']
-)
-"""Helper proxy to access state object."""
 
 
 class _AccessState(object):
@@ -49,6 +41,32 @@ class _AccessState(object):
         self.cache = cache
         if entry_point_group:
             self.load_entry_point_group(entry_point_group)
+
+    def set_action_cache(self, action_name, data):
+        """Store action needs and excludes."""
+        if self.cache:
+            self.cache.set(
+                self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
+                str(action_name), data
+            )
+
+    def get_action_cache(self, action_name):
+        """Get action needs and excludes from cache."""
+        data = None
+        if self.cache:
+            data = self.cache.get(
+                self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
+                str(action_name)
+            )
+        return data
+
+    def delete_action_cache(self, action_name):
+        """Delete action needs and excludes from cache."""
+        if self.cache:
+            self.cache.delete(
+                self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
+                str(action_name)
+            )
 
     def register_action(self, action):
         """Register an action to be showed in the actions list."""
@@ -72,11 +90,17 @@ class InvenioAccess(object):
     def init_app(self, app, entry_point_group='invenio_access.actions',
                  **kwargs):
         """Flask application initialization."""
+        self.init_config(app)
         app.cli.add_command(access_cli, 'access')
         state = _AccessState(app, entry_point_group=entry_point_group,
                              cache=kwargs.get('cache'))
         app.extensions['invenio-access'] = state
         return state
+
+    def init_config(self, app):
+        """Initialize configuration."""
+        app.config.setdefault('ACCESS_ACTION_CACHE_PREFIX',
+                              'DynamicPermission::action::')
 
     def __getattr__(self, name):
         """Proxy to state object."""
