@@ -2,7 +2,7 @@
  Invenio-Access v1.0.0
 =======================
 
-Invenio-Access v1.0.0 was released on November 12, 2015.
+Invenio-Access v1.0.0 was released on November 30, 2015.
 
 About
 -----
