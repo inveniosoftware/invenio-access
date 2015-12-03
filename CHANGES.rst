@@ -23,7 +23,7 @@
 
 Changes
 =======
-Version 1.0.0 (released 2015-11-30)
+Version 1.0.0 (released 2015-12-04)
 -----------------------------------
 
 - Major incompatible rewrite.
