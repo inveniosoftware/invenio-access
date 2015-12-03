@@ -57,12 +57,15 @@ extras_require = {
     'postgresql': [
         'invenio-db[postgresql]>=1.0.0a5',
     ],
+    'sqlite': [
+        'invenio-db>=1.0.0a5',
+    ],
     'tests': tests_require,
 }
 
 extras_require['all'] = []
 for name, reqs in extras_require.items():
-    if name.endswith('sql'):
+    if name in ('sqlite', 'mysql', 'postgresql'):
         continue
     extras_require['all'].extend(reqs)
 
@@ -70,7 +73,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'invenio-accounts>=1.0.0a4',
+    'flask-cli>=0.2.1',
+    'invenio-accounts>=1.0.0a6',
 ]
 
 packages = find_packages()

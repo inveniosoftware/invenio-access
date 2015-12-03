@@ -117,7 +117,7 @@ def index():
     for action in access.actions:
         actions[action.value] = DynamicPermission(action).allows(identity)
 
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return render_template("invenio_access/open.html",
                                actions=actions,
                                identity=identity)

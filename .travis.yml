@@ -39,13 +39,13 @@ services:
   - redis-server
 
 env:
-  - REQUIREMENTS=lowest EXTRAS=all SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
+  - REQUIREMENTS=lowest EXTRAS=all,sqlite SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
   - REQUIREMENTS=lowest EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
   - REQUIREMENTS=lowest EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
-  - REQUIREMENTS=release EXTRAS=all SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
+  - REQUIREMENTS=release EXTRAS=all,sqlite SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
   - REQUIREMENTS=release EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
   - REQUIREMENTS=release EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
-  - REQUIREMENTS=devel EXTRAS=all SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
+  - REQUIREMENTS=devel EXTRAS=all,sqlite SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
   - REQUIREMENTS=devel EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/travis"
   - REQUIREMENTS=devel EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/travis"
 
