@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -33,11 +33,11 @@ from flask_cli import FlaskCLI
 from flask_mail import Mail
 from flask_principal import ActionNeed
 from invenio_accounts import InvenioAccounts
+from invenio_db import InvenioDB
 from mock import patch
 from pkg_resources import EntryPoint
 
 from invenio_access import InvenioAccess, current_access
-from invenio_db import InvenioDB
 
 
 class MockEntryPoint(EntryPoint):
@@ -99,7 +99,7 @@ def test_actions():
     Mail(app)
     InvenioDB(app)
     InvenioAccounts(app)
-    InvenioAccess(app)
+    InvenioAccess(app, entry_point_group=None)
     with app.app_context():
         current_access.register_action(ActionNeed('action_a'))
         assert len(current_access.actions) == 1
