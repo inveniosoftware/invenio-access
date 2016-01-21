@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -32,12 +32,11 @@ from flask import g
 from flask_principal import ActionNeed
 from flask_security.core import _security
 from flask_security.utils import login_user
-from invenio_accounts.cli import roles_create, roles_add, users_create
+from invenio_accounts.cli import roles_add, roles_create, users_create
 
 from invenio_access.cli import access
-from invenio_access.permissions import (
-    DynamicPermission, ParameterizedActionNeed
-)
+from invenio_access.permissions import DynamicPermission, \
+    ParameterizedActionNeed
 
 
 def test_access_cli_allow_action_empty(script_info):
@@ -77,7 +76,7 @@ def test_access_cli_allow_action_user(script_info):
     # User creation
     result = runner.invoke(
         users_create,
-        ['-e', 'a@example.org', '--password', '123456'],
+        ['a@example.org', '--password', '123456'],
         obj=script_info
     )
     assert result.exit_code == 0
@@ -93,7 +92,7 @@ def test_access_cli_allow_action_role(script_info):
     # Role creation
     result = runner.invoke(
         roles_create,
-        ['-n', 'open_role'],
+        ['open_role'],
         obj=script_info)
     assert result.exit_code == 0
 
@@ -101,7 +100,7 @@ def test_access_cli_allow_action_role(script_info):
         access,
         ['allow', 'open', '-r', 'open_role'],
         obj=script_info
-        )
+    )
     assert result.exit_code == 0
 
 
@@ -137,14 +136,14 @@ def test_access_matrix(script_info_cli_list):
     for role in {role for roles in user_roles.values() for role in roles}:
         # Role creation
         result = runner.invoke(
-            roles_create, ['-n', role], obj=script_info
+            roles_create, [role], obj=script_info
         )
         assert result.exit_code == 0
 
     for email, roles in user_roles.items():
         result = runner.invoke(
             users_create,
-            ['-e', email, '--password', '123456', '-a'],
+            [email, '--password', '123456', '-a'],
             obj=script_info
         )
         assert result.exit_code == 0
@@ -152,7 +151,7 @@ def test_access_matrix(script_info_cli_list):
         for role in roles:
             # Role creation
             result = runner.invoke(
-                roles_add, ['-r', role, '-u', email], obj=script_info
+                roles_add, [email, role], obj=script_info
             )
             assert result.exit_code == 0
 
@@ -168,7 +167,7 @@ def test_access_matrix(script_info_cli_list):
             access,
             ['allow', action] + list(role_args(roles)),
             obj=script_info
-            )
+        )
         assert result.exit_code == 0
 
     result = runner.invoke(
@@ -278,7 +277,7 @@ def test_access_matrix(script_info_cli_list):
             access,
             ['remove', action] + list(role_args(roles)),
             obj=script_info
-            )
+        )
         assert result.exit_code == 0
 
     result = runner.invoke(

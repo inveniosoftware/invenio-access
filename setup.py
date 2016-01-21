@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -48,6 +48,9 @@ tests_require = [
 ]
 
 extras_require = {
+    'admin': [
+        'invenio-admin>=1.0.0a2',
+    ],
     'docs': [
         "Sphinx>=1.3",
     ],
@@ -74,7 +77,7 @@ setup_requires = [
 
 install_requires = [
     'flask-cli>=0.2.1',
-    'invenio-accounts>=1.0.0a6',
+    'invenio-accounts>=1.0.0a8',
 ]
 
 packages = find_packages()
@@ -134,6 +137,12 @@ setup(
     include_package_data=True,
     platforms='any',
     entry_points={
+        'invenio_admin.views': [
+            'invenio_access_action_users = '
+            'invenio_access.admin:action_users_adminview',
+            'invenio_access_action_roles = '
+            'invenio_access.admin:action_roles_adminview',
+        ],
         'invenio_base.apps': [
             'invenio_access = invenio_access:InvenioAccess',
         ],

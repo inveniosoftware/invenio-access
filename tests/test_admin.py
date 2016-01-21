@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,14 +22,25 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Helper proxy to the state object."""
-
-from __future__ import absolute_import, print_function
+"""Test for admin view."""
 
 from flask import current_app
+from invenio_accounts import InvenioAccounts
 from werkzeug.local import LocalProxy
 
-current_access = LocalProxy(
-    lambda: current_app.extensions['invenio-access']
+from invenio_access.admin import action_roles_adminview, action_users_adminview
+
+_datastore = LocalProxy(
+    lambda: current_app.extensions['security'].datastore
 )
-"""Helper proxy to access state object."""
+
+
+def test_admin(app):
+    """Test flask-admin interace."""
+    assert isinstance(action_roles_adminview, dict)
+    assert isinstance(action_users_adminview, dict)
+
+    assert 'model' in action_roles_adminview
+    assert 'modelview' in action_roles_adminview
+    assert 'model' in action_users_adminview
+    assert 'modelview' in action_users_adminview
