@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -84,10 +84,10 @@ from flask_mail import Mail
 from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint
+from invenio_db import InvenioDB
 
 from invenio_access import InvenioAccess
 from invenio_access.permissions import DynamicPermission
-from invenio_db import InvenioDB
 
 # Create Flask application
 app = Flask(__name__)
