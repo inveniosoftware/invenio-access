@@ -23,7 +23,7 @@
 
 Changes
 =======
-Version 1.0.0a4 (released 2016-02-28)
+Version 1.0.0a5 (released 2016-04-26)
 -------------------------------------
 
 - Major incompatible rewrite.
