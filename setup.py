@@ -146,6 +146,9 @@ setup(
         'invenio_base.apps': [
             'invenio_access = invenio_access:InvenioAccess',
         ],
+        'invenio_base.api_apps': [
+            'invenio_access = invenio_access:InvenioAccess',
+        ],
     },
     extras_require=extras_require,
     install_requires=install_requires,
