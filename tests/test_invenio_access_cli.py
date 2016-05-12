@@ -92,15 +92,7 @@ def test_any_all_global(script_info):
     """Test any/all/global subcommands."""
     runner = CliRunner()
 
-    result = runner.invoke(access, ['allow', 'open', 'any'],
-                           obj=script_info)
-    assert result.exit_code == 0
-
     result = runner.invoke(access, ['remove', 'open', 'global'],
-                           obj=script_info)
-    assert result.exit_code == 0
-
-    result = runner.invoke(access, ['deny', 'open', 'all'],
                            obj=script_info)
     assert result.exit_code == 0
 
