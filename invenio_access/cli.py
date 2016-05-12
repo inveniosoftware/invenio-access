@@ -119,14 +119,6 @@ def allow_action(action, argument):
     """Allow action."""
 
 
-@allow_action.command('any')
-def allow_any():
-    """Allow any user."""
-    def processor(action, argument):
-        db.session.add(ActionUsers.allow(action, argument=argument))
-    return processor
-
-
 @allow_action.command('user')
 @argument_user
 def allow_user(user):
@@ -166,14 +158,6 @@ def process_allow_action(processors, action, argument):
 @option_argument
 def deny_action(action, argument):
     """Deny actions."""
-
-
-@deny_action.command('all')
-def deny_any():
-    """Deny all users."""
-    def processor(action, argument):
-        db.session.add(ActionUsers.deny(action, argument=argument))
-    return processor
 
 
 @deny_action.command('user')

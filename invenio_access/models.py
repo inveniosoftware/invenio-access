@@ -122,7 +122,7 @@ class ActionNeedMixin(object):
 
 
 class ActionUsers(ActionNeedMixin, db.Model):
-    """ActionRoles data model.
+    """ActionUsers data model.
 
     It relates an allowed action with a user.
     """
@@ -136,7 +136,7 @@ class ActionUsers(ActionNeedMixin, db.Model):
 
     user_id = db.Column(db.Integer(),
                         db.ForeignKey(User.id, ondelete='CASCADE'),
-                        nullable=True, index=True)
+                        nullable=False, index=True)
 
     user = db.relationship("User",
                            backref=db.backref("actionusers",
