@@ -52,7 +52,7 @@ extras_require = {
         'invenio-admin>=1.0.0a2',
     ],
     'docs': [
-        "Sphinx>=1.3",
+        'Sphinx>=1.4',
     ],
     'mysql': [
         'invenio-db[mysql]>=1.0.0a5',
