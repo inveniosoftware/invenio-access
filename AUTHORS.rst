@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015 CERN.
+    Copyright (C) 2015, 2016 CERN.
 
     Invenio is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -65,6 +65,7 @@ Invenio module for common role based access control.
 - Radoslav Ivanov <radoslav.ivanov@cern.ch>
 - Raquel Jimenez Encinar <raquel.jimenez.encinar@cern.ch>
 - Roman Chyla <roman.chyla@cern.ch>
+- Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
 - Samuele Kaplun <samuele.kaplun@cern.ch>
 - Theodoropoulos Theodoros <theod@lib.auth.gr>
 - Thomas Baron <thomas.baron@cern.ch>

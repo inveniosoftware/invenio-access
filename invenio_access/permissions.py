@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -33,7 +33,7 @@ from collections import namedtuple
 from functools import partial
 from itertools import chain
 
-from flask_principal import Permission
+from flask_principal import ActionNeed, Permission
 
 from .models import ActionRoles, ActionUsers
 from .proxies import current_access
@@ -48,6 +48,12 @@ ParameterizedActionNeed.__doc__ = \
     If it is called with `argument=None` then this need is equivalent
     to ``ActionNeed``.
     """
+
+superuser_access = ActionNeed('superuser-access')
+"""SuperUser access allows access to everything on Invenio.
+
+DynamicPermissions handles allowing access to SuperUser.
+"""
 
 
 class _P(namedtuple('Permission', ['needs', 'excludes'])):
@@ -74,6 +80,7 @@ class DynamicPermission(Permission):
         """Default constructor."""
         self._permissions = None
         self.explicit_needs = set(needs)
+        self.explicit_needs.add(superuser_access)
 
     def _load_permissions(self):
         """Load permissions associated to actions."""

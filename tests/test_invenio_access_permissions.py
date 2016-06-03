@@ -58,13 +58,17 @@ def test_invenio_access_permission_for_users(app):
     InvenioAccess(app)
     with app.test_request_context():
         db.session.begin(nested=True)
+        superuser = User(email='superuser@invenio-software.org')
         user_can_all = User(email='all@invenio-software.org')
         user_can_read = User(email='read@invenio-software.org')
         user_can_open = User(email='open@invenio-software.org')
 
+        db.session.add(superuser)
         db.session.add(user_can_all)
         db.session.add(user_can_read)
         db.session.add(user_can_open)
+
+        db.session.add(ActionUsers(action='superuser-access', user=superuser))
 
         db.session.add(ActionUsers(action='open', user=user_can_all))
         db.session.add(ActionUsers(action='open', user=user_can_open))
@@ -76,9 +80,13 @@ def test_invenio_access_permission_for_users(app):
         permission_open = DynamicPermission(ActionNeed('open'))
         permission_read = DynamicPermission(ActionNeed('read'))
 
+        identity_superuser = FakeIdentity(UserNeed(superuser.id))
         identity_all = FakeIdentity(UserNeed(user_can_all.id))
         identity_read = FakeIdentity(UserNeed(user_can_read.id))
         identity_open = FakeIdentity(UserNeed(user_can_open.id))
+
+        assert permission_open.allows(identity_superuser)
+        assert permission_read.allows(identity_superuser)
 
         assert permission_open.allows(identity_all)
         assert permission_read.allows(identity_all)
@@ -94,13 +102,18 @@ def test_invenio_access_permission_for_roles(app):
     """User with a role can access to an action allowed to the role"""
     InvenioAccess(app)
     with app.test_request_context():
+        superuser_role = Role(name='superuser')
         admin_role = Role(name='admin')
         reader_role = Role(name='reader')
         opener_role = Role(name='opener')
 
+        db.session.add(superuser_role)
         db.session.add(admin_role)
         db.session.add(reader_role)
         db.session.add(opener_role)
+
+        db.session.add(
+            ActionRoles(action='superuser-access', role=superuser_role))
 
         db.session.add(ActionRoles(action='open', role=admin_role))
         db.session.add(ActionRoles(action='open', role=opener_role))
@@ -114,9 +127,13 @@ def test_invenio_access_permission_for_roles(app):
         permission_open = DynamicPermission(ActionNeed('open'))
         permission_read = DynamicPermission(ActionNeed('read'))
 
+        identity_superuser = FakeIdentity(RoleNeed('superuser'))
         identity_all = FakeIdentity(RoleNeed('admin'))
         identity_read = FakeIdentity(RoleNeed('reader'))
         identity_open = FakeIdentity(RoleNeed('opener'))
+
+        assert permission_open.allows(identity_superuser)
+        assert permission_read.allows(identity_superuser)
 
         assert permission_open.allows(identity_all)
         assert permission_read.allows(identity_all)
