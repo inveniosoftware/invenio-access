@@ -1,8 +1,8 @@
 =========================
- Invenio-Access v1.0.0a6
+ Invenio-Access v1.0.0a7
 =========================
 
-Invenio-Access v1.0.0a6 was released on June 13, 2016.
+Invenio-Access v1.0.0a7 was released on June 14, 2016.
 
 About
 -----
@@ -14,15 +14,12 @@ Invenio module for common role based access control.
 What's new
 ----------
 
-- Adds 'superuser_access' action. This grants access to all permissions
-  checked through DynamicPermissions. Note that granting
-  'superuser_access' will make every DynamicPermission deny access by
-  default.
+- Registers the 'superuser_access' action through an entrypoint.
 
 Installation
 ------------
 
-   $ pip install invenio-access==1.0.0a6
+   $ pip install invenio-access==1.0.0a7
 
 Documentation
 -------------
