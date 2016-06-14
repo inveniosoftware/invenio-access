@@ -143,6 +143,10 @@ setup(
             'invenio_access_action_roles = '
             'invenio_access.admin:action_roles_adminview',
         ],
+        'invenio_access.actions': [
+            'invenio_access.actions = '
+            'invenio_access.permissions:superuser_access',
+        ],
         'invenio_base.apps': [
             'invenio_access = invenio_access:InvenioAccess',
         ],
