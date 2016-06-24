@@ -33,13 +33,17 @@ import pytest
 from flask import Flask
 from flask.ext.principal import ActionNeed
 from flask_babelex import Babel
-from flask_cli import FlaskCLI, ScriptInfo
 from flask_mail import Mail
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
 
 from invenio_access import InvenioAccess
 from invenio_access.permissions import ParameterizedActionNeed
+
+try:
+    from flask.cli import ScriptInfo
+except ImportError:
+    from flask_cli import ScriptInfo
 
 
 @pytest.fixture()
@@ -54,7 +58,9 @@ def app(request):
             'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
         TESTING=True,
     )
-    FlaskCLI(app)
+    if not hasattr(app, 'cli'):
+        from flask_cli import FlaskCLI
+        FlaskCLI(app)
     Babel(app)
     Mail(app)
     InvenioDB(app)

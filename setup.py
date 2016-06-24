@@ -76,7 +76,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'flask-cli>=0.2.1',
+    'Flask>=0.10.1',
+    'Flask-CLI>=0.2.1',
     'invenio-accounts>=1.0.0a8',
 ]
 

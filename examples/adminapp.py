@@ -30,23 +30,24 @@ Create database and tables:
 .. code-block:: console
 
    $ cd examples
-   $ flask -a adminapp.py db init
-   $ flask -a adminapp.py db create
+   $ export FLASK_APP=app.py
+   $ flask db init
+   $ flask db create
 
 Create some users:
 
 .. code-block:: console
 
-   $ flask -a adminapp.py users create info@invenio-software.org -a
-   $ flask -a adminapp.py users create reader@invenio-software.org -a
-   $ flask -a adminapp.py users create editor@invenio-software.org -a
-   $ flask -a adminapp.py users create admin@invenio-software.org -a
+   $ flask users create info@invenio-software.org -a
+   $ flask users create reader@invenio-software.org -a
+   $ flask users create editor@invenio-software.org -a
+   $ flask users create admin@invenio-software.org -a
 
 Run the development server:
 
 .. code-block:: console
 
-   $ flask -a adminapp.py run
+   $ flask run
 
 """
 
@@ -55,7 +56,6 @@ from __future__ import absolute_import, print_function
 from flask import Flask
 from flask_admin import Admin
 from flask_babelex import Babel
-from flask_cli import FlaskCLI
 from flask_mail import Mail
 from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
@@ -67,7 +67,9 @@ from invenio_access import InvenioAccess
 
 app = Flask(__name__)
 app.secret_key = 'ExampleApp'
-FlaskCLI(app)
+if not hasattr(app, 'cli'):
+    from flask_cli import FlaskCLI
+    FlaskCLI(app)
 Babel(app)
 Mail(app)
 Menu(app)

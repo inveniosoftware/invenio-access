@@ -30,42 +30,43 @@ Create database and tables:
 .. code-block:: console
 
    $ cd examples
-   $ flask -a app.py db init
-   $ flask -a app.py db create
+   $ export FLASK_APP=app.py
+   $ flask db init
+   $ flask db create
 
 Create some users:
 
 .. code-block:: console
 
-   $ flask -a app.py users create -e info@invenio-software.org -a
-   $ flask -a app.py users create -e reader@invenio-software.org -a
-   $ flask -a app.py users create -e editor@invenio-software.org -a
-   $ flask -a app.py users create -e admin@invenio-software.org -a
+   $ flask users create -e info@invenio-software.org -a
+   $ flask users create -e reader@invenio-software.org -a
+   $ flask users create -e editor@invenio-software.org -a
+   $ flask users create -e admin@invenio-software.org -a
 
 Add a role to a user:
 
 .. code-block:: console
 
-   $ flask -a app.py roles create -n admin
-   $ flask -a app.py roles add -u info@invenio-software.org -r admin
-   $ flask -a app.py roles add -u admin@invenio-software.org -r admin
+   $ flask roles create -n admin
+   $ flask roles add -u info@invenio-software.org -r admin
+   $ flask roles add -u admin@invenio-software.org -r admin
 
 Assign some allowed actions to this users:
 
 .. code-block:: console
 
-   $ flask -a app.py access allow open -e editor@invenio-software.org
-   $ flask -a app.py access deny open -e info@invenio-software.org
-   $ flask -a app.py access allow read -e reader@invenio-software.org
-   $ flask -a app.py access allow open -r admin
-   $ flask -a app.py access allow read -r admin
+   $ flask access allow open -e editor@invenio-software.org
+   $ flask access deny open -e info@invenio-software.org
+   $ flask access allow read -e reader@invenio-software.org
+   $ flask access allow open -r admin
+   $ flask access allow read -r admin
 
 
 Run the development server:
 
 .. code-block:: console
 
-   $ flask -a app.py run
+   $ flask run
 
 If you are using an action in your app which does not have any role or user
 assigned, the action will be allowed to perform by everyone (Anonymous users
@@ -76,9 +77,8 @@ included).
 from __future__ import absolute_import, print_function
 
 from flask import Flask, g, render_template
-from flask.ext.principal import ActionNeed, RoleNeed
+from flask_principal import ActionNeed, RoleNeed
 from flask_babelex import Babel
-from flask_cli import FlaskCLI
 from flask_login import current_user
 from flask_mail import Mail
 from flask_menu import Menu
@@ -92,7 +92,9 @@ from invenio_access.permissions import DynamicPermission
 # Create Flask application
 app = Flask(__name__)
 app.secret_key = 'ExampleApp'
-FlaskCLI(app)
+if not hasattr(app, 'cli'):
+    from flask_cli import FlaskCLI
+    FlaskCLI(app)
 Babel(app)
 Mail(app)
 Menu(app)

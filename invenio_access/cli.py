@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -28,12 +28,16 @@ from __future__ import absolute_import, print_function
 
 import click
 from flask import current_app
-from flask_cli import with_appcontext
 from invenio_accounts.models import Role, User
 from invenio_db import db
 from werkzeug.local import LocalProxy
 
 from .models import ActionRoles, ActionUsers
+
+try:
+    from flask.cli import with_appcontext
+except ImportError:  # pragma: no cover
+    from flask_cli import with_appcontext
 
 _current_actions = LocalProxy(
     lambda: current_app.extensions['invenio-access'].actions

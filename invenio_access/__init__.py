@@ -38,13 +38,14 @@ Initialization
 --------------
 
 First create a Flask application (Flask-CLI is not needed for Flask
-version 1.0+):
+version 0.11+):
 
 >>> from flask import Flask
->>> from flask_cli import FlaskCLI
 >>> app = Flask('myapp')
 >>> app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
->>> ext_cli = FlaskCLI(app)
+>>> if not hasattr(app, 'cli'):
+...     from flask_cli import FlaskCLI
+...     cli = FlaskCLI(app)
 
 You initialize Access like a normal Flask extension, however Invenio-Access is
 dependent on Invenio-DB and Invenio-Accounts so first you need to initialize
