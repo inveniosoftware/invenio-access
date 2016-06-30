@@ -58,10 +58,10 @@ def test_invenio_access_permission_for_users(app):
     InvenioAccess(app)
     with app.test_request_context():
         db.session.begin(nested=True)
-        superuser = User(email='superuser@invenio-software.org')
-        user_can_all = User(email='all@invenio-software.org')
-        user_can_read = User(email='read@invenio-software.org')
-        user_can_open = User(email='open@invenio-software.org')
+        superuser = User(email='superuser@inveniosoftware.org')
+        user_can_all = User(email='all@inveniosoftware.org')
+        user_can_read = User(email='read@inveniosoftware.org')
+        user_can_open = User(email='open@inveniosoftware.org')
 
         db.session.add(superuser)
         db.session.add(user_can_all)

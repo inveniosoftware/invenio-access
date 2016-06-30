@@ -51,8 +51,8 @@ def test_invenio_access_permission_cache(app):
     cache = SimpleCache()
     InvenioAccess(app, cache=cache)
     with app.test_request_context():
-        user_can_all = User(email='all@invenio-software.org')
-        user_can_open = User(email='open@invenio-software.org')
+        user_can_all = User(email='all@inveniosoftware.org')
+        user_can_open = User(email='open@inveniosoftware.org')
 
         db.session.add(user_can_all)
         db.session.add(user_can_open)
@@ -88,8 +88,8 @@ def test_invenio_access_permission_cache_redis(app):
     cache = RedisCache()
     InvenioAccess(app, cache=cache)
     with app.test_request_context():
-        user_can_all = User(email='all@invenio-software.org')
-        user_can_open = User(email='open@invenio-software.org')
+        user_can_all = User(email='all@inveniosoftware.org')
+        user_can_open = User(email='open@inveniosoftware.org')
 
         db.session.add(user_can_all)
         db.session.add(user_can_open)
@@ -149,7 +149,7 @@ def test_intenio_access_cache_performance(app):
         users = []
         for i in range(users_number):
             user = User(
-                email='invenio{0}@invenio-software.org'.format(str(i)),
+                email='invenio{0}@inveniosoftware.org'.format(str(i)),
                 roles=[roles[i % actions_roles_number]])
             users.append(user)
             db.session.add(user)
@@ -212,11 +212,11 @@ def test_invenio_access_permission_cache_users_updates(app):
     InvenioAccess(app, cache=cache)
     with app.test_request_context():
         # Creation of some data to test.
-        user_1 = User(email='user_1@invenio-software.org')
-        user_2 = User(email='user_2@invenio-software.org')
-        user_3 = User(email='user_3@invenio-software.org')
-        user_4 = User(email='user_4@invenio-software.org')
-        user_5 = User(email='user_5@invenio-software.org')
+        user_1 = User(email='user_1@inveniosoftware.org')
+        user_2 = User(email='user_2@inveniosoftware.org')
+        user_3 = User(email='user_3@inveniosoftware.org')
+        user_4 = User(email='user_4@inveniosoftware.org')
+        user_5 = User(email='user_5@inveniosoftware.org')
 
         db.session.add(user_1)
         db.session.add(user_2)

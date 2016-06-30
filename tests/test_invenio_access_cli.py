@@ -121,11 +121,11 @@ def test_access_matrix(script_info_cli_list):
     runner = CliRunner()
 
     user_roles = {
-        'admin@invenio-software.org': ['admin'],
-        'admin-edit@invenio-software.org': ['admin'],
-        'open@invenio-software.org': ['opener'],
-        'edit@invenio-software.org': ['editor'],
-        'info@invenio-software.org': ['opener'],
+        'admin@inveniosoftware.org': ['admin'],
+        'admin-edit@inveniosoftware.org': ['admin'],
+        'open@inveniosoftware.org': ['opener'],
+        'edit@inveniosoftware.org': ['editor'],
+        'info@inveniosoftware.org': ['opener'],
     }
 
     action_roles = {
@@ -172,14 +172,14 @@ def test_access_matrix(script_info_cli_list):
 
     result = runner.invoke(
         access,
-        ['deny', 'edit', '-e', 'admin-edit@invenio-software.org'],
+        ['deny', 'edit', '-e', 'admin-edit@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
 
     result = runner.invoke(
         access,
-        ['allow', 'edit', '-a', '1', '-e', 'info@invenio-software.org'],
+        ['allow', 'edit', '-a', '1', '-e', 'info@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
@@ -191,7 +191,7 @@ def test_access_matrix(script_info_cli_list):
     permission_edit_2 = DynamicPermission(ParameterizedActionNeed('edit', 2))
 
     user_permissions = {
-        'admin@invenio-software.org': {
+        'admin@inveniosoftware.org': {
             True: [
                 permission_open,
                 permission_edit,
@@ -199,7 +199,7 @@ def test_access_matrix(script_info_cli_list):
                 permission_edit_2,
             ],
         },
-        'admin-edit@invenio-software.org': {
+        'admin-edit@inveniosoftware.org': {
             True: [permission_open],
             False: [
                 permission_edit,
@@ -207,7 +207,7 @@ def test_access_matrix(script_info_cli_list):
                 permission_edit_2,
             ],
         },
-        'open@invenio-software.org': {
+        'open@inveniosoftware.org': {
             True: [permission_open],
             False: [
                 permission_edit,
@@ -215,7 +215,7 @@ def test_access_matrix(script_info_cli_list):
                 permission_edit_2,
             ],
         },
-        'edit@invenio-software.org': {
+        'edit@inveniosoftware.org': {
             True: [
                 permission_edit,
                 permission_edit_1,
@@ -223,7 +223,7 @@ def test_access_matrix(script_info_cli_list):
             ],
             False: [permission_open],
         },
-        'info@invenio-software.org': {
+        'info@inveniosoftware.org': {
             True: [
                 permission_open,
                 permission_edit_1,
@@ -254,11 +254,11 @@ def test_access_matrix(script_info_cli_list):
 
     result = runner.invoke(
         access,
-        ['show', '-e', 'admin-edit@invenio-software.org'],
+        ['show', '-e', 'admin-edit@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
-    assert 'user:admin-edit@invenio-software.org:edit::deny' in result.output
+    assert 'user:admin-edit@inveniosoftware.org:edit::deny' in result.output
 
     result = runner.invoke(
         access,
@@ -282,14 +282,14 @@ def test_access_matrix(script_info_cli_list):
 
     result = runner.invoke(
         access,
-        ['remove', 'edit', '-e', 'admin-edit@invenio-software.org'],
+        ['remove', 'edit', '-e', 'admin-edit@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
 
     result = runner.invoke(
         access,
-        ['remove', 'edit', '-a', '1', '-e', 'info@invenio-software.org'],
+        ['remove', 'edit', '-a', '1', '-e', 'info@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
@@ -297,7 +297,7 @@ def test_access_matrix(script_info_cli_list):
     # All authorizations should be removed.
     result = runner.invoke(
         access,
-        ['show', '-r', 'admin-edit@invenio-software.org'],
+        ['show', '-r', 'admin-edit@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0

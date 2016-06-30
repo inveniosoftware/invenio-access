@@ -118,8 +118,8 @@ some users and roles in your database.
 
 >>> from invenio_db import db
 >>> from invenio_accounts.models import User, Role
->>> admin = User(email='admin@invenio-software.org')
->>> student = User(email='student@invenio-software.org')
+>>> admin = User(email='admin@inveniosoftware.org')
+>>> student = User(email='student@inveniosoftware.org')
 >>> db.session.begin(nested=True)
 <sqlalchemy.orm.session.SessionTransaction object ...
 >>> db.session.add(admin)

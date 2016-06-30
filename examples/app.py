@@ -38,26 +38,26 @@ Create some users:
 
 .. code-block:: console
 
-   $ flask users create info@invenio-software.org -a
-   $ flask users create reader@invenio-software.org -a
-   $ flask users create editor@invenio-software.org -a
-   $ flask users create admin@invenio-software.org -a
+   $ flask users create info@inveniosoftware.org -a
+   $ flask users create reader@inveniosoftware.org -a
+   $ flask users create editor@inveniosoftware.org -a
+   $ flask users create admin@inveniosoftware.org -a
 
 Add a role to a user:
 
 .. code-block:: console
 
    $ flask roles create -n admin
-   $ flask roles add -u info@invenio-software.org -r admin
-   $ flask roles add -u admin@invenio-software.org -r admin
+   $ flask roles add -u info@inveniosoftware.org -r admin
+   $ flask roles add -u admin@inveniosoftware.org -r admin
 
 Assign some allowed actions to this users:
 
 .. code-block:: console
 
-   $ flask access allow open -e editor@invenio-software.org
-   $ flask access deny open -e info@invenio-software.org
-   $ flask access allow read -e reader@invenio-software.org
+   $ flask access allow open -e editor@inveniosoftware.org
+   $ flask access deny open -e info@inveniosoftware.org
+   $ flask access allow read -e reader@inveniosoftware.org
    $ flask access allow open -r admin
    $ flask access allow read -r admin
 

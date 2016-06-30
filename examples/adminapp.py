@@ -38,10 +38,10 @@ Create some users:
 
 .. code-block:: console
 
-   $ flask users create info@invenio-software.org -a
-   $ flask users create reader@invenio-software.org -a
-   $ flask users create editor@invenio-software.org -a
-   $ flask users create admin@invenio-software.org -a
+   $ flask users create info@inveniosoftware.org -a
+   $ flask users create reader@inveniosoftware.org -a
+   $ flask users create editor@inveniosoftware.org -a
+   $ flask users create admin@inveniosoftware.org -a
 
 Run the development server:
 
