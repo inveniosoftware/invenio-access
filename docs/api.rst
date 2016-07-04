@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015 CERN.
+    Copyright (C) 2015, 2016 CERN.
 
     Invenio is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -26,6 +26,13 @@ API Docs
 ========
 
 .. automodule:: invenio_access.ext
+   :members:
+   :undoc-members:
+
+Configuration
+-------------
+
+.. automodule:: invenio_access.config
    :members:
    :undoc-members:
 

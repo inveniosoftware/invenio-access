@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -27,7 +27,10 @@
 from __future__ import absolute_import, print_function
 
 import pkg_resources
+import six
+from werkzeug.utils import cached_property, import_string
 
+from . import config
 from .cli import access as access_cli
 
 
@@ -38,9 +41,16 @@ class _AccessState(object):
         """Initialize state."""
         self.app = app
         self.actions = {}
-        self.cache = cache
+        self._cache = cache
         if entry_point_group:
             self.load_entry_point_group(entry_point_group)
+
+    @cached_property
+    def cache(self):
+        """Return a cache instance."""
+        cache = self._cache or self.app.config.get('ACCESS_CACHE')
+        return import_string(cache) if isinstance(cache, six.string_types) \
+            else cache
 
     def set_action_cache(self, action_name, data):
         """Store action needs and excludes."""
@@ -99,8 +109,9 @@ class InvenioAccess(object):
 
     def init_config(self, app):
         """Initialize configuration."""
-        app.config.setdefault('ACCESS_ACTION_CACHE_PREFIX',
-                              'DynamicPermission::action::')
+        for k in dir(config):
+            if k.startswith('ACCESS_'):
+                app.config.setdefault(k, getattr(config, k))
 
     def __getattr__(self, name):
         """Proxy to state object."""
