@@ -23,26 +23,8 @@
 
 Changes
 =======
-Version 1.0.0a7 (released 2016-06-14)
--------------------------------------
 
-Bug fixes
-~~~~~~~~~~~~~~~~~
-
-- Registers the 'superuser_access' action through an entrypoint.
-
-Version 1.0.0a6 (released 2016-06-13)
--------------------------------------
-
-New features
-~~~~~~~~~~~~
-
-- Adds 'superuser_access' action. This grants access to all permissions
-  checked through DynamicPermissions. Note that granting
-  'superuser_access' will make every DynamicPermission deny access by
-  default.
-
-Version 1.0.0a5 (released 2016-04-26)
+Version 1.0.0a8 (released 2016-07-04)
 -------------------------------------
 
 - Major incompatible rewrite.
