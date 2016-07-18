@@ -142,6 +142,44 @@ False
 >>> admin_identity.can(permission_index)
 True
 
+How to discover existing actions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Modules that intend to implement a given set of actions can register them in
+entry points in the corresponding `setup.py`, e.g.
+
+.. code-block:: python
+
+    entry_points={
+        'invenio_access.actions': [
+            'records_read_all'
+            ' = invenio_records.permissions:records_read_all',
+            'records_create_all'
+            ' = invenio_records.permissions:records_create_all',
+            'records_update_all'
+            ' = invenio_records.permissions:records_update_all',
+            'records_delete_all'
+            ' = invenio_records.permissions:records_delete_all',
+        ],
+    }
+
+In order to discover which actions are available in a given installation one
+can retrieve them via:
+
+>>> sorted(app.extensions['invenio-access'].actions.keys())
+['admin-access', 'superuser-access']
+
+One can also use CLI to discover registered actions. Here's an example:
+
+.. code-block:: console
+
+    $ cd examples
+    $ export FLASK_APP=app.py
+    $ flask access list
+    read:
+    open:
+    admin-access:
+    superuser-access:
 """
 
 from __future__ import absolute_import, print_function
