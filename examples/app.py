@@ -31,6 +31,7 @@ Create database and tables:
 
    $ cd examples
    $ export FLASK_APP=app.py
+   $ mkdir instance
    $ flask db init
    $ flask db create
 
