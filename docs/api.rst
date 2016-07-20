@@ -27,21 +27,18 @@ API Docs
 
 .. automodule:: invenio_access.ext
    :members:
-   :undoc-members:
 
 Configuration
 -------------
 
 .. automodule:: invenio_access.config
    :members:
-   :undoc-members:
 
 Permissions
 -----------
 
 .. automodule:: invenio_access.permissions
    :members:
-   :undoc-members:
 
 .. autodata:: invenio_access.permissions.ParameterizedActionNeed
 
