@@ -28,16 +28,12 @@ from __future__ import absolute_import, print_function
 
 import click
 from flask import current_app
+from flask.cli import with_appcontext
 from invenio_accounts.models import Role, User
 from invenio_db import db
 from werkzeug.local import LocalProxy
 
 from .models import ActionRoles, ActionUsers
-
-try:
-    from flask.cli import with_appcontext
-except ImportError:  # pragma: no cover
-    from flask_cli import with_appcontext
 
 _current_actions = LocalProxy(
     lambda: current_app.extensions['invenio-access'].actions

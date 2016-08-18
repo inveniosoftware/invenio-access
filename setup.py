@@ -54,13 +54,13 @@ extras_require = {
         'Sphinx>=1.4.2',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0a5',
+        'invenio-db[mysql]>=1.0.0b1',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0a5',
+        'invenio-db[postgresql]>=1.0.0b1',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0a5',
+        'invenio-db>=1.0.0b1',
     ],
     'tests': tests_require,
 }
@@ -76,9 +76,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'Flask>=0.10.1',
-    'Flask-CLI>=0.2.1',
-    'invenio-accounts>=1.0.0a8',
+    'Flask>=0.11.1',
+    'invenio-accounts>=1.0.0a13',
     'six>=1.10',
 ]
 

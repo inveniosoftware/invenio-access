@@ -70,9 +70,6 @@ def test_version():
 def test_init():
     """Test extension initialization."""
     app = Flask('testapp')
-    if not hasattr(app, 'cli'):
-        from flask_cli import FlaskCLI
-        FlaskCLI(app)
     Babel(app)
     Mail(app)
     InvenioDB(app)
@@ -81,9 +78,6 @@ def test_init():
     assert 'invenio-access' in app.extensions
 
     app = Flask('testapp')
-    if not hasattr(app, 'cli'):
-        from flask_cli import FlaskCLI
-        FlaskCLI(app)
     Babel(app)
     Mail(app)
     InvenioDB(app)
@@ -97,9 +91,6 @@ def test_init():
 def test_actions():
     """Test if the actions are registered properly."""
     app = Flask('testapp')
-    if not hasattr(app, 'cli'):
-        from flask_cli import FlaskCLI
-        FlaskCLI(app)
     Babel(app)
     Mail(app)
     InvenioDB(app)
@@ -116,9 +107,6 @@ def test_actions():
 def test_actions_entrypoint():
     """Test if the entrypoint is registering actions properly."""
     app = Flask('testapp')
-    if not hasattr(app, 'cli'):
-        from flask_cli import FlaskCLI
-        FlaskCLI(app)
     ext = InvenioAccess(app)
     assert len(ext.actions) == 2
     assert ActionNeed('open') in ext.actions.values()

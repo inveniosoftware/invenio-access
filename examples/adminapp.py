@@ -67,9 +67,6 @@ from invenio_access import InvenioAccess
 
 app = Flask(__name__)
 app.secret_key = 'ExampleApp'
-if not hasattr(app, 'cli'):
-    from flask_cli import FlaskCLI
-    FlaskCLI(app)
 Babel(app)
 Mail(app)
 Menu(app)
