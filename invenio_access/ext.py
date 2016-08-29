@@ -38,7 +38,13 @@ class _AccessState(object):
     """Access state storing registered actions."""
 
     def __init__(self, app, entry_point_group=None, cache=None):
-        """Initialize state."""
+        """Initialize state.
+
+        :param app: The Flask application.
+        :param entry_point_group: The entrypoint for extensions.
+            (Default: ``None``)
+        :param cache: The cache system. (Default: ``None``)
+        """
         self.app = app
         self.actions = {}
         self._cache = cache
@@ -53,7 +59,13 @@ class _AccessState(object):
             else cache
 
     def set_action_cache(self, action_name, data):
-        """Store action needs and excludes."""
+        """Store action needs and excludes.
+
+        .. note:: The action is saved only if a cache system is defined.
+
+        :param action_name: The unique action name.
+        :param data: The action to be saved.
+        """
         if self.cache:
             self.cache.set(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
@@ -61,7 +73,13 @@ class _AccessState(object):
             )
 
     def get_action_cache(self, action_name):
-        """Get action needs and excludes from cache."""
+        """Get action needs and excludes from cache.
+
+        .. note:: It returns the action if a cache system is defined.
+
+        :param action_name: The unique action name.
+        :returns: The action stored in cache or ``None``.
+        """
         data = None
         if self.cache:
             data = self.cache.get(
@@ -71,7 +89,12 @@ class _AccessState(object):
         return data
 
     def delete_action_cache(self, action_name):
-        """Delete action needs and excludes from cache."""
+        """Delete action needs and excludes from cache.
+
+        .. note:: It returns the action if a cache system is defined.
+
+        :param action_name: The unique action name.
+        """
         if self.cache:
             self.cache.delete(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
@@ -79,12 +102,21 @@ class _AccessState(object):
             )
 
     def register_action(self, action):
-        """Register an action to be showed in the actions list."""
+        """Register an action to be showed in the actions list.
+
+        .. note:: A action can't be registered two times. If it happens, then
+        an assert exception will be raised.
+
+        :param action: The action to be registered.
+        """
         assert action.value not in self.actions
         self.actions[action.value] = action
 
     def load_entry_point_group(self, entry_point_group):
-        """Load actions from an entry point group."""
+        """Load actions from an entry point group.
+
+        :param entry_point_group: The entrypoint for extensions.
+        """
         for ep in pkg_resources.iter_entry_points(group=entry_point_group):
             self.register_action(ep.load())
 
@@ -93,13 +125,22 @@ class InvenioAccess(object):
     """Invenio Access extension."""
 
     def __init__(self, app=None, **kwargs):
-        """Extension initialization."""
+        """Extension initialization.
+
+        :param app: The Flask application. (Default: ``None``)
+        """
         if app:
             self._state = self.init_app(app, **kwargs)
 
     def init_app(self, app, entry_point_group='invenio_access.actions',
                  **kwargs):
-        """Flask application initialization."""
+        """Flask application initialization.
+
+        :param app: The Flask application.
+        :param entry_point_group: The entrypoint for extensions.
+            (Default: ``'invenio_access.actions'``)
+        :param cache: The cache system. (Default: ``None``)
+        """
         self.init_config(app)
         app.cli.add_command(access_cli, 'access')
         state = _AccessState(app, entry_point_group=entry_point_group,
@@ -108,7 +149,10 @@ class InvenioAccess(object):
         return state
 
     def init_config(self, app):
-        """Initialize configuration."""
+        """Initialize configuration.
+
+        :param app: The Flask application.
+        """
         for k in dir(config):
             if k.startswith('ACCESS_'):
                 app.config.setdefault(k, getattr(config, k))

@@ -77,7 +77,10 @@ class DynamicPermission(Permission):
     """
 
     def __init__(self, *needs):
-        """Default constructor."""
+        r"""Default constructor.
+
+        :param \*needs: A list of need instances.
+        """
         self._permissions = None
         self.explicit_needs = set(needs)
         self.explicit_needs.add(superuser_access)
@@ -125,6 +128,8 @@ class DynamicPermission(Permission):
 
         If there is no role or user assigned to an action, everyone is allowed
         to perform that action.
+
+        :returns: A list of need instances.
         """
         if not self._permissions:
             self._load_permissions()
@@ -136,6 +141,8 @@ class DynamicPermission(Permission):
 
         If there is no role or user assigned to an action, everyone is allowed
         to perform that action.
+
+        :returns: A list of denied permissions.
         """
         if not self._permissions:
             self._load_permissions()  # pragma: no cover

@@ -53,7 +53,16 @@ class ActionNeedMixin(object):
 
     @classmethod
     def create(cls, action, **kwargs):
-        """Create new database instance from action need."""
+        """Create new database instance from action need.
+
+        :param action: A object containing a method equal to ``'action'`` and
+            a value.
+        :param argument: The action argument. If this parameter is not passed,
+            then the ``action.argument`` will be taken into account. If the
+            ``action.argument`` does not exist, ``None`` will be set as
+            argument for the new action need.
+        :returns: A :class:`invenio_access.models.ActionNeedMixin` instance.
+        """
         assert action.method == 'action'
         argument = kwargs.pop('argument', None) or getattr(
             action, 'argument', None)
@@ -65,17 +74,32 @@ class ActionNeedMixin(object):
 
     @classmethod
     def allow(cls, action, **kwargs):
-        """Allow given action need."""
+        """Allow given action need.
+
+        :param action: The action to allow.
+        :returns: A :class:`invenio_access.models.ActionNeedMixin` instance.
+        """
         return cls.create(action, exclude=False, **kwargs)
 
     @classmethod
     def deny(cls, action, **kwargs):
-        """Deny usage of given action need."""
+        """Deny usage of given action need.
+
+        :param action: The action to deny.
+        :returns: A :class:`invenio_access.models.ActionNeedMixin` instance.
+        """
         return cls.create(action, exclude=True, **kwargs)
 
     @classmethod
     def query_by_action(cls, action, argument=None):
-        """Prepare query object with filtered action."""
+        """Prepare query object with filtered action.
+
+        :param action: The action to deny.
+        :param argument: The action argument. If it's ``None`` then, if exists,
+            the ``action.argument`` will be taken. In the worst case will be
+            set as ``None``. (Default: ``None``)
+        :returns: A query object.
+        """
         query = cls.query.filter_by(action=action.value)
         argument = argument or getattr(action, 'argument', None)
         if argument is not None:
