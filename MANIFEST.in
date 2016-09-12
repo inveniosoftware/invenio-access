@@ -44,7 +44,6 @@ recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
-recursive-include examples *.html
-recursive-include examples *.py
+recursive-include examples *.html *.py *.sh
 recursive-include invenio_access *.html
 recursive-include tests *.py

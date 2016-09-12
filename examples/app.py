@@ -25,54 +25,43 @@
 
 """Minimal Flask application example for development.
 
-Create database and tables:
+Start redis server.
+
+Install requirements:
 
 .. code-block:: console
 
+   $ pip install -e .[all]
    $ cd examples
-   $ export FLASK_APP=app.py
-   $ mkdir instance
-   $ flask db init
-   $ flask db create
-
-Create some users:
-
-.. code-block:: console
-
-   $ flask users create info@inveniosoftware.org -a
-   $ flask users create reader@inveniosoftware.org -a
-   $ flask users create editor@inveniosoftware.org -a
-   $ flask users create admin@inveniosoftware.org -a
-
-Add a role to a user:
-
-.. code-block:: console
-
-   $ flask roles create -n admin
-   $ flask roles add -u info@inveniosoftware.org -r admin
-   $ flask roles add -u admin@inveniosoftware.org -r admin
-
-Assign some allowed actions to this users:
-
-.. code-block:: console
-
-   $ flask access allow open -e editor@inveniosoftware.org
-   $ flask access deny open -e info@inveniosoftware.org
-   $ flask access allow read -e reader@inveniosoftware.org
-   $ flask access allow open -r admin
-   $ flask access allow read -r admin
-
+   $ ./app-setup.sh
+   $ ./app-fixtures.sh
 
 Run the development server:
 
 .. code-block:: console
 
-   $ flask run
+   $ FLASK_APP=app.py flask run --debugger -p 5000
 
-If you are using an action in your app which does not have any role or user
-assigned, the action will be allowed to perform by everyone (Anonymous users
-included).
+View the pages using different users:
 
+.. code-block:: console
+
+    $ open http://localhost:5000/
+    $ open http://localhost:5000/role_admin
+    $ open http://localhost:5000/action_open
+    $ open http://localhost:5000/action_read
+
+To be able to uninstall the example app:
+
+.. code-block:: console
+
+    $ ./app-teardown.sh
+
+.. note::
+
+    If you are using an action in your app which does not have any role or user
+    assigned, the action will be allowed to perform by everyone (Anonymous
+    users included)
 """
 
 from __future__ import absolute_import, print_function
@@ -84,8 +73,9 @@ from flask_login import current_user
 from flask_mail import Mail
 from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
-from invenio_accounts.views import blueprint
+from invenio_accounts.views import blueprint as blueprint_accounts
 from invenio_db import InvenioDB
+from flask_principal import PermissionDenied
 
 from invenio_access import InvenioAccess
 from invenio_access.permissions import DynamicPermission
@@ -98,7 +88,7 @@ Mail(app)
 Menu(app)
 InvenioDB(app)
 InvenioAccounts(app)
-app.register_blueprint(blueprint)
+app.register_blueprint(blueprint_accounts)
 
 access = InvenioAccess(app)
 
@@ -109,12 +99,18 @@ action_read = ActionNeed('read')
 access.register_action(action_read)
 
 
+@app.errorhandler(PermissionDenied)
+def permission_denied_page(error):
+    """Show a personalized error message."""
+    return "Not Permitted", 403
+
+
 @app.route("/")
 def index():
     """Basic test view."""
     identity = g.identity
     actions = {}
-    for action in access.actions:
+    for action in access.actions.values():
         actions[action.value] = DynamicPermission(action).allows(identity)
 
     if current_user.is_anonymous:
@@ -137,7 +133,7 @@ def role_admin():
     """View only allowed to admin role."""
     identity = g.identity
     actions = {}
-    for action in access.actions:
+    for action in access.actions.values():
         actions[action.value] = DynamicPermission(action).allows(identity)
 
     message = 'You are opening a page limited to action read'
@@ -156,7 +152,7 @@ def action_open():
     """View only allowed to open action."""
     identity = g.identity
     actions = {}
-    for action in access.actions:
+    for action in access.actions.values():
         actions[action.value] = DynamicPermission(action).allows(identity)
 
     message = 'You are opening a page limited to action read'
@@ -175,7 +171,7 @@ def action_read():
     """View only allowed to open action."""
     identity = g.identity
     actions = {}
-    for action in access.actions:
+    for action in access.actions.values():
         actions[action.value] = DynamicPermission(action).allows(identity)
 
     message = 'You are opening a page limited to action read'
