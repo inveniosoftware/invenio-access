@@ -30,11 +30,11 @@ include .editorconfig
 include .tx/config
 include LICENSE
 include babel.ini
+include docs/requirements.txt
 include pytest.ini
 recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
-recursive-include docs *.txt
 recursive-include docs Makefile
 recursive-include examples *.html *.py *.sh
 recursive-include invenio_access *.html
