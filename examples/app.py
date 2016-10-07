@@ -67,15 +67,14 @@ To be able to uninstall the example app:
 from __future__ import absolute_import, print_function
 
 from flask import Flask, g, render_template
-from flask_principal import ActionNeed, RoleNeed
 from flask_babelex import Babel
 from flask_login import current_user
 from flask_mail import Mail
 from flask_menu import Menu
+from flask_principal import ActionNeed, PermissionDenied, RoleNeed
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_accounts
 from invenio_db import InvenioDB
-from flask_principal import PermissionDenied
 
 from invenio_access import InvenioAccess
 from invenio_access.permissions import DynamicPermission
