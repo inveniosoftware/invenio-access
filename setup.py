@@ -25,7 +25,6 @@
 """Invenio module for common role based access control."""
 
 import os
-import sys
 
 from setuptools import find_packages, setup
 
@@ -77,7 +76,7 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'invenio-accounts>=1.0.0a13',
+    'invenio-accounts>=1.0.0a16',
     'six>=1.10',
 ]
 
