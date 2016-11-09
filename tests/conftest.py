@@ -37,9 +37,26 @@ from flask_mail import Mail
 from flask_principal import ActionNeed
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.schema import DropConstraint, DropSequence, DropTable
 
 from invenio_access import InvenioAccess
 from invenio_access.permissions import ParameterizedActionNeed
+
+
+@compiles(DropTable, 'postgresql')
+def _compile_drop_table(element, compiler, **kwargs):
+    return compiler.visit_drop_table(element) + ' CASCADE'
+
+
+@compiles(DropConstraint, 'postgresql')
+def _compile_drop_constraint(element, compiler, **kwargs):
+    return compiler.visit_drop_constraint(element) + ' CASCADE'
+
+
+@compiles(DropSequence, 'postgresql')
+def _compile_drop_sequence(element, compiler, **kwargs):
+    return compiler.visit_drop_sequence(element) + ' CASCADE'
 
 
 @pytest.fixture()
@@ -48,8 +65,8 @@ def app(request):
     app = Flask('testapp')
     app.config.update(
         ACCOUNTS_USE_CELERY=False,
-        SECRET_KEY="CHANGE_ME",
-        SECURITY_PASSWORD_SALT="CHANGE_ME_ALSO",
+        SECRET_KEY='CHANGE_ME',
+        SECURITY_PASSWORD_SALT='CHANGE_ME_ALSO',
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
         TESTING=True,

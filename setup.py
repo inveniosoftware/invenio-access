@@ -32,6 +32,8 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
+    'SQLAlchemy-Continuum>=1.2.1',
+    'Werkzeug>=0.11.2',
     'check-manifest>=0.25',
     'coverage>=4.0',
     'isort>=4.2.2',
@@ -41,8 +43,7 @@ tests_require = [
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
-    'Werkzeug>=0.11.2',
-    'redis>=2.10.3'
+    'redis>=2.10.3',
 ]
 
 extras_require = {
@@ -53,13 +54,13 @@ extras_require = {
         'Sphinx>=1.4.2',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0b1',
+        'invenio-db[mysql]>=1.0.0b3',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0b1',
+        'invenio-db[postgresql]>=1.0.0b3',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0b1',
+        'invenio-db>=1.0.0b3',
     ],
     'tests': tests_require,
 }
@@ -76,7 +77,7 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'invenio-accounts>=1.0.0a16',
+    'invenio-accounts>=1.0.0b1',
     'six>=1.10',
 ]
 
@@ -118,6 +119,9 @@ setup(
         ],
         'invenio_base.api_apps': [
             'invenio_access = invenio_access:InvenioAccess',
+        ],
+        'invenio_db.alembic': [
+            'invenio_access = invenio_access:alembic',
         ],
         'invenio_i18n.translations': [
             'messages = invenio_access',

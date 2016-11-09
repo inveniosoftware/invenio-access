@@ -27,12 +27,13 @@
 
 from __future__ import absolute_import, print_function
 
+import pytest
 from flask import Flask
 from flask_babelex import Babel
 from flask_mail import Mail
 from flask_principal import ActionNeed
 from invenio_accounts import InvenioAccounts
-from invenio_db import InvenioDB
+from invenio_db import InvenioDB, db
 from mock import patch
 from pkg_resources import EntryPoint
 
@@ -111,3 +112,22 @@ def test_actions_entrypoint():
     assert len(ext.actions) == 2
     assert ActionNeed('open') in ext.actions.values()
     assert ActionNeed('close') in ext.actions.values()
+
+
+def test_alembic(app):
+    """Test alembic recipes."""
+    ext = app.extensions['invenio-db']
+
+    with app.app_context():
+        if db.engine.name == 'sqlite':
+            raise pytest.skip('Upgrades are not supported on SQLite.')
+
+        assert not ext.alembic.compare_metadata()
+        db.drop_all()
+        ext.alembic.upgrade()
+
+        assert not ext.alembic.compare_metadata()
+        ext.alembic.downgrade(target='96e796392533')
+        ext.alembic.upgrade()
+
+        assert not ext.alembic.compare_metadata()
