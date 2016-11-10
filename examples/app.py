@@ -66,6 +66,8 @@ To be able to uninstall the example app:
 
 from __future__ import absolute_import, print_function
 
+import os
+
 from flask import Flask, g, render_template
 from flask_babelex import Babel
 from flask_login import current_user
@@ -82,6 +84,9 @@ from invenio_access.permissions import DynamicPermission
 # Create Flask application
 app = Flask(__name__)
 app.secret_key = 'ExampleApp'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'
+)
 Babel(app)
 Mail(app)
 Menu(app)
