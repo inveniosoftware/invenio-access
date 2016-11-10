@@ -104,6 +104,9 @@ setup(
     include_package_data=True,
     platforms='any',
     entry_points={
+        'flask.commands': [
+            'access = invenio_access.cli:access',
+        ],
         'invenio_admin.views': [
             'invenio_access_action_users = '
             'invenio_access.admin:action_users_adminview',

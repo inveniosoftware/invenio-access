@@ -31,7 +31,6 @@ import six
 from werkzeug.utils import cached_property, import_string
 
 from . import config
-from .cli import access as access_cli
 
 
 class _AccessState(object):
@@ -142,7 +141,6 @@ class InvenioAccess(object):
         :param cache: The cache system. (Default: ``None``)
         """
         self.init_config(app)
-        app.cli.add_command(access_cli, 'access')
         state = _AccessState(app, entry_point_group=entry_point_group,
                              cache=kwargs.get('cache'))
         app.extensions['invenio-access'] = state
