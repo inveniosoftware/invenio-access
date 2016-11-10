@@ -53,7 +53,7 @@ def test_access_cli_allow_action_unknown_email(script_info):
     runner = CliRunner()
 
     result = runner.invoke(
-        access, ['allow', 'open', '-e', 'unknown'],
+        access, ['allow', 'open', 'user', 'unknown'],
         obj=script_info)
     assert result.exit_code != 0
 
@@ -64,7 +64,7 @@ def test_access_cli_allow_action_unknown_role(script_info):
 
     result = runner.invoke(
         access,
-        ['allow', 'open', '-r', 'unknown'],
+        ['allow', 'open', 'role', 'unknown'],
         obj=script_info)
     assert result.exit_code != 0
 
@@ -81,7 +81,31 @@ def test_access_cli_allow_action_user(script_info):
     )
     assert result.exit_code == 0
     result = runner.invoke(
-        access, ['allow', 'open', '-e', 'a@example.org'], obj=script_info)
+        access, ['allow', 'invalid', 'user', 'a@example.org'], obj=script_info)
+    assert result.exit_code != 0
+    result = runner.invoke(
+        access, ['allow', 'open', 'user', 'a@example.org'], obj=script_info)
+    assert result.exit_code == 0
+
+
+def test_any_all_global(script_info):
+    """Test any/all/global subcommands."""
+    runner = CliRunner()
+
+    result = runner.invoke(access, ['allow', 'open', 'any'],
+                           obj=script_info)
+    assert result.exit_code == 0
+
+    result = runner.invoke(access, ['remove', 'open', 'global'],
+                           obj=script_info)
+    assert result.exit_code == 0
+
+    result = runner.invoke(access, ['deny', 'open', 'all'],
+                           obj=script_info)
+    assert result.exit_code == 0
+
+    result = runner.invoke(access, ['remove', 'open', 'global'],
+                           obj=script_info)
     assert result.exit_code == 0
 
 
@@ -98,7 +122,25 @@ def test_access_cli_allow_action_role(script_info):
 
     result = runner.invoke(
         access,
-        ['allow', 'open', '-r', 'open_role'],
+        ['allow', 'open', 'role', 'open_role'],
+        obj=script_info
+    )
+    assert result.exit_code == 0
+
+
+def test_access_cli_deny_action_role(script_info):
+    """Test add action role in access CLI."""
+    runner = CliRunner()
+
+    # Role creation
+    result = runner.invoke(
+        roles_create,
+        ['edit_role'],
+        obj=script_info)
+    assert result.exit_code == 0
+    result = runner.invoke(
+        access,
+        ['deny', 'edit', 'role', 'edit_role'],
         obj=script_info
     )
     assert result.exit_code == 0
@@ -158,7 +200,7 @@ def test_access_matrix(script_info_cli_list):
     def role_args(roles):
         """Generate role arguments."""
         for role in roles:
-            yield '-r'
+            yield 'role'
             yield role
 
     for action, roles in action_roles.items():
@@ -172,14 +214,14 @@ def test_access_matrix(script_info_cli_list):
 
     result = runner.invoke(
         access,
-        ['deny', 'edit', '-e', 'admin-edit@inveniosoftware.org'],
+        ['deny', 'edit', 'user', 'admin-edit@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
 
     result = runner.invoke(
         access,
-        ['allow', 'edit', '-a', '1', '-e', 'info@inveniosoftware.org'],
+        ['allow', '-a', '1', 'edit', 'user', 'info@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
@@ -243,7 +285,7 @@ def test_access_matrix(script_info_cli_list):
 
             for can, actions in permissions.items():
                 for action in actions:
-                    assert action.allows(identity) == can
+                    assert action.allows(identity) == can, identity
 
     result = runner.invoke(
         access,
@@ -282,14 +324,14 @@ def test_access_matrix(script_info_cli_list):
 
     result = runner.invoke(
         access,
-        ['remove', 'edit', '-e', 'admin-edit@inveniosoftware.org'],
+        ['remove', 'edit', 'user', 'admin-edit@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0
 
     result = runner.invoke(
         access,
-        ['remove', 'edit', '-a', '1', '-e', 'info@inveniosoftware.org'],
+        ['remove', '-a', '1', 'edit', 'user', 'info@inveniosoftware.org'],
         obj=script_info
     )
     assert result.exit_code == 0

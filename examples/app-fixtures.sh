@@ -25,10 +25,10 @@ flask roles add info@inveniosoftware.org admin
 flask roles add admin@inveniosoftware.org admin
 
 # assign some allowed actions to this users
-flask access allow open -e editor@inveniosoftware.org
-flask access deny open -e info@inveniosoftware.org
-flask access allow read -e reader@inveniosoftware.org
-flask access allow open -r admin
-flask access allow read -r admin
-flask access allow admin-access -r admin
-flask access allow superuser-access -r admin
+flask access allow open user editor@inveniosoftware.org
+flask access deny open user info@inveniosoftware.org
+flask access allow read user reader@inveniosoftware.org
+flask access allow open role admin
+flask access allow read role admin
+flask access allow admin-access role admin
+flask access allow superuser-access role admin

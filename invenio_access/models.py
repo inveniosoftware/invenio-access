@@ -130,7 +130,7 @@ class ActionUsers(ActionNeedMixin, db.Model):
         name='access_actionsusers_unique'),
     )
 
-    user_id = db.Column(db.Integer(), db.ForeignKey(User.id))
+    user_id = db.Column(db.Integer(), db.ForeignKey(User.id), nullable=True)
 
     user = db.relationship("User")
 
