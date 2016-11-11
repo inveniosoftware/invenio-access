@@ -24,7 +24,7 @@
 Changes
 =======
 
-Version 1.0.0a10 (released 2016-10-31)
+Version 1.0.0a11 (released 2016-11-11)
 --------------------------------------
 
 - Major incompatible rewrite.
