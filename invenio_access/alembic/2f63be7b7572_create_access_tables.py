@@ -1,6 +1,6 @@
 #
 # This file is part of Invenio.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -40,7 +40,8 @@ def upgrade():
         'access_actionsroles',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('action', sa.String(length=80), nullable=True),
-        sa.Column('exclude', sa.Boolean(), server_default='0', nullable=False),
+        sa.Column('exclude', sa.Boolean(name='exclude'), server_default='0',
+                  nullable=False),
         sa.Column('argument', sa.String(length=255), nullable=True),
         sa.Column('role_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['role_id'], [u'accounts_role.id'], ),
@@ -58,7 +59,8 @@ def upgrade():
         'access_actionsusers',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('action', sa.String(length=80), nullable=True),
-        sa.Column('exclude', sa.Boolean(), server_default='0', nullable=False),
+        sa.Column('exclude', sa.Boolean(name='exclude'), server_default='0',
+                  nullable=False),
         sa.Column('argument', sa.String(length=255), nullable=True),
         sa.Column('user_id', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['user_id'], [u'accounts_user.id'], ),

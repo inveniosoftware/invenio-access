@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -44,8 +44,8 @@ class ActionNeedMixin(object):
     action = db.Column(db.String(80), index=True)
     """Name of the action."""
 
-    exclude = db.Column(db.Boolean(), nullable=False,
-                        default=False, server_default="0")
+    exclude = db.Column(db.Boolean(name='exclude'), nullable=False,
+                        default=False, server_default='0')
     """Deny associated objects."""
 
     argument = db.Column(db.String(255), nullable=True, index=True)
