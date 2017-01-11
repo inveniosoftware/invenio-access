@@ -44,7 +44,7 @@ class ActionNeedMixin(object):
     action = db.Column(db.String(80), index=True)
     """Name of the action."""
 
-    exclude = db.Column(db.Boolean(), nullable=False,
+    exclude = db.Column(db.Boolean(name='exclude'), nullable=False,
                         default=False, server_default="0")
     """Deny associated objects."""
 
