@@ -126,6 +126,9 @@ setup(
         'invenio_db.alembic': [
             'invenio_access = invenio_access:alembic',
         ],
+        'invenio_db.models': [
+            'invenio_access = invenio_access.models',
+        ],
         'invenio_i18n.translations': [
             'messages = invenio_access',
         ],
