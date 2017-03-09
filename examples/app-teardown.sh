@@ -9,4 +9,4 @@ export FLASK_APP=app.py
 flask db drop --yes-i-know
 
 # clean environment
-[ -e "$DIR/instance" ] && rm $DIR/instance -Rf
+[ -e "$DIR/instance" ] && rm -Rf $DIR/instance
