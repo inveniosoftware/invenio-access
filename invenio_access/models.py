@@ -130,7 +130,10 @@ class ActionUsers(ActionNeedMixin, db.Model):
         name='access_actionsusers_unique'),
     )
 
-    user_id = db.Column(db.Integer(), db.ForeignKey(User.id), nullable=True)
+    user_id = db.Column(db.Integer(),
+                        db.ForeignKey(User.id,
+                                      name='fk_access_actionusers_user_id'),
+                        nullable=True)
 
     user = db.relationship("User")
 
@@ -153,7 +156,10 @@ class ActionRoles(ActionNeedMixin, db.Model):
         name='access_actionsroles_unique'),
     )
 
-    role_id = db.Column(db.Integer(), db.ForeignKey(Role.id), nullable=False)
+    role_id = db.Column(db.Integer(),
+                        db.ForeignKey(Role.id,
+                                      name='fk_access_actionsroles_role_id'),
+                        nullable=False)
 
     role = db.relationship("Role")
 
