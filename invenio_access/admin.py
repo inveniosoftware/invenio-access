@@ -24,11 +24,8 @@
 
 """Admin views for managing access to actions."""
 
-from flask import current_app, flash
-from flask_admin.actions import action
+from flask import current_app
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.form.fields import DateTimeField
-from flask_login import login_user, logout_user
 from werkzeug.local import LocalProxy
 from wtforms import SelectField
 
@@ -91,6 +88,18 @@ class ActionRolesView(ModelView):
     column_labels = {
         'role.name': _("Role Name"),
     }
+
+    form_args = dict(
+        action=dict(
+            choices=LocalProxy(lambda: [
+                (action, action) for action in current_access.actions.keys()
+            ])
+        )
+    )
+
+    form_overrides = dict(
+        action=SelectField,
+    )
 
 
 action_roles_adminview = {
