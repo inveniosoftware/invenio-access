@@ -44,7 +44,8 @@ def upgrade():
                   nullable=False),
         sa.Column('argument', sa.String(length=255), nullable=True),
         sa.Column('role_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['role_id'], [u'accounts_role.id'], ),
+        sa.ForeignKeyConstraint(['role_id'], [u'accounts_role.id'],
+                                name='fk_access_actionroles_role_id'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('action', 'exclude', 'argument', 'role_id',
                             name='access_actionsroles_unique')
@@ -63,7 +64,8 @@ def upgrade():
                   nullable=False),
         sa.Column('argument', sa.String(length=255), nullable=True),
         sa.Column('user_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['user_id'], [u'accounts_user.id'], ),
+        sa.ForeignKeyConstraint(['user_id'], [u'accounts_user.id'],
+                                name='fk_access_actionusers_user_id'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('action', 'exclude', 'argument', 'user_id',
                             name='access_actionsusers_unique')
