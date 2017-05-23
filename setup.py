@@ -72,11 +72,13 @@ for name, reqs in extras_require.items():
     extras_require['all'].extend(reqs)
 
 setup_requires = [
+    'Babel>=1.3',
     'pytest-runner>=2.6.2',
 ]
 
 install_requires = [
     'Flask>=0.11.1',
+    'Flask-BabelEx>=0.9.2',
     'invenio-accounts>=1.0.0b3',
     'six>=1.10',
 ]
@@ -107,20 +109,20 @@ setup(
         'flask.commands': [
             'access = invenio_access.cli:access',
         ],
+        'invenio_access.actions': [
+            'invenio_access.actions = '
+            'invenio_access.permissions:superuser_access',
+        ],
         'invenio_admin.views': [
             'invenio_access_action_users = '
             'invenio_access.admin:action_users_adminview',
             'invenio_access_action_roles = '
             'invenio_access.admin:action_roles_adminview',
         ],
-        'invenio_access.actions': [
-            'invenio_access.actions = '
-            'invenio_access.permissions:superuser_access',
-        ],
-        'invenio_base.apps': [
+        'invenio_base.api_apps': [
             'invenio_access = invenio_access:InvenioAccess',
         ],
-        'invenio_base.api_apps': [
+        'invenio_base.apps': [
             'invenio_access = invenio_access:InvenioAccess',
         ],
         'invenio_db.alembic': [

@@ -13,7 +13,7 @@ export FLASK_APP=app.py
 
 ## Load fixtures
 
-# create users
+# create users. Use the following emails and passwords to login.
 flask users create info@inveniosoftware.org -a --password 123456
 flask users create reader@inveniosoftware.org -a --password 123456
 flask users create editor@inveniosoftware.org -a --password 123456

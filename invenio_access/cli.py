@@ -62,7 +62,7 @@ def process_action(ctx, value):
 
 @lazy_result
 def process_email(ctx, value):
-    """Return an user if exists."""
+    """Return an user if it exists."""
     user = User.query.filter(User.email == value).first()
     if not user:
         raise click.BadParameter('User with email \'%s\' not found.', value)
@@ -71,7 +71,7 @@ def process_email(ctx, value):
 
 @lazy_result
 def process_role(ctx, value):
-    """Return a role if exists."""
+    """Return a role if it exists."""
     role = Role.query.filter(Role.name == value).first()
     if not role:
         raise click.BadParameter('Role with name \'%s\' not found.', value)

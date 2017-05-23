@@ -28,12 +28,6 @@ API Docs
 .. automodule:: invenio_access.ext
    :members:
 
-Configuration
--------------
-
-.. automodule:: invenio_access.config
-   :members:
-
 Permissions
 -----------
 

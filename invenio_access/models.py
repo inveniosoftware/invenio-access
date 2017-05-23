@@ -39,29 +39,29 @@ class ActionNeedMixin(object):
     """Define common attributes for Action needs."""
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    """Primary key to support nullable fields."""
+    """Primary key. It allows the other fields to be nullable."""
 
     action = db.Column(db.String(80), index=True)
     """Name of the action."""
 
     exclude = db.Column(db.Boolean(name='exclude'), nullable=False,
                         default=False, server_default='0')
-    """Deny associated objects."""
+    """If set to True, deny the action, otherwise allow it."""
 
     argument = db.Column(db.String(255), nullable=True, index=True)
-    """String value of action argument."""
+    """Action argument."""
 
     @classmethod
     def create(cls, action, **kwargs):
-        """Create new database instance from action need.
+        """Create new database row using the provided action need.
 
-        :param action: A object containing a method equal to ``'action'`` and
+        :param action: An object containing a method equal to ``'action'`` and
             a value.
         :param argument: The action argument. If this parameter is not passed,
-            then the ``action.argument`` will be taken into account. If the
+            then the ``action.argument`` will be used instead. If the
             ``action.argument`` does not exist, ``None`` will be set as
             argument for the new action need.
-        :returns: A :class:`invenio_access.models.ActionNeedMixin` instance.
+        :returns: An :class:`invenio_access.models.ActionNeedMixin` instance.
         """
         assert action.method == 'action'
         argument = kwargs.pop('argument', None) or getattr(
@@ -74,7 +74,7 @@ class ActionNeedMixin(object):
 
     @classmethod
     def allow(cls, action, **kwargs):
-        """Allow given action need.
+        """Allow the given action need.
 
         :param action: The action to allow.
         :returns: A :class:`invenio_access.models.ActionNeedMixin` instance.
@@ -83,7 +83,7 @@ class ActionNeedMixin(object):
 
     @classmethod
     def deny(cls, action, **kwargs):
-        """Deny usage of given action need.
+        """Deny the given action need.
 
         :param action: The action to deny.
         :returns: A :class:`invenio_access.models.ActionNeedMixin` instance.
@@ -113,8 +113,11 @@ class ActionNeedMixin(object):
 
     @property
     def need(self):
-        """Abstract need."""
-        raise NotImplemented()  # pragma: no cover
+        """Return the need corresponding to this model instance.
+
+        This is an abstract method and will raise NotImplementedError.
+        """
+        raise NotImplementedError()  # pragma: no cover
 
 
 class ActionUsers(ActionNeedMixin, db.Model):

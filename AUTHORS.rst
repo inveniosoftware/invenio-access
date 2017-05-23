@@ -58,6 +58,7 @@ Invenio module for common role based access control.
 - Marko Niinimaki <manzikki@gmail.com>
 - Mathieu Barras <mbarras@gmail.com>
 - Mikael Vik <mikael.vik@cern.ch>
+- Nicolas Harraudeau <nicolas.harraudeau@cern.ch>
 - Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>
 - Patrick Glauner <patrick.oliver.glauner@cern.ch>
 - Paulo Cabral <paulo.cabral@cern.ch>

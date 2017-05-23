@@ -9,7 +9,10 @@ About
 
 Invenio module for common role based access control.
 
-*This is an experimental developer preview release.*
+What's new
+----------
+
+- Initial public release.
 
 Installation
 ------------

@@ -43,7 +43,16 @@
 
 Invenio module for common role based access control.
 
-*This is an experimental developer preview release.*
+Features
+========
 
-* Free software: GPLv2 license
-* Documentation: https://invenio-access.readthedocs.io
+Invenio Access has the following features:
+
+* It provides a way to restrict access to an invenio application's endpoints
+  for users and roles.
+* It enables administrators to configure the access rights via a Command Line
+  Interface and a View.
+* It stores access rights in the database.
+
+Further documentation is available on
+https://invenio-access.readthedocs.io/

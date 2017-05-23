@@ -51,6 +51,9 @@ View the pages using different users:
     $ open http://localhost:5000/action_open
     $ open http://localhost:5000/action_read
 
+The login and passwords, as well as the assigned permissions are listed
+in ./app-fixtures.sh.
+
 To be able to uninstall the example app:
 
 .. code-block:: console
@@ -132,6 +135,8 @@ admin_permission = DynamicPermission(RoleNeed('admin'))
 
 
 @app.route('/role_admin')
+# this decorator limits the access of this view to users with "admin-access"
+# permission.
 @admin_permission.require()
 def role_admin():
     """View only allowed to admin role."""
@@ -140,7 +145,7 @@ def role_admin():
     for action in access.actions.values():
         actions[action.value] = DynamicPermission(action).allows(identity)
 
-    message = 'You are opening a page limited to action read'
+    message = 'You are opening a page requiring the "admin-access" permission'
     return render_template("invenio_access/limited.html",
                            message=message,
                            actions=actions,
@@ -159,7 +164,7 @@ def action_open():
     for action in access.actions.values():
         actions[action.value] = DynamicPermission(action).allows(identity)
 
-    message = 'You are opening a page limited to action read'
+    message = 'You are opening a page requiring the "open" permission'
     return render_template("invenio_access/limited.html",
                            message=message,
                            actions=actions,
@@ -178,7 +183,7 @@ def action_read():
     for action in access.actions.values():
         actions[action.value] = DynamicPermission(action).allows(identity)
 
-    message = 'You are opening a page limited to action read'
+    message = 'You are opening a page requiring the "read" permission'
     return render_template("invenio_access/limited.html",
                            message=message,
                            actions=actions,

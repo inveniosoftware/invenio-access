@@ -24,28 +24,30 @@
 
 """Invenio module for common role based access control.
 
-It aims to make a process of managing access rigths quick and easy while
-preventing unwanted visitors performing restricted actions due to system
+It aims to make the process of managing access rigths quick and easy while
+preventing unwanted visitors from performing restricted actions due to system
 misconfiguration.
+
+This module uses the Flask-Principal library. You can refer to its
+documentation for definitions of "Needs", "Identity" and "Permission" concepts.
 
 Access module in three points:
 
-- parametrized action needs
+- parametrized action "Needs"
 - arbitrary combinations of rules for allowing/denying users and/or roles
 - support lazy loading of permissions at runtime
 
 Initialization
 --------------
 
-First create a Flask application:
+Create a Flask application:
 
 >>> from flask import Flask
 >>> app = Flask('myapp')
 >>> app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
 
-You initialize Access like a normal Flask extension, however Invenio-Access is
-dependent on Invenio-DB and Invenio-Accounts so first you need to initialize
-these extensions:
+Initialize Invenio-Access dependencies, which are Invenio-DB and
+Invenio-Accounts, and then Invenio-Access itself:
 
 >>> from invenio_db import InvenioDB
 >>> from invenio_accounts import InvenioAccounts
@@ -54,8 +56,8 @@ these extensions:
 >>> ext_accounts = InvenioAccounts(app)
 >>> ext_access = InvenioAccess(app)
 
-In order for the following examples to work, you need to work within an
-Flask application context so let's push one:
+The following examples needs to run in a Flask application context, so
+let's push one:
 
 >>> ctx = app.app_context()
 >>> ctx.push()
@@ -66,20 +68,44 @@ in this example we use an in-memory SQLite database):
 >>> from invenio_db import db
 >>> db.create_all()
 
-Dynamic Permissions
--------------------
 
-Dynamic permissions represent needs associated with ``ActionNeed`` or
-``ParametrizedActionNeed`` or directly the needs which method is different from
-`'action'`. This consequently means that if the action is not attached to
-any user or role then it is **allowed** by default.
+Dynamic permission control
+--------------------------
+
+ActionUsers and ActionRoles
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Flask-Principal provides the ``Need`` concept which reprensents a basic
+permission to access a resource, perform an action, etc...
+
+Invenio-Access extends this concept by providing
+``ParametrizedActionNeed``. A ``ParametrizedActionNeed`` is used in
+order to allow or restrict an action and it has an optional parameter.
+
+Invenio-Access stores two types of ``ParametrizedActionNeeds`` in the database:
+
+- ``ActionUsers``: it allows or denies a user to perform an action.
+- ``ActionRoles``: it allows or denies a user role to perform an action.
+
+Actions have a name and can be defined by any module. The optional parameter
+can be used as the module sees fit.
+
+DynamicPermission
+~~~~~~~~~~~~~~~~~
+
+A ``DynamicPermission`` is based on the Flask-Principle's ``Permission``. It
+checks if a user can perform an action by querying the corresponding
+``ActionUsers`` and ``ActionRoles`` tables.
 
 The permissions are loaded from the database the first time you perform
-```needs``` or ```excludes``` in the DynamicPermission object and they are
-stored in the instance of DynamicPermission affected to be used in future
+```needs``` or ```excludes``` in the ``DynamicPermission`` object and they are
+stored in the instance of ``DynamicPermission`` affected to be used in future
 calls.
 
-Action Needs
+Note that if no ``ActionRoles`` or ``ActionUsers`` exist in the database for
+a given action, the action is allowed to every user, including anonymous users.
+
+How it works
 ~~~~~~~~~~~~
 
 You can start by creating new actions either with or without parameters:
@@ -106,10 +132,17 @@ True
 >>> anonymous_identity.can(permission_view_1)
 True
 
+If the parameter is set to ``None`` as in this example, the action is allowed
+or denied for all possible values. If it is set to a specific value then only
+this value is allowed or denied.
+
 Assign actions
 ~~~~~~~~~~~~~~
 
-You can either assign actions to user or roles. First, you need to have
+Programmatically
+++++++++++++++++
+
+You can either assign actions to users or roles. First, you need to have
 some users and roles in your database.
 
 >>> from invenio_db import db
@@ -129,6 +162,9 @@ With users created you can allow and deny actions:
 <sqlalchemy.orm.session.SessionTransaction object ...
 >>> db.session.add(ActionUsers.allow(action_index, user=admin))
 >>> db.session.commit()
+
+It is then possible to check the permissions:
+
 >>> permission_index = DynamicPermission(action_index)
 >>> anonymous_identity.can(permission_index)
 False
@@ -137,6 +173,45 @@ False
 >>> admin_identity.provides.add(UserNeed(admin.id))
 >>> admin_identity.can(permission_index)
 True
+>>> student_identity = Identity(student.id)
+>>> student_identity.provides.add(UserNeed(student.id))
+>>> student_identity.can(permission_index)
+False
+
+
+With the command line interface
++++++++++++++++++++++++++++++++
+
+The permissions can also be assigned using the CLI. For example it is
+possible to allow the action ``open``, which is registered in the
+example application.
+
+Let's first intialize the example application which we will use.
+
+.. code-block:: console
+
+    $ cd examples
+    $ export FLASK_APP=app.py
+    $ ./app-setup.sh
+
+Let's create a user.
+
+.. code-block:: console
+
+    $ flask users create admin@inveniosoftware.org -a --password 123456
+
+This is how to allow the action "open" to this user.
+
+.. code-block:: console
+
+    $ flask access allow open user admin@inveniosoftware.org
+
+Run the following command in order to uninstall the example application
+
+.. code-block:: console
+
+    $ ./app-teardown.sh
+
 
 How to discover existing actions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

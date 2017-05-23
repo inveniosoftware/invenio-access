@@ -43,7 +43,7 @@ _Need = namedtuple('Need', ['method', 'value', 'argument'])
 ParameterizedActionNeed = partial(_Need, 'action')
 
 ParameterizedActionNeed.__doc__ = \
-    """A need with the method preset to `"action"` with parameter.
+    """A need having the method preset to `"action"` and a parameter.
 
     If it is called with `argument=None` then this need is equivalent
     to ``ActionNeed``.
@@ -52,7 +52,7 @@ ParameterizedActionNeed.__doc__ = \
 superuser_access = ActionNeed('superuser-access')
 """SuperUser access allows access to everything on Invenio.
 
-DynamicPermissions handles allowing access to SuperUser.
+DynamicPermissions allows by default access to SuperUser.
 """
 
 
@@ -73,7 +73,6 @@ class DynamicPermission(Permission):
         If ``ActionNeed`` or ``ParameterizedActionNeed`` is not allowed or
         restricted to any user or role then it is **ALLOWED** to anybody.
         This is a major diference to standard ``Permission`` class.
-
     """
 
     def __init__(self, *needs):
