@@ -31,6 +31,7 @@ from invenio_accounts.models import Role, User
 from invenio_db import db
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.event import listen
+from sqlalchemy.orm.attributes import get_history
 
 from .proxies import current_access
 
@@ -166,36 +167,44 @@ class ActionRoles(ActionNeedMixin, db.Model):
         return RoleNeed(self.role.name)
 
 
+def _get_action_name(name, argument):
+    tokens = [str(name)]
+    if argument:
+        tokens.append(str(argument))
+    return '::'.join(tokens)
+
+
 def removed_or_inserted_action(mapper, connection, target):
     """Remove the action from cache when an item is inserted or deleted."""
-    current_access.delete_action_cache(target.action)
+    current_access.delete_action_cache(_get_action_name(target.action,
+                                                        target.argument))
 
 
-def changed_action_action(target, value, oldvalue, initiator):
-    """Remove the action from cache when an action is updated.
+def changed_action(mapper, connection, target):
+    """Remove the action from cache when an item is updated."""
+    action_history = get_history(target, 'action')
+    argument_history = get_history(target, 'argument')
+    owner_history = get_history(
+        target,
+        'user' if isinstance(target, ActionUsers) else 'role')
 
-    Remove the action from cache when ActionRoles.action or ActionUsers.action
-    is updated.
-    """
-    current_access.delete_action_cache(value)
-    current_access.delete_action_cache(oldvalue)
-
-
-def changed_owner_action(target, value, oldvalue, initiator):
-    """Remove the action from cache when the owner is updated.
-
-    Remove the action from cache when ActionRoles.role or ActionUsers.user
-    is updated.
-    """
-    current_access.delete_action_cache(target.action)
+    if action_history.has_changes() or argument_history.has_changes() \
+       or owner_history.has_changes():
+        current_access.delete_action_cache(_get_action_name(target.action,
+                                                            target.argument))
+        current_access.delete_action_cache(
+            _get_action_name(
+                action_history.deleted[0] if action_history.deleted
+                else target.action,
+                argument_history.deleted[0] if argument_history.deleted
+                else target.argument)
+        )
 
 
 listen(ActionUsers, 'after_insert', removed_or_inserted_action)
 listen(ActionUsers, 'after_delete', removed_or_inserted_action)
-listen(ActionUsers.action, 'set', changed_action_action)
-listen(ActionUsers.user, 'set', changed_owner_action)
+listen(ActionUsers, 'after_update', changed_action)
 
 listen(ActionRoles, 'after_insert', removed_or_inserted_action)
 listen(ActionRoles, 'after_delete', removed_or_inserted_action)
-listen(ActionRoles.action, 'set', changed_action_action)
-listen(ActionRoles.role, 'set', changed_owner_action)
+listen(ActionRoles, 'after_update', changed_action)

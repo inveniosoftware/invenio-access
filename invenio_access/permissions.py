@@ -91,7 +91,7 @@ class DynamicPermission(Permission):
         for explicit_need in self.explicit_needs:
             if explicit_need.method == 'action':
                 action = current_access.get_action_cache(
-                    explicit_need.value
+                    explicit_need
                 )
                 if action is None:
                     action = _P(needs=set(), excludes=set())
@@ -113,7 +113,7 @@ class DynamicPermission(Permission):
                             action.needs.add(db_action.need)
 
                     current_access.set_action_cache(
-                        explicit_need.value, action
+                        explicit_need, action
                     )
                 # in-place update of results
                 result.update(action)

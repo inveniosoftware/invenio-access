@@ -57,7 +57,17 @@ class _AccessState(object):
         return import_string(cache) if isinstance(cache, six.string_types) \
             else cache
 
-    def set_action_cache(self, action_name, data):
+    def _get_action_name(self, action):
+        """Get an action name."""
+        if isinstance(action, six.string_types):
+            return str(action)
+
+        tokens = [str(action.value)]
+        if hasattr(action, 'argument'):
+            tokens.append(str(action.argument))
+        return '::'.join(tokens)
+
+    def set_action_cache(self, action, data):
         """Store action needs and excludes.
 
         .. note:: The action is saved only if a cache system is defined.
@@ -68,10 +78,10 @@ class _AccessState(object):
         if self.cache:
             self.cache.set(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                str(action_name), data
+                self._get_action_name(action), data
             )
 
-    def get_action_cache(self, action_name):
+    def get_action_cache(self, action):
         """Get action needs and excludes from cache.
 
         .. note:: It returns the action if a cache system is defined.
@@ -83,11 +93,11 @@ class _AccessState(object):
         if self.cache:
             data = self.cache.get(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                str(action_name)
+                self._get_action_name(action)
             )
         return data
 
-    def delete_action_cache(self, action_name):
+    def delete_action_cache(self, action):
         """Delete action needs and excludes from cache.
 
         .. note:: It returns the action if a cache system is defined.
@@ -97,7 +107,7 @@ class _AccessState(object):
         if self.cache:
             self.cache.delete(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                str(action_name)
+                self._get_action_name(action)
             )
 
     def register_action(self, action):
