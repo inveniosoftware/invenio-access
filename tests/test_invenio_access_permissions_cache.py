@@ -36,7 +36,8 @@ from werkzeug.contrib.cache import RedisCache, SimpleCache
 
 from invenio_access import InvenioAccess, current_access
 from invenio_access.models import ActionRoles, ActionUsers
-from invenio_access.permissions import DynamicPermission
+from invenio_access.permissions import DynamicPermission, \
+    ParameterizedActionNeed
 
 
 class FakeIdentity(object):
@@ -53,9 +54,11 @@ def test_invenio_access_permission_cache(app):
     with app.test_request_context():
         user_can_all = User(email='all@inveniosoftware.org')
         user_can_open = User(email='open@inveniosoftware.org')
+        user_can_open_1 = User(email='open1@inveniosoftware.org')
 
         db.session.add(user_can_all)
         db.session.add(user_can_open)
+        db.session.add(user_can_open_1)
 
         db.session.add(ActionUsers(action='open', user=user_can_all))
 
@@ -82,6 +85,27 @@ def test_invenio_access_permission_cache(app):
             set([])
         )
 
+        db.session.add(ActionUsers(action='open', argument=1,
+                                   user=user_can_open_1))
+        db.session.flush()
+
+        identity_open_1 = FakeIdentity(UserNeed(user_can_open_1.id))
+        permission_open_1 = DynamicPermission(
+            ParameterizedActionNeed('open', '1'))
+        assert not permission_open.allows(identity_open_1)
+        assert permission_open_1.allows(identity_open_1)
+        assert current_access.get_action_cache('open::1') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2),
+                 Need(method='id', value=3)]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
+
 
 def test_invenio_access_permission_cache_redis(app):
     """Caching the user using redis."""
@@ -90,9 +114,11 @@ def test_invenio_access_permission_cache_redis(app):
     with app.test_request_context():
         user_can_all = User(email='all@inveniosoftware.org')
         user_can_open = User(email='open@inveniosoftware.org')
+        user_can_open_1 = User(email='open1@inveniosoftware.org')
 
         db.session.add(user_can_all)
         db.session.add(user_can_open)
+        db.session.add(user_can_open_1)
 
         db.session.add(ActionUsers(action='open', user=user_can_all))
 
@@ -112,6 +138,28 @@ def test_invenio_access_permission_cache_redis(app):
 
         permission_open = DynamicPermission(ActionNeed('open'))
         assert permission_open.allows(identity_open)
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2)]),
+            set([])
+        )
+
+        db.session.add(ActionUsers(action='open', argument=1,
+                                   user=user_can_open_1))
+
+        db.session.flush()
+
+        identity_open_1 = FakeIdentity(UserNeed(user_can_open_1.id))
+        permission_open_1 = DynamicPermission(
+            ParameterizedActionNeed('open', '1'))
+        assert not permission_open.allows(identity_open_1)
+        assert permission_open_1.allows(identity_open_1)
+        assert current_access.get_action_cache('open::1') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2),
+                 Need(method='id', value=3)]),
+            set([])
+        )
         assert current_access.get_action_cache('open') == (
             set([Need(method='id', value=1),
                  Need(method='id', value=2)]),
@@ -217,12 +265,14 @@ def test_invenio_access_permission_cache_users_updates(app):
         user_3 = User(email='user_3@inveniosoftware.org')
         user_4 = User(email='user_4@inveniosoftware.org')
         user_5 = User(email='user_5@inveniosoftware.org')
+        user_6 = User(email='user_6@inveniosoftware.org')
 
         db.session.add(user_1)
         db.session.add(user_2)
         db.session.add(user_3)
         db.session.add(user_4)
         db.session.add(user_5)
+        db.session.add(user_6)
 
         db.session.add(ActionUsers(action='open', user=user_1))
         db.session.add(ActionUsers(action='write', user=user_4))
@@ -235,6 +285,7 @@ def test_invenio_access_permission_cache_users_updates(app):
         identity_user_3 = FakeIdentity(UserNeed(user_3.id))
         identity_user_4 = FakeIdentity(UserNeed(user_4.id))
         identity_user_5 = FakeIdentity(UserNeed(user_5.id))
+        identity_user_6 = FakeIdentity(UserNeed(user_6.id))
 
         # Test if user 1 can open. In this case, the cache should store only
         # this object.
@@ -384,6 +435,43 @@ def test_invenio_access_permission_cache_users_updates(app):
             set([])
         )
 
+        db.session.add(ActionUsers(action='open', argument='1', user=user_6))
+        db.session.flush()
+        permission_open_1 = DynamicPermission(
+            ParameterizedActionNeed('open', '1'))
+        assert not permission_open.allows(identity_user_6)
+        assert permission_open_1.allows(identity_user_6)
+        assert current_access.get_action_cache('open::1') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2),
+                 Need(method='id', value=5),
+                 Need(method='id', value=6)]),
+            set([])
+        )
+        user_6_action_open_1 = ActionUsers.query.filter_by(
+            action='open', argument='1', user_id=user_6.id).first()
+        user_6_action_open_1.argument = '2'
+        db.session.flush()
+        assert current_access.get_action_cache('open::1') is None
+        assert current_access.get_action_cache('open::2') is None
+        permission_open_2 = DynamicPermission(
+            ParameterizedActionNeed('open', '2'))
+        assert permission_open_2.allows(identity_user_6)
+        assert current_access.get_action_cache('open::2') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2),
+                 Need(method='id', value=5),
+                 Need(method='id', value=6)]),
+            set([])
+        )
+        # open action cache should remain as before
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='id', value=1),
+                 Need(method='id', value=2),
+                 Need(method='id', value=5)]),
+            set([])
+        )
+
 
 def test_invenio_access_permission_cache_roles_updates(app):
     """Testing ActionRoles cache with inserts/updates/deletes."""
@@ -397,12 +485,14 @@ def test_invenio_access_permission_cache_roles_updates(app):
         role_3 = Role(name='role_3')
         role_4 = Role(name='role_4')
         role_5 = Role(name='role_5')
+        role_6 = Role(name='role_6')
 
         db.session.add(role_1)
         db.session.add(role_2)
         db.session.add(role_3)
         db.session.add(role_4)
         db.session.add(role_5)
+        db.session.add(role_6)
 
         db.session.add(ActionRoles(action='open', role=role_1))
         db.session.add(ActionRoles(action='write', role=role_4))
@@ -415,6 +505,7 @@ def test_invenio_access_permission_cache_roles_updates(app):
         identity_fake_role_3 = FakeIdentity(RoleNeed(role_3.name))
         identity_fake_role_4 = FakeIdentity(RoleNeed(role_4.name))
         identity_fake_role_5 = FakeIdentity(RoleNeed(role_5.name))
+        identity_fake_role_6 = FakeIdentity(RoleNeed(role_6.name))
 
         # Test if role 1 can open. In this case, the cache should store only
         # this object.
@@ -475,6 +566,7 @@ def test_invenio_access_permission_cache_roles_updates(app):
             ActionRoles.role == role_4).first()
         role_4_action_write.role = role_3
         db.session.flush()
+
         assert current_access.get_action_cache('write') is None
         assert current_access.get_action_cache('open') is not None
         assert current_access.get_action_cache('open') == (
@@ -562,5 +654,42 @@ def test_invenio_access_permission_cache_roles_updates(app):
         assert not permission_write.allows(identity_fake_role_5)
         assert current_access.get_action_cache('write') == (
             set([Need(method='role', value=role_4.name)]),
+            set([])
+        )
+
+        db.session.add(ActionRoles(action='open', argument='1', role=role_6))
+        db.session.flush()
+        permission_open_1 = DynamicPermission(
+            ParameterizedActionNeed('open', '1'))
+        assert not permission_open.allows(identity_fake_role_6)
+        assert permission_open_1.allows(identity_fake_role_6)
+        assert current_access.get_action_cache('open::1') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name),
+                 Need(method='role', value=role_5.name),
+                 Need(method='role', value=role_6.name)]),
+            set([])
+        )
+        user_6_action_open_1 = ActionRoles.query.filter_by(
+            action='open', argument='1', role_id=role_6.id).first()
+        user_6_action_open_1.argument = '2'
+        db.session.flush()
+        assert current_access.get_action_cache('open::1') is None
+        assert current_access.get_action_cache('open::2') is None
+        permission_open_2 = DynamicPermission(
+            ParameterizedActionNeed('open', '2'))
+        assert permission_open_2.allows(identity_fake_role_6)
+        assert current_access.get_action_cache('open::2') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name),
+                 Need(method='role', value=role_5.name),
+                 Need(method='role', value=role_6.name)]),
+            set([])
+        )
+        # open action cache should remain as before
+        assert current_access.get_action_cache('open') == (
+            set([Need(method='role', value=role_1.name),
+                 Need(method='role', value=role_2.name),
+                 Need(method='role', value=role_5.name)]),
             set([])
         )
