@@ -26,7 +26,6 @@
 import sqlalchemy as sa
 from alembic import op
 
-
 # revision identifiers, used by Alembic.
 revision = '2f63be7b7572'
 down_revision = '67ba0de65fbb'
