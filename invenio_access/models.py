@@ -167,7 +167,8 @@ class ActionRoles(ActionNeedMixin, db.Model):
         return RoleNeed(self.role.name)
 
 
-def _get_action_name(name, argument):
+def get_action_cache_key(name, argument):
+    """Get an action cache key string."""
     tokens = [str(name)]
     if argument:
         tokens.append(str(argument))
@@ -176,8 +177,8 @@ def _get_action_name(name, argument):
 
 def removed_or_inserted_action(mapper, connection, target):
     """Remove the action from cache when an item is inserted or deleted."""
-    current_access.delete_action_cache(_get_action_name(target.action,
-                                                        target.argument))
+    current_access.delete_action_cache(get_action_cache_key(target.action,
+                                                            target.argument))
 
 
 def changed_action(mapper, connection, target):
@@ -190,10 +191,10 @@ def changed_action(mapper, connection, target):
 
     if action_history.has_changes() or argument_history.has_changes() \
        or owner_history.has_changes():
-        current_access.delete_action_cache(_get_action_name(target.action,
-                                                            target.argument))
         current_access.delete_action_cache(
-            _get_action_name(
+            get_action_cache_key(target.action, target.argument))
+        current_access.delete_action_cache(
+            get_action_cache_key(
                 action_history.deleted[0] if action_history.deleted
                 else target.action,
                 argument_history.deleted[0] if argument_history.deleted

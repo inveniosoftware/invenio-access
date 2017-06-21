@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -57,57 +57,47 @@ class _AccessState(object):
         return import_string(cache) if isinstance(cache, six.string_types) \
             else cache
 
-    def _get_action_name(self, action):
-        """Get an action name."""
-        if isinstance(action, six.string_types):
-            return str(action)
-
-        tokens = [str(action.value)]
-        if hasattr(action, 'argument'):
-            tokens.append(str(action.argument))
-        return '::'.join(tokens)
-
-    def set_action_cache(self, action, data):
+    def set_action_cache(self, action_key, data):
         """Store action needs and excludes.
 
         .. note:: The action is saved only if a cache system is defined.
 
-        :param action_name: The unique action name.
+        :param action_key: The unique action name.
         :param data: The action to be saved.
         """
         if self.cache:
             self.cache.set(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                self._get_action_name(action), data
+                action_key, data
             )
 
-    def get_action_cache(self, action):
+    def get_action_cache(self, action_key):
         """Get action needs and excludes from cache.
 
         .. note:: It returns the action if a cache system is defined.
 
-        :param action_name: The unique action name.
+        :param action_key: The unique action name.
         :returns: The action stored in cache or ``None``.
         """
         data = None
         if self.cache:
             data = self.cache.get(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                self._get_action_name(action)
+                action_key
             )
         return data
 
-    def delete_action_cache(self, action):
+    def delete_action_cache(self, action_key):
         """Delete action needs and excludes from cache.
 
         .. note:: It returns the action if a cache system is defined.
 
-        :param action_name: The unique action name.
+        :param action_key: The unique action name.
         """
         if self.cache:
             self.cache.delete(
                 self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                self._get_action_name(action)
+                action_key
             )
 
     def register_action(self, action):
