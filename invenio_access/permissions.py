@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -35,7 +35,7 @@ from itertools import chain
 
 from flask_principal import ActionNeed, Permission
 
-from .models import ActionRoles, ActionUsers
+from .models import ActionRoles, ActionUsers, get_action_cache_key
 from .proxies import current_access
 
 _Need = namedtuple('Need', ['method', 'value', 'argument'])
@@ -91,7 +91,10 @@ class DynamicPermission(Permission):
         for explicit_need in self.explicit_needs:
             if explicit_need.method == 'action':
                 action = current_access.get_action_cache(
-                    explicit_need
+                    get_action_cache_key(explicit_need.value,
+                                         explicit_need.argument
+                                         if hasattr(explicit_need, 'argument')
+                                         else None)
                 )
                 if action is None:
                     action = _P(needs=set(), excludes=set())
@@ -113,7 +116,12 @@ class DynamicPermission(Permission):
                             action.needs.add(db_action.need)
 
                     current_access.set_action_cache(
-                        explicit_need, action
+                        get_action_cache_key(explicit_need.value,
+                                             explicit_need.argument
+                                             if hasattr(explicit_need,
+                                                        'argument')
+                                             else None),
+                        action
                     )
                 # in-place update of results
                 result.update(action)
