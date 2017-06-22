@@ -134,9 +134,13 @@ class ActionUsers(ActionNeedMixin, db.Model):
         name='access_actionsusers_unique'),
     )
 
-    user_id = db.Column(db.Integer(), db.ForeignKey(User.id), nullable=True)
+    user_id = db.Column(db.Integer(),
+                        db.ForeignKey(User.id, ondelete='CASCADE'),
+                        nullable=True, index=True)
 
-    user = db.relationship("User")
+    user = db.relationship("User",
+                           backref=db.backref("actionusers",
+                                              cascade="all, delete-orphan"))
 
     @property
     def need(self):
@@ -157,9 +161,13 @@ class ActionRoles(ActionNeedMixin, db.Model):
         name='access_actionsroles_unique'),
     )
 
-    role_id = db.Column(db.Integer(), db.ForeignKey(Role.id), nullable=False)
+    role_id = db.Column(db.Integer(),
+                        db.ForeignKey(Role.id, ondelete='CASCADE'),
+                        nullable=False, index=True)
 
-    role = db.relationship("Role")
+    role = db.relationship("Role",
+                           backref=db.backref("actionusers",
+                                              cascade="all, delete-orphan"))
 
     @property
     def need(self):
