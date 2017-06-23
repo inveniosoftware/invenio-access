@@ -30,7 +30,7 @@ Create database and tables:
 .. code-block:: console
 
    $ cd examples
-   $ export FLASK_APP=app.py
+   $ export FLASK_APP=adminapp.py
    $ flask db init
    $ flask db create
 
@@ -53,13 +53,13 @@ Run the development server:
 
 from __future__ import absolute_import, print_function
 
+import os
+
 from flask import Flask
-from flask_admin import Admin
 from flask_babelex import Babel
 from flask_mail import Mail
 from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
-from invenio_accounts.views import blueprint
 from invenio_admin import InvenioAdmin
 from invenio_db import InvenioDB
 
@@ -67,6 +67,9 @@ from invenio_access import InvenioAccess
 
 app = Flask(__name__)
 app.secret_key = 'ExampleApp'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'
+)
 Babel(app)
 Mail(app)
 Menu(app)
