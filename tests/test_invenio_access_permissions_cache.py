@@ -693,3 +693,34 @@ def test_invenio_access_permission_cache_roles_updates(app):
                  Need(method='role', value=role_5.name)]),
             set([])
         )
+
+
+def test_dynamic_permission_needs_cache_invalidation(app):
+    """Testing DynamicPermission refreshes needs.
+
+    This is important when protecting a view with
+    @permission.require(http_exception=403)
+    If cache does not get invalidated, the needs will only be refreshed when
+    the Python process restarts.
+    """
+    cache = SimpleCache()
+    InvenioAccess(app, cache=cache)
+    with app.test_request_context():
+        user_can_all = User(email='all@inveniosoftware.org')
+        user_can_open = User(email='open@inveniosoftware.org')
+        db.session.add(user_can_all)
+        db.session.add(user_can_open)
+
+        db.session.add(ActionUsers(action='open', user=user_can_all))
+        db.session.flush()
+
+        permission_open = DynamicPermission(ActionNeed('open'))
+
+        assert permission_open.needs == set([Need(method='id', value=1)])
+
+        db.session.add(ActionUsers(action='open', user=user_can_open))
+        db.session.flush()
+
+        assert permission_open.needs == set(
+            [Need(method='id', value=1), Need(method='id', value=2)]
+            )

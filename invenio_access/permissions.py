@@ -138,8 +138,7 @@ class DynamicPermission(Permission):
 
         :returns: A list of need instances.
         """
-        if not self._permissions:
-            self._load_permissions()
+        self._load_permissions()
         return self._permissions.needs
 
     @property
@@ -151,6 +150,5 @@ class DynamicPermission(Permission):
 
         :returns: A list of denied permissions.
         """
-        if not self._permissions:
-            self._load_permissions()  # pragma: no cover
+        self._load_permissions()
         return self._permissions.excludes
