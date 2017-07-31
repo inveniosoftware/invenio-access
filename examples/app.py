@@ -25,6 +25,8 @@
 
 """Minimal Flask application example for development.
 
+SPHINX-START
+
 Start redis server.
 
 Install requirements:
@@ -65,6 +67,8 @@ To be able to uninstall the example app:
     If you are using an action in your app which does not have any role or user
     assigned, the action will be allowed to perform by everyone (Anonymous
     users included)
+
+SPHINX-END
 """
 
 from __future__ import absolute_import, print_function
