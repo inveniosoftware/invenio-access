@@ -33,7 +33,7 @@ from collections import namedtuple
 from functools import partial
 from itertools import chain
 
-from flask_principal import ActionNeed, Permission
+from flask_principal import ActionNeed, Need, Permission
 
 from .models import ActionRoles, ActionUsers, get_action_cache_key
 from .proxies import current_access
@@ -49,10 +49,27 @@ ParameterizedActionNeed.__doc__ = \
     to ``ActionNeed``.
     """
 
+SystemRoleNeed = partial(Need, 'system_role')
+SystemRoleNeed.__doc__ = \
+    """A need with the method preset to `"system role"`"""
+
 superuser_access = ActionNeed('superuser-access')
 """SuperUser access allows access to everything on Invenio.
 
 DynamicPermissions allows by default access to SuperUser.
+"""
+
+any_user = SystemRoleNeed('any_user')
+"""AnyUser system role.
+
+This role is used to assign all possible users (authenticated and guests) to
+an action.
+"""
+
+authenticated_user = SystemRoleNeed('authenticated_user')
+"""AuthenticatedUser system role.
+
+This role is used to assign all authenticated users to an action.
 """
 
 

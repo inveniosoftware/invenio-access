@@ -113,6 +113,11 @@ setup(
             'invenio_access.actions = '
             'invenio_access.permissions:superuser_access',
         ],
+        'invenio_access.system_roles': [
+            'any_user = invenio_access.permissions:any_user',
+            'authenticated_user = '
+            'invenio_access.permissions:authenticated_user',
+        ],
         'invenio_admin.views': [
             'invenio_access_action_users = '
             'invenio_access.admin:action_users_adminview',

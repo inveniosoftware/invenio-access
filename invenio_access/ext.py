@@ -36,19 +36,25 @@ from . import config
 class _AccessState(object):
     """Access state storing registered actions."""
 
-    def __init__(self, app, entry_point_group=None, cache=None):
+    def __init__(self, app, entry_point_actions=None,
+                 entry_point_system_roles=None, cache=None):
         """Initialize state.
 
         :param app: The Flask application.
-        :param entry_point_group: The entrypoint for extensions.
+        :param entry_point_actions: The entrypoint for actions extensions.
             (Default: ``None``)
+        :param entry_point_system_roles: The entrypoint for system roles
+            extensions. (Default: ``None``)
         :param cache: The cache system. (Default: ``None``)
         """
         self.app = app
         self.actions = {}
+        self.system_roles = {}
         self._cache = cache
-        if entry_point_group:
-            self.load_entry_point_group(entry_point_group)
+        if entry_point_actions:
+            self.load_entry_point_actions(entry_point_actions)
+        if entry_point_system_roles:
+            self.load_entry_point_system_roles(entry_point_system_roles)
 
     @cached_property
     def cache(self):
@@ -111,13 +117,32 @@ class _AccessState(object):
         assert action.value not in self.actions
         self.actions[action.value] = action
 
-    def load_entry_point_group(self, entry_point_group):
+    def load_entry_point_actions(self, entry_point_group):
         """Load actions from an entry point group.
 
         :param entry_point_group: The entrypoint for extensions.
         """
         for ep in pkg_resources.iter_entry_points(group=entry_point_group):
             self.register_action(ep.load())
+
+    def register_system_role(self, system_role):
+        """Register a system role.
+
+        .. note:: A system role can't be registered two times. If it happens,
+        then an assert exception will be raised.
+
+        :param system_role: The system role to be registered.
+        """
+        assert system_role.value not in self.system_roles
+        self.system_roles[system_role.value] = system_role
+
+    def load_entry_point_system_roles(self, entry_point_group):
+        """Load system roles from an entry point group.
+
+        :param entry_point_group: The entrypoint for extensions.
+        """
+        for ep in pkg_resources.iter_entry_points(group=entry_point_group):
+            self.register_system_role(ep.load())
 
 
 class InvenioAccess(object):
@@ -131,18 +156,23 @@ class InvenioAccess(object):
         if app:
             self._state = self.init_app(app, **kwargs)
 
-    def init_app(self, app, entry_point_group='invenio_access.actions',
+    def init_app(self, app, entry_point_actions='invenio_access.actions',
+                 entry_point_system_roles='invenio_access.system_roles',
                  **kwargs):
         """Flask application initialization.
 
         :param app: The Flask application.
-        :param entry_point_group: The entrypoint for extensions.
+        :param entry_point_actions: The entrypoint for actions extensions.
             (Default: ``'invenio_access.actions'``)
+        :param entry_point_system_roles: The entrypoint for  system roles
+            extensions. (Default: ``'invenio_access.system_roles'``)
         :param cache: The cache system. (Default: ``None``)
         """
         self.init_config(app)
-        state = _AccessState(app, entry_point_group=entry_point_group,
-                             cache=kwargs.get('cache'))
+        state = _AccessState(
+            app, entry_point_actions=entry_point_actions,
+            entry_point_system_roles=entry_point_system_roles,
+            cache=kwargs.get('cache'))
         app.extensions['invenio-access'] = state
         return state
 
