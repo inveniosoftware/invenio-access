@@ -38,9 +38,10 @@ from mock import patch
 from pkg_resources import EntryPoint
 
 from invenio_access import InvenioAccess, current_access
+from invenio_access.permissions import SystemRoleNeed
 
 
-class MockEntryPoint(EntryPoint):
+class MockEntryPointAction(EntryPoint):
     """Mocking of entrypoint."""
 
     def load(self):
@@ -48,13 +49,25 @@ class MockEntryPoint(EntryPoint):
         return ActionNeed(self.name)
 
 
+class MockEntryPointSystemRole(EntryPoint):
+    """Mocking of entrypoint."""
+
+    def load(self):
+        """Mock load entry point."""
+        return SystemRoleNeed(self.name)
+
+
 def _mock_entry_points(group=None):
     """Mocking funtion of entrypoints."""
     data = {
-        'invenio_access.actions': [MockEntryPoint('open',
-                                                  'demo.actions'),
-                                   MockEntryPoint('close',
-                                                  'demo.actions')],
+        'invenio_access.actions': [
+            MockEntryPointAction('open', 'demo.actions'),
+            MockEntryPointAction('close', 'demo.actions')
+        ],
+        'invenio_access.system_roles': [
+            MockEntryPointSystemRole('any_user', 'demo.specrole'),
+            MockEntryPointSystemRole('authenticated_user', 'demo.specrole')
+        ],
     }
     names = data.keys() if group is None else [group]
     for key in names:
@@ -96,7 +109,7 @@ def test_actions():
     Mail(app)
     InvenioDB(app)
     InvenioAccounts(app)
-    InvenioAccess(app, entry_point_group=None)
+    InvenioAccess(app, entry_point_actions=None)
     with app.app_context():
         current_access.register_action(ActionNeed('action_a'))
         assert len(current_access.actions) == 1
@@ -104,14 +117,32 @@ def test_actions():
         assert len(current_access.actions) == 2
 
 
+def test_system_roles():
+    """Test if the system roles are registered properly."""
+    app = Flask('testapp')
+    Babel(app)
+    Mail(app)
+    InvenioDB(app)
+    InvenioAccounts(app)
+    InvenioAccess(app, entry_point_system_roles=None)
+    with app.app_context():
+        current_access.register_system_role(SystemRoleNeed('spn_a'))
+        assert len(current_access.system_roles) == 1
+        current_access.register_system_role(SystemRoleNeed('spn_b'))
+        assert len(current_access.system_roles) == 2
+
+
 @patch('pkg_resources.iter_entry_points', _mock_entry_points)
-def test_actions_entrypoint():
-    """Test if the entrypoint is registering actions properly."""
+def test_entrypoints():
+    """Test if the entrypoints are registering actions and roles properly."""
     app = Flask('testapp')
     ext = InvenioAccess(app)
     assert len(ext.actions) == 2
     assert ActionNeed('open') in ext.actions.values()
     assert ActionNeed('close') in ext.actions.values()
+    assert len(ext.system_roles) == 2
+    assert SystemRoleNeed('any_user') in ext.system_roles.values()
+    assert SystemRoleNeed('authenticated_user') in ext.system_roles.values()
 
 
 def test_alembic(app):
