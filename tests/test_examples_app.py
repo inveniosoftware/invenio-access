@@ -53,7 +53,7 @@ def example_app():
     assert exit_status == 0
 
     # Starting example web app
-    cmd = 'FLASK_APP=app.py flask run --debugger -p 5000'
+    cmd = 'FLASK_APP=app.py FLASK_DEBUG=1 flask run'
     webapp = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                               preexec_fn=os.setsid, shell=True)
     time.sleep(20)

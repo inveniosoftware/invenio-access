@@ -28,19 +28,57 @@ API Docs
 .. automodule:: invenio_access.ext
    :members:
 
+Action factory
+--------------
+
+.. automodule:: invenio_access.factory
+  :members:
+
 Permissions
 -----------
 
-.. automodule:: invenio_access.permissions
+.. autoclass:: invenio_access.permissions.Permission
    :members:
 
+.. autoclass:: invenio_access.permissions.DynamicPermission
+   :members:
+
+Needs
+-----
+
 .. autodata:: invenio_access.permissions.ParameterizedActionNeed
+
+.. autodata:: invenio_access.permissions.SystemRoleNeed
+
+System roles
+------------
+
+.. autodata:: invenio_access.permissions.any_user
+
+.. autodata:: invenio_access.permissions.authenticated_user
+
+Actions
+-------
+
+.. autodata:: invenio_access.permissions.superuser_access
 
 Models
 ------
 
 .. automodule:: invenio_access.models
    :members:
+
+Utils
+-----
+
+.. automodule:: invenio_access.utils
+   :members:
+
+Proxies
+-------
+
+.. automodule:: invenio_access.proxies
+  :members:
 
 CLI
 ---
