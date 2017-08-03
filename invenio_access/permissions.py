@@ -29,13 +29,16 @@ package.  It allows administrator to fine-tune access to various
 actions with parameters to a specific user or role.
 """
 
+import warnings
 from collections import namedtuple
 from functools import partial
 from itertools import chain
 
-from flask_principal import ActionNeed, Need, Permission
+from flask_principal import Permission as _Permission
+from flask_principal import ActionNeed, Need
 
-from .models import ActionRoles, ActionUsers, get_action_cache_key
+from .models import ActionRoles, ActionSystemRoles, ActionUsers, \
+    get_action_cache_key
 from .proxies import current_access
 
 _Need = namedtuple('Need', ['method', 'value', 'argument'])
@@ -82,14 +85,15 @@ class _P(namedtuple('Permission', ['needs', 'excludes'])):
         self.excludes.update(permission.excludes)
 
 
-class DynamicPermission(Permission):
+class Permission(_Permission):
     """Utility class providing lazy loading of permissions.
 
-    .. warning::
+    This class denies any access by default.
+    """
 
-        If ``ActionNeed`` or ``ParameterizedActionNeed`` is not allowed or
-        restricted to any user or role then it is **ALLOWED** to anybody.
-        This is a major difference to standard ``Permission`` class.
+    allow_by_default = False
+    """If enabled, all permissions are granted when they are not assigned to
+    anybody.
     """
 
     def __init__(self, *needs):
@@ -104,6 +108,8 @@ class DynamicPermission(Permission):
     def _load_permissions(self):
         """Load permissions associated to actions."""
         result = _P(needs=set(), excludes=set())
+        if not self.allow_by_default:
+            result.needs.update(self.explicit_needs)
 
         for explicit_need in self.explicit_needs:
             if explicit_need.method == 'action':
@@ -126,7 +132,12 @@ class DynamicPermission(Permission):
                         ActionRoles.role
                     ).all()
 
-                    for db_action in chain(actionsusers, actionsroles):
+                    actionssystem = ActionSystemRoles.query_by_action(
+                        explicit_need
+                    ).all()
+
+                    for db_action in chain(actionsusers, actionsroles,
+                                           actionssystem):
                         if db_action.exclude:
                             action.excludes.add(db_action.need)
                         else:
@@ -142,7 +153,7 @@ class DynamicPermission(Permission):
                     )
                 # in-place update of results
                 result.update(action)
-            else:
+            elif self.allow_by_default:
                 result.needs.add(explicit_need)
         self._permissions = result
 
@@ -169,3 +180,22 @@ class DynamicPermission(Permission):
         """
         self._load_permissions()
         return self._permissions.excludes
+
+
+class DynamicPermission(Permission):
+    """Utility class providing lazy loading of permissions.
+
+    .. warning::
+
+        If ``ActionNeed`` or ``ParameterizedActionNeed`` is not allowed or
+        restricted to any user or role then it is **ALLOWED** to anybody.
+        This is a major difference to standard ``Permission`` class.
+    """
+
+    allow_by_default = True
+
+    def __init__(self, *args, **kwargs):
+        """Constructor."""
+        super(DynamicPermission, self).__init__(*args, **kwargs)
+        warnings.warn("DynamicPermission will scheduled for removal",
+                      PendingDeprecationWarning)

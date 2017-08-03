@@ -27,14 +27,15 @@
 
 from __future__ import absolute_import, print_function
 
+import pytest
 from flask_principal import ActionNeed, AnonymousIdentity, RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db
 
 from invenio_access import InvenioAccess
-from invenio_access.models import ActionRoles, ActionUsers
+from invenio_access.models import ActionRoles, ActionSystemRoles, ActionUsers
 from invenio_access.permissions import DynamicPermission, \
-    ParameterizedActionNeed
+    ParameterizedActionNeed, Permission, any_user, authenticated_user
 
 
 class FakeIdentity(object):
@@ -52,6 +53,65 @@ def test_invenio_access_permissions_deny(app):
 
         fake_identity = FakeIdentity()
         assert not permission.allows(fake_identity)
+
+
+def test_invenio_access_dynamic_permission(app):
+    """DynamicPermission allows by default."""
+    fake_identity = FakeIdentity()
+
+    InvenioAccess(app)
+    with app.test_request_context():
+        db.session.begin(nested=True)
+        user = User(email='test@inveniosoftware.org')
+        permission = DynamicPermission(ActionNeed('read'))
+
+        # The permission is granted if nobody is assigned the "read" permission
+        assert permission.allows(fake_identity)
+
+        # Once the permission is assigned, the need is mandatory
+        db.session.add(ActionUsers(action='read', user=user))
+        db.session.commit()
+        assert not permission.allows(fake_identity)
+
+        fake_identity.provides.add(UserNeed(user.id))
+        assert permission.allows(fake_identity)
+
+
+def test_invenio_access_permission(app):
+    """Permission is always denied if not explicitly granted."""
+    fake_identity = FakeIdentity()
+
+    InvenioAccess(app)
+    with app.test_request_context():
+        db.session.begin(nested=True)
+        user = User(email='test@inveniosoftware.org')
+        permission = Permission(ActionNeed('read'))
+
+        assert not permission.allows(fake_identity)
+
+        db.session.add(ActionUsers(action='read', user=user))
+        db.session.commit()
+
+        assert not permission.allows(fake_identity)
+
+        fake_identity.provides.add(UserNeed(user.id))
+        assert permission.allows(fake_identity)
+
+
+def test_invenio_access_system_role_name(app):
+    """Check that ActionSystemRoles cannot be created with undeclared names.
+    """
+    InvenioAccess(app)
+    state = app.extensions['invenio-access']
+    with app.test_request_context():
+        db.session.begin(nested=True)
+        # Declare a system role.
+        state.system_roles = {'any_user': any_user}
+        # Create with a declared name.
+        ActionSystemRoles(action='read', role_name='any_user')
+        # Create with an undeclared name.
+        with pytest.raises(AssertionError):
+            ActionSystemRoles(action='read', role_name='unknown')
 
 
 def test_invenio_access_permission_for_users(app):
@@ -236,3 +296,31 @@ def test_invenio_access_permission_for_roles(app):
 
         assert not permission_open.allows(identity_read)
         assert permission_read.allows(identity_read)
+
+
+def test_invenio_access_permission_for_system_roles(app):
+    """User can access to an action allowed/denied to their system roles."""
+    InvenioAccess(app)
+    with app.test_request_context():
+        db.session.begin(nested=True)
+        user = User(email='user@inveniosoftware.org')
+
+        db.session.add(user)
+
+        db.session.add(ActionSystemRoles(action='open',
+                                         role_name='authenticated_user'))
+        db.session.add(ActionSystemRoles(action='write',
+                                         role_name='any_user'))
+        db.session.commit()
+
+        permission_open = DynamicPermission(ActionNeed('open'))
+        permission_write = DynamicPermission(ActionNeed('write'))
+
+        identity_anon_user = FakeIdentity(any_user)
+        identity_auth_user = FakeIdentity(authenticated_user, any_user)
+
+        assert not permission_open.allows(identity_anon_user)
+        assert permission_open.allows(identity_auth_user)
+
+        assert permission_write.allows(identity_anon_user)
+        assert permission_write.allows(identity_auth_user)

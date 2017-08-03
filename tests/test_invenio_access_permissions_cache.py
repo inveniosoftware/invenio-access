@@ -35,9 +35,9 @@ from invenio_db import db
 from werkzeug.contrib.cache import RedisCache, SimpleCache
 
 from invenio_access import InvenioAccess, current_access
-from invenio_access.models import ActionRoles, ActionUsers
+from invenio_access.models import ActionRoles, ActionSystemRoles, ActionUsers
 from invenio_access.permissions import DynamicPermission, \
-    ParameterizedActionNeed
+    ParameterizedActionNeed, SystemRoleNeed
 
 
 class FakeIdentity(object):
@@ -691,6 +691,222 @@ def test_invenio_access_permission_cache_roles_updates(app):
             set([Need(method='role', value=role_1.name),
                  Need(method='role', value=role_2.name),
                  Need(method='role', value=role_5.name)]),
+            set([])
+        )
+
+
+def test_invenio_access_permission_cache_system_roles_updates(app):
+    """Testing ActionSystemRoles cache with inserts/updates/deletes."""
+    # This test case is doing the same of user test case but using
+    # system roles.
+    cache = SimpleCache()
+    InvenioAccess(app, cache=cache)
+    with app.test_request_context():
+        system_role_1 = SystemRoleNeed('system_role_1')
+        system_role_2 = SystemRoleNeed('system_role_2')
+        system_role_3 = SystemRoleNeed('system_role_3')
+        system_role_4 = SystemRoleNeed('system_role_4')
+        system_role_5 = SystemRoleNeed('system_role_5')
+        system_role_6 = SystemRoleNeed('system_role_6')
+        current_access.system_roles = {
+            'system_role_1': system_role_1,
+            'system_role_2': system_role_2,
+            'system_role_3': system_role_3,
+            'system_role_4': system_role_4,
+            'system_role_5': system_role_5,
+            'system_role_6': system_role_6,
+        }
+
+        # Creation of some data to test.
+        db.session.add(ActionSystemRoles(action='open',
+                                         role_name=system_role_1.value))
+        db.session.add(ActionSystemRoles(action='write',
+                                         role_name=system_role_4.value))
+
+        db.session.flush()
+
+        # Creation of identities to test.
+        identity_fake_1 = FakeIdentity(system_role_1)
+        identity_fake_2 = FakeIdentity(system_role_2)
+        identity_fake_3 = FakeIdentity(system_role_3)
+        identity_fake_4 = FakeIdentity(system_role_4)
+        identity_fake_5 = FakeIdentity(system_role_5)
+        identity_fake_6 = FakeIdentity(system_role_6)
+
+        # Test if system_role_1 can open. In this case, the cache should store
+        # only this object.
+        permission_open = DynamicPermission(ActionNeed('open'))
+        assert permission_open.allows(identity_fake_1)
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1]),
+            set([])
+        )
+
+        # Test if system_role_2 can write. In this case, the cache should
+        # have this new object and the previous one (Open is allowed to
+        # system_role_1)
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert permission_write.allows(identity_fake_4)
+        assert current_access.get_action_cache('write') == (
+            set([system_role_4]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1]),
+            set([])
+        )
+
+        # If we add a new system role to the action open, the open action in
+        # cache should be removed but it should still containing the write
+        # entry.
+        db.session.add(ActionSystemRoles(action='open',
+                                         role_name=system_role_2.value))
+        db.session.flush()
+        assert current_access.get_action_cache('open') is None
+        permission_open = DynamicPermission(ActionNeed('open'))
+        assert permission_open.allows(identity_fake_2)
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2]),
+            set([])
+        )
+        assert current_access.get_action_cache('write') == (
+            set([system_role_4]),
+            set([])
+        )
+
+        # Test if the new role is added to the action 'open'
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert permission_write.allows(identity_fake_4)
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2]),
+            set([])
+        )
+        assert current_access.get_action_cache('write') == (
+            set([system_role_4]),
+            set([])
+        )
+
+        # If we update an action swapping a role, the cache containing the
+        # action, should be removed.
+        role_4_action_write = ActionSystemRoles.query.filter(
+            ActionSystemRoles.action == 'write' and
+            ActionSystemRoles.role_name == system_role_4.value).first()
+        role_4_action_write.role_name = system_role_3.value
+        db.session.flush()
+
+        assert current_access.get_action_cache('write') is None
+        assert current_access.get_action_cache('open') is not None
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2]),
+            set([])
+        )
+
+        # Test if the system_role_3 can write now.
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert not permission_write.allows(identity_fake_4)
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert permission_write.allows(identity_fake_3)
+        assert current_access.get_action_cache('write') == (
+            set([system_role_3]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2]),
+            set([])
+        )
+
+        # If we remove a role from an action, the cache should clear the
+        # action item.
+        cust_action_write = ActionSystemRoles.query.filter(
+            ActionSystemRoles.action == 'write' and
+            ActionSystemRoles.role_name == system_role_3).first()
+        db.session.delete(cust_action_write)
+        db.session.flush()
+        assert current_access.get_action_cache('write') is None
+        # If no one is allowed to perform an action then everybody is allowed.
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert permission_write.allows(identity_fake_3)
+        assert current_access.get_action_cache('write') == (
+            set([]),
+            set([])
+        )
+        db.session.add(ActionSystemRoles(action='write',
+                                         role_name=system_role_5.value))
+        db.session.flush()
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert permission_write.allows(identity_fake_5)
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert not permission_write.allows(identity_fake_3)
+        assert current_access.get_action_cache('write') == (
+            set([system_role_5]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2]),
+            set([])
+        )
+
+        # If you update the name of an existing action, the previous action
+        # and the new action should be remove from cache.
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert permission_write.allows(identity_fake_5)
+        assert current_access.get_action_cache('write') == (
+            set([system_role_5]),
+            set([])
+        )
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2]),
+            set([])
+        )
+        role_5_action_write = ActionSystemRoles.query.filter(
+            ActionSystemRoles.action == 'write' and
+            ActionSystemRoles.role_name == system_role_5.value).first()
+        role_5_action_write.action = 'open'
+        db.session.flush()
+        assert current_access.get_action_cache('write') is None
+        assert current_access.get_action_cache('open') is None
+        permission_open = DynamicPermission(ActionNeed('open'))
+        assert permission_open.allows(identity_fake_1)
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2, system_role_5]),
+            set([])
+        )
+        db.session.add(ActionSystemRoles(action='write',
+                                         role_name=system_role_4.value))
+        permission_write = DynamicPermission(ActionNeed('write'))
+        assert not permission_write.allows(identity_fake_5)
+        assert current_access.get_action_cache('write') == (
+            set([system_role_4]),
+            set([])
+        )
+
+        db.session.add(ActionSystemRoles(action='open', argument='1',
+                                         role_name=system_role_6.value))
+        db.session.flush()
+        permission_open_1 = DynamicPermission(
+            ParameterizedActionNeed('open', '1'))
+        assert not permission_open.allows(identity_fake_6)
+        assert permission_open_1.allows(identity_fake_6)
+        assert current_access.get_action_cache('open::1') == (
+            set([system_role_1, system_role_2, system_role_5, system_role_6]),
+            set([])
+        )
+        user_6_action_open_1 = ActionSystemRoles.query.filter_by(
+            action='open', argument='1', role_name=system_role_6.value).first()
+        user_6_action_open_1.argument = '2'
+        db.session.flush()
+        assert current_access.get_action_cache('open::1') is None
+        assert current_access.get_action_cache('open::2') is None
+        permission_open_2 = DynamicPermission(
+            ParameterizedActionNeed('open', '2'))
+        assert permission_open_2.allows(identity_fake_6)
+        assert current_access.get_action_cache('open::2') == (
+            set([system_role_1, system_role_2, system_role_5, system_role_6]),
+            set([])
+        )
+        # open action cache should remain as before
+        assert current_access.get_action_cache('open') == (
+            set([system_role_1, system_role_2, system_role_5]),
             set([])
         )
 

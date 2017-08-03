@@ -31,6 +31,7 @@ from invenio_accounts.models import Role, User
 from invenio_db import db
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.event import listen
+from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import get_history
 
 from .proxies import current_access
@@ -175,6 +176,34 @@ class ActionRoles(ActionNeedMixin, db.Model):
         return RoleNeed(self.role.name)
 
 
+class ActionSystemRoles(ActionNeedMixin, db.Model):
+    """ActionSystemRoles data model.
+
+    It relates an allowed action with a predefined role.
+    Example: "any user"
+    """
+
+    __tablename__ = 'access_actionssystemroles'
+
+    __table_args__ = (UniqueConstraint(
+        'action', 'exclude', 'argument', 'role_name',
+        name='access_actionssystemroles_unique'),
+    )
+
+    role_name = db.Column(db.String(40), nullable=False, index=True)
+
+    @validates('role_name')
+    def validate_role_name(self, key, role_name):
+        """Checks that the role name has been registered."""
+        assert role_name in current_access.system_roles
+        return role_name
+
+    @property
+    def need(self):
+        """Return the corresponding Need instance."""
+        return current_access.system_roles[self.role_name]
+
+
 def get_action_cache_key(name, argument):
     """Get an action cache key string."""
     tokens = [str(name)]
@@ -195,7 +224,8 @@ def changed_action(mapper, connection, target):
     argument_history = get_history(target, 'argument')
     owner_history = get_history(
         target,
-        'user' if isinstance(target, ActionUsers) else 'role')
+        'user' if isinstance(target, ActionUsers) else
+        'role' if isinstance(target, ActionRoles) else 'role_name')
 
     if action_history.has_changes() or argument_history.has_changes() \
        or owner_history.has_changes():
@@ -217,3 +247,7 @@ listen(ActionUsers, 'after_update', changed_action)
 listen(ActionRoles, 'after_insert', removed_or_inserted_action)
 listen(ActionRoles, 'after_delete', removed_or_inserted_action)
 listen(ActionRoles, 'after_update', changed_action)
+
+listen(ActionSystemRoles, 'after_insert', removed_or_inserted_action)
+listen(ActionSystemRoles, 'after_delete', removed_or_inserted_action)
+listen(ActionSystemRoles, 'after_update', changed_action)
