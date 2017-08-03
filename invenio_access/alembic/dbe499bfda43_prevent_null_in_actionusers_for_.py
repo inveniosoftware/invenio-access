@@ -23,6 +23,7 @@
 
 """Prevent NULL in ActionUsers for stability reasons."""
 
+import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -34,9 +35,11 @@ depends_on = None
 
 def upgrade():
     """Upgrade database."""
-    op.alter_column('access_actionsusers', 'user_id', nullable=False)
+    op.alter_column('access_actionsusers', 'user_id', nullable=False,
+                    existing_type=sa.Integer())
 
 
 def downgrade():
     """Downgrade database."""
-    op.alter_column('access_actionsusers', 'user_id', nullable=True)
+    op.alter_column('access_actionsusers', 'user_id', nullable=True,
+                    existing_type=sa.Integer())
