@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,17 +22,25 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Default values for access configuration.
+"""Factory method for creating new action needs."""
 
-.. note::
+from __future__ import absolute_import, print_function
 
-    By default no caching is enabled. For production instances it is **highly
-    advisable** to enable caching as the permission checking is very query
-    intensive on the database.
-"""
+from functools import partial
 
-ACCESS_CACHE = None
-"""A cache instance or an importable string pointing to the cache instance."""
+from flask_principal import ActionNeed
 
-ACCESS_ACTION_CACHE_PREFIX = 'Permission::action::'
-"""Prefix for actions cached when used in dynamic permissions."""
+from .permissions import ParameterizedActionNeed
+
+
+def action_factory(name, parameter=False):
+    """Factory method for creating new actions (w/wo parameters).
+
+    :param name: Name of the action (prefix with your module name).
+    :param parameter: Determines if action should take parameters or not.
+        Default is ``False``.
+    """
+    if parameter:
+        return partial(ParameterizedActionNeed, name)
+    else:
+        return ActionNeed(name)

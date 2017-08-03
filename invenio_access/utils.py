@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,17 +22,25 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Default values for access configuration.
+"""Utility functions for Invenio-Access."""
 
-.. note::
+from __future__ import absolute_import, print_function
 
-    By default no caching is enabled. For production instances it is **highly
-    advisable** to enable caching as the permission checking is very query
-    intensive on the database.
-"""
+from flask_principal import Identity, RoleNeed, UserNeed
 
-ACCESS_CACHE = None
-"""A cache instance or an importable string pointing to the cache instance."""
 
-ACCESS_ACTION_CACHE_PREFIX = 'Permission::action::'
-"""Prefix for actions cached when used in dynamic permissions."""
+def get_identity(user):
+    """Create an identity for a given user instance.
+
+    Primarily useful for testing.
+    """
+    identity = Identity(user.id)
+
+    if hasattr(user, 'id'):
+        identity.provides.add(UserNeed(user.id))
+
+    for role in getattr(user, 'roles', []):
+        identity.provides.add(RoleNeed(role.name))
+
+    identity.user = user
+    return identity

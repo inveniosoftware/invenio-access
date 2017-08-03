@@ -33,6 +33,7 @@ Invenio-Access.
 .. toctree::
    :maxdepth: 2
 
+   overview
    installation
    configuration
    usage

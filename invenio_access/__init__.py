@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,20 +22,20 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Invenio module for common role based access control.
+"""Role-based access control for Invenio.
 
-It aims to make the process of managing access rigths quick and easy while
-preventing unwanted visitors from performing restricted actions due to system
-misconfiguration.
+Invenio-Access works together with Invenio-Accounts to provide a full-fledge
+authentication and authorization system for Flask and Invenio based on a suite
+of existing Flask extensions such as:
 
-This module uses the Flask-Principal library. You can refer to its
-documentation for definitions of "Needs", "Identity" and "Permission" concepts.
+- Flask-Security
+- Flask-Login
+- Flask-Principal
+- passlib
 
-Access module in three points:
-
-- parametrized action "Needs"
-- arbitrary combinations of rules for allowing/denying users and/or roles
-- support lazy loading of permissions at runtime
+Make sure you check out :ref:`concepts` to have a basic understanding of the
+entities in the access control system. This part of the usage documentation is
+focused on the programmatic APIs and are intended for developers.
 
 Initialization
 --------------
@@ -51,7 +51,7 @@ Invenio-Accounts, and then Invenio-Access itself:
 
 >>> from invenio_db import InvenioDB
 >>> from invenio_accounts import InvenioAccounts
->>> from invenio_access  import InvenioAccess
+>>> from invenio_access import InvenioAccess
 >>> ext_db = InvenioDB(app)
 >>> ext_accounts = InvenioAccounts(app)
 >>> ext_access = InvenioAccess(app)
@@ -59,8 +59,7 @@ Invenio-Accounts, and then Invenio-Access itself:
 The following examples needs to run in a Flask application context, so
 let's push one:
 
->>> ctx = app.app_context()
->>> ctx.push()
+>>> app.app_context().push()
 
 Also, for the examples to work we need to create the database and tables (note,
 in this example we use an in-memory SQLite database):
@@ -68,202 +67,375 @@ in this example we use an in-memory SQLite database):
 >>> from invenio_db import db
 >>> db.create_all()
 
+Demo data
+~~~~~~~~~
+Let's also create two initial users and a role:
 
-Dynamic permission control
---------------------------
+>>> from invenio_accounts.models import User, Role
+>>> alice = User(email='alice@inveniosoftware.org')
+>>> bob = User(email='bob@inveniosoftware.org')
+>>> admin = Role(name='admin')
 
-ActionUsers and ActionRoles
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Now, assign Alice to the admin role:
 
-Flask-Principal provides the ``Need`` concept which reprensents a basic
-permission to access a resource, perform an action, etc...
+>>> admin.users.append(alice)
 
-Invenio-Access extends this concept by providing
-``ParametrizedActionNeed``. A ``ParametrizedActionNeed`` is used in
-order to allow or restrict an action and it has an optional parameter.
+Last, persist the changees to the database:
 
-Invenio-Access stores two types of ``ParametrizedActionNeeds`` in the database:
+>>> db.session.add_all([alice, bob, admin])
+>>> db.session.commit()
 
-- ``ActionUsers``: it allows or denies a user to perform an action.
-- ``ActionRoles``: it allows or denies a user role to perform an action.
+Protecting resources
+--------------------
+The basics, of protecting a resource involves:
 
-Actions have a name and can be defined by any module. The optional parameter
-can be used as the module sees fit.
+1. Defining one or more actions.
+2. Create a permission that requires one or more actions.
+3. Check if a permission allows a given identity (i.e. the identity provides
+   one more of the required actions).
 
-DynamicPermission
-~~~~~~~~~~~~~~~~~
+**1. Define actions**
 
-A ``DynamicPermission`` is based on the Flask-Principle's ``Permission``. It
-checks if a user can perform an action by querying the corresponding
-``ActionUsers`` and ``ActionRoles`` tables.
+First, let's start with defining an action (e.g. view an index page in our
+module) using the action creation factory:
 
-The permissions are loaded from the database the first time you perform
-```needs``` or ```excludes``` in the ``DynamicPermission`` object and they are
-stored in the instance of ``DynamicPermission`` affected to be used in future
-calls.
+>>> from invenio_access import action_factory
+>>> view_index_action = action_factory('mymodule-index-view')
 
-Note that if no ``ActionRoles`` or ``ActionUsers`` exist in the database for
-a given action, the action is allowed to every user, including anonymous users.
+**2. Create a permission**
 
-How it works
-~~~~~~~~~~~~
+Next, we create a permission that requires the just created action:
 
-You can start by creating new actions either with or without parameters:
+>>> from invenio_access import Permission
+>>> permission = Permission(view_index_action)
 
->>> from flask_principal import ActionNeed
->>> from invenio_access import ParameterizedActionNeed
->>> action_index = ActionNeed('index')
->>> action_view_all = ParameterizedActionNeed('view', None)
->>> action_view_1 = ParameterizedActionNeed('view', '1')
+**3. Check permission**
 
-If no role or user is attached anybody can perform the action. You can verify
-this behavior using following commands.
+In order to check the permission we first need an identity, so let's start out
+with an anonymous identity (this happens transparently in the background when
+a user login):
 
 >>> from flask_principal import AnonymousIdentity
->>> from invenio_access import DynamicPermission, ParameterizedActionNeed
->>> permission_index = DynamicPermission(action_index)
->>> permission_view_all = DynamicPermission(action_view_all)
->>> permission_view_1 = DynamicPermission(action_view_1)
->>> anonymous_identity = AnonymousIdentity()
->>> anonymous_identity.can(permission_index)
-True
->>> anonymous_identity.can(permission_view_all)
-True
->>> anonymous_identity.can(permission_view_1)
-True
+>>> anonymous = AnonymousIdentity()
 
-If the parameter is set to ``None`` as in this example, the action is allowed
-or denied for all possible values. If it is set to a specific value then only
-this value is allowed or denied.
+Next, we can check if the permission allows the given identity (we will see
+in detail below how to use permissions in a view):
 
-Assign actions
-~~~~~~~~~~~~~~
+>>> permission.allows(anonymous)
+False
 
-Programmatically
-++++++++++++++++
+Granting acccss
+---------------
+Checking if the anonymous identity is granted access by a permission is often
+not too interesting, so let's grant our admin role access to our action:
 
-You can either assign actions to users or roles. First, you need to have
-some users and roles in your database.
-
->>> from invenio_db import db
->>> from invenio_accounts.models import User, Role
->>> admin = User(email='admin@inveniosoftware.org')
->>> student = User(email='student@inveniosoftware.org')
->>> db.session.begin(nested=True)
-<sqlalchemy.orm.session.SessionTransaction object ...
->>> db.session.add(admin)
->>> db.session.add(student)
+>>> from invenio_access.models import ActionRoles, ActionUsers
+>>> db.session.add(ActionRoles.allow(view_index_action, role=admin))
 >>> db.session.commit()
 
-With users created you can allow and deny actions:
+Next, we need identity instances for our two users (normally you will not have
+to worry about this when checking permissions in a view as it is handled
+transparently by Flask-Security):
+
+>>> from invenio_access.utils import get_identity
+>>> alice_identity = get_identity(alice)
+>>> bob_identity = get_identity(bob)
+
+Now that we have the identities, we can check if the permission grants access
+to the identities:
+
+>>> permission.allows(alice_identity)
+True
+>>> permission.allows(bob_identity)
+False
+
+Notice, that we granted access to Alice by assigning her the role ``admin``
+and granting the role permission on the action.
+
+The Flask-Principal API is pretty rich, and there is multiple other ways
+that you can check if a permission grants access to an identity. For instance
+below is another example, but please explore the Flask-Principal API
+documentation for a full reference:
+
+>>> bob_identity.can(permission)
+False
+
+Action parameters
+-----------------
+Above we created an action that did not take any parameters. These actions are
+useful to grant/restrict access to e.g. an entire adminstration interface.
+However, in many cases you need object level permissions, in which case you
+need to use actions with parameters.
+
+Action with parameters are also created with the
+:py:func:`~.factory.action_factory`, but works a bit different as
+they take a parameter.
+
+First you create the new action with parameter:
+
+>>> ObjectReadAction = action_factory(
+...     'mymodule-object-read', parameter=True)
+
+Everytime you create the action, you also need to create an instance of the
+action representing *any* parameter as done like below:
+
+>>> object_read_action_all = ObjectReadAction(None)
+
+**Granting access to actions with parameters**
+
+You grant access to actions with parameters in a similar way as for normal
+actions, but you can now grant access to either **all** objects:
+
+>>> db.session.add(ActionRoles.allow(
+...     object_read_action_all, role=admin))
+
+Or you can grant access to a **specific** object like this:
+
+>>> db.session.add(ActionUsers.allow(ObjectReadAction(42), user=bob))
+>>> db.session.commit()
+
+**Checking permissions for a specific object**
+
+Similar you also create a permission that checks access to a specific object:
+
+>>> permission = Permission(ObjectReadAction(42))
+>>> permission.allows(bob_identity)
+True
+>>> permission.allows(alice_identity)
+True
+
+Denying access
+--------------
+Besides granting access, you can also **deny** access to specific users or
+roles. Below for instance we deny access to Alice on the ``view_index_action``.
 
 >>> from invenio_access.models import ActionUsers
->>> db.session.begin(nested=True)
-<sqlalchemy.orm.session.SessionTransaction object ...
->>> db.session.add(ActionUsers.allow(action_index, user=admin))
+>>> db.session.add(ActionUsers.deny(view_index_action, user=alice))
 >>> db.session.commit()
 
-It is then possible to check the permissions:
+When we now check the permission, Alice no longer has access:
 
->>> permission_index = DynamicPermission(action_index)
->>> anonymous_identity.can(permission_index)
+>>> permission = Permission(view_index_action)
+>>> permission.allows(alice_identity)
 False
->>> from flask_principal import Identity, RoleNeed, UserNeed
->>> admin_identity = Identity(admin.id)
->>> admin_identity.provides.add(UserNeed(admin.id))
->>> admin_identity.can(permission_index)
+
+**Deny takes presedence over allow**
+
+Note, that the deny grant takes presendence over allow grant. Alice was earlier
+granted access to the action via her role assignment, however since the deny
+grant takes presendence Alice is ultimately denied access.
+
+This is useful if you for instance want to grant acess to all objects
+*except* one.
+
+Protecting views
+----------------
+The most common use for permissions is to protect a view. For actions without
+parameters you can simply use a decorator for the view:
+
+>>> index_permission = Permission(view_index_action)
+>>> @app.route('/')
+... @index_permission.require(http_exception=403)
+... def index():
+...     return 'Protected index page'
+
+Permission factories
+~~~~~~~~~~~~~~~~~~~~
+In most situations, you however have to deal with object level permissions,
+and thus you will have to create the permission on-the-fly via a factory
+method. A simple permission factory can look like the one below:
+
+>>> def permission_factory(obj):
+...     return Permission(ObjectReadAction(obj['id']))
+
+The factory function simply takes your object and returns a permission for the
+specific action. This unfortunately also means that you usually cannot use
+the decorator option shown above. Instead you usually have to first fetch your
+object from e.g. the database, and then run the permission check:
+
+>>> @app.route('/objects/<int:object_id>')
+... def object_view(object_id):
+...     with permission_factory({'id': object_id}).require(http_exception=404):
+...         return 'Protected index page'
+
+.. note::
+
+    Invenio source code almost exclusively use the permission factory approach
+    for protecting views. In addition usually the permission factory is
+    configurable so that Invenio instances can fully override the internal
+    permission handling.
+
+Security considerations
+~~~~~~~~~~~~~~~~~~~~~~~
+We can now test the two views via the built-in Flask test client, and see that
+anonymous requests are denied in both cases:
+
+>>> with app.test_client() as c:
+...     c.get('/')
+<Response streamed [403 FORBIDDEN]>
+>>> with app.test_client() as c:
+...     c.get('/objects/42')
+<Response streamed [404 NOT FOUND]>
+
+In the two above examples for protecting views, you will notice that in one we
+return an HTTP 403 Forbidden error, and in the other we return a HTTP 404 Not
+Found error.
+
+In views, you should always make a consicience decision if you should return
+401/403 or 404 errors as it has important security considerations.
+
+- **403/401** errors exposes *existence* of an object under a given URL. Hence,
+  by using 401/403 errors, the system is "leaking" knowledge that certain
+  objects exists in the system. Hence, only use 401/403 errors when this
+  behaviour is desired. In all other cases use 404 errors.
+- **404** errors does not leak any additional information and
+  *should be the default error* used when a permission check fails.
+
+Superuser
+---------
+Invenio-Access provides a way to grant superuser priviledges to users or roles
+via a superuser action. Granting superuser access to a user implicit gives
+that user access to any action in the system without explicitly having to grant
+the action.
+
+For instance, currently Bob does not have permissions on our
+``view_index_action``:
+
+>>> permission = Permission(view_index_action)
+>>> permission.allows(bob_identity)
+False
+
+We can however grant Bob superuser access like this:
+
+>>> from invenio_access.permissions import superuser_access
+>>> db.session.add(ActionUsers.allow(superuser_access, user=bob))
+>>> db.session.commit()
+
+Now, Bob will have access to the ``view_index_action`` even though we did not
+explicitly grant Bob access:
+
+>>> permission.allows(bob_identity)
 True
->>> student_identity = Identity(student.id)
->>> student_identity.provides.add(UserNeed(student.id))
->>> student_identity.can(permission_index)
-False
 
+System roles
+------------
+Invenio-Access in addition to normal administrator defined roles also provides
+system roles, which are roles that are defined by the system and automatically
+assigned to users.
 
-With the command line interface
-+++++++++++++++++++++++++++++++
+By default the following system roles exists:
 
-The permissions can also be assigned using the CLI. For example it is
-possible to allow the action ``open``, which is registered in the
-example application.
+* Any user (guests and autenticated users)
+* Authenticated user
 
-Let's first intialize the example application which we will use.
+System roles works very much like normal roles, so you can e.g. assign
+to them actions:
 
-.. code-block:: console
+>>> from invenio_access import ActionSystemRoles, any_user
+>>> db.session.add(ActionSystemRoles.allow(
+...     view_index_action, role_name='any_user'))
 
-    $ cd examples
-    $ export FLASK_APP=app.py
-    $ ./app-setup.sh
+In order to test system roles from the shell, we have to manually add the need
+into the identity.
 
-Let's create a user.
+>>> anonymous.provides.add(any_user)
 
-.. code-block:: console
+Now we can check the permission:
 
-    $ flask users create admin@inveniosoftware.org -a --password 123456
+>>> permission = Permission(view_index_action)
+>>> permission.allows(anonymous)
+True
 
-This is how to allow the action "open" to this user.
+Creating system roles
+~~~~~~~~~~~~~~~~~~~~~
+Invenio modules may provide additional system roles. You could for instance
+create a system role that could be used to grant permissions based on IP
+address.
 
-.. code-block:: console
+First the module should define the system role:
 
-    $ flask access allow open user admin@inveniosoftware.org
+>>> from invenio_access import SystemRoleNeed
+>>> campus_user = SystemRoleNeed('campus_user')
 
-Run the following command in order to uninstall the example application
+Next, connect a receiver to the :py:data:`~identity_loaded`
+signal and add the system role need to the identity:
 
-.. code-block:: console
+>>> from flask import request
+>>> from flask_principal import identity_loaded
+>>> @identity_loaded.connect_via(app)
+... def on_identity_loaded(sender, identity):
+...     if request.remote_addr.startswith('192.168.'):
+...         identity.provides.add(campus_user)
 
-    $ ./app-teardown.sh
+Last, you need to register the system role in the Invenio module's entry
+points in ``setup.py``:
 
+.. code-block:: python
 
-How to discover existing actions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    entry_points={
+        'invenio_access.system_roles': [
+            'campus_user'
+            ' = mymodule.permissions:campus_user',
+        ],
+    }
 
-Modules that intend to implement a given set of actions can register them in
-entry points in the corresponding `setup.py`, e.g.
+Registering actions
+-------------------
+All actions that a package provides should be registered in the
+``invenio_access.actions`` entry points. This ensures the actions are e.g.
+available in the adminstration interface and via the CLI.
+
+Below is an example for of the entry point part of the ``setup.py``:
 
 .. code-block:: python
 
     entry_points={
         'invenio_access.actions': [
-            'records_read_all'
-            ' = invenio_records.permissions:records_read_all',
-            'records_create_all'
-            ' = invenio_records.permissions:records_create_all',
-            'records_update_all'
-            ' = invenio_records.permissions:records_update_all',
-            'records_delete_all'
-            ' = invenio_records.permissions:records_delete_all',
+            # Action with parameter
+            'object_read_action_all'
+            ' = mymodule.permissions:object_read_action_all',
+            # Action without parameter
+            'view_index_action'
+            ' = mymodule.permissions:view_index_action',
         ],
     }
 
+Note that for action with parameters you need point to the import path of the
+action representing *any* parameters.
+
+Listing actions
+---------------
 In order to discover which actions are available in a given installation one
 can retrieve them via:
 
 >>> sorted(app.extensions['invenio-access'].actions.keys())
 ['admin-access', 'superuser-access']
-
-One can also use CLI to discover registered actions. Here's an example:
-
-.. code-block:: console
-
-    $ cd examples
-    $ export FLASK_APP=app.py
-    $ flask access list
-    read:
-    open:
-    admin-access:
-    superuser-access:
 """
 
 from __future__ import absolute_import, print_function
 
+from flask_principal import ActionNeed
+
 from .ext import InvenioAccess
-from .permissions import DynamicPermission, ParameterizedActionNeed
+from .factory import action_factory
+from .models import ActionRoles, ActionSystemRoles, ActionUsers
+from .permissions import any_user, authenticated_user, DynamicPermission, \
+    ParameterizedActionNeed, Permission, superuser_access, SystemRoleNeed
 from .proxies import current_access
 from .version import __version__
 
+
 __all__ = (
     '__version__',
+    'any_user',
+    'authenticated_user',
+    'action_factory',
     'current_access',
-    'DynamicPermission',
+    'ActionNeed',
+    'DynamicPermission',  # Deprecated in favor of Permission.
     'InvenioAccess',
     'ParameterizedActionNeed',
+    'Permission',
+    'superuser_access'
+    'SystemRoleNeed',
 )
