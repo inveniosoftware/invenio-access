@@ -23,6 +23,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+export PYTEST_ADDOPTS='docs tests invenio_access'
 
 pydocstyle invenio_access tests docs && \
 isort -rc -c -df && \
