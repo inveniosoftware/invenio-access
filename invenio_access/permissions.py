@@ -72,7 +72,7 @@ class DynamicPermission(Permission):
 
         If ``ActionNeed`` or ``ParameterizedActionNeed`` is not allowed or
         restricted to any user or role then it is **ALLOWED** to anybody.
-        This is a major diference to standard ``Permission`` class.
+        This is a major difference to standard ``Permission`` class.
     """
 
     def __init__(self, *needs):

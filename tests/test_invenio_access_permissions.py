@@ -27,13 +27,14 @@
 
 from __future__ import absolute_import, print_function
 
-from flask_principal import ActionNeed, RoleNeed, UserNeed
+from flask_principal import ActionNeed, AnonymousIdentity, RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db
 
 from invenio_access import InvenioAccess
 from invenio_access.models import ActionRoles, ActionUsers
-from invenio_access.permissions import DynamicPermission
+from invenio_access.permissions import DynamicPermission, \
+    ParameterizedActionNeed
 
 
 class FakeIdentity(object):
@@ -75,27 +76,119 @@ def test_invenio_access_permission_for_users(app):
 
         db.session.add(ActionUsers(action='read', user=user_can_all))
         db.session.add(ActionUsers(action='read', user=user_can_read))
+
+        db.session.add(ActionUsers(action='not_logged', user=user_can_all))
+
         db.session.commit()
 
         permission_open = DynamicPermission(ActionNeed('open'))
         permission_read = DynamicPermission(ActionNeed('read'))
+        permission_not_logged = DynamicPermission(ActionNeed('not_logged'))
 
         identity_superuser = FakeIdentity(UserNeed(superuser.id))
         identity_all = FakeIdentity(UserNeed(user_can_all.id))
         identity_read = FakeIdentity(UserNeed(user_can_read.id))
         identity_open = FakeIdentity(UserNeed(user_can_open.id))
+        identity_unknown = AnonymousIdentity()
 
+        # global permissions
         assert permission_open.allows(identity_superuser)
         assert permission_read.allows(identity_superuser)
 
         assert permission_open.allows(identity_all)
         assert permission_read.allows(identity_all)
+        assert permission_not_logged.allows(identity_all)
 
         assert permission_open.allows(identity_open)
         assert not permission_read.allows(identity_open)
+        assert not permission_not_logged.allows(identity_open)
 
         assert not permission_open.allows(identity_read)
         assert permission_read.allows(identity_read)
+        assert not permission_not_logged.allows(identity_read)
+
+        assert not permission_open.allows(identity_unknown)
+        assert not permission_read.allows(identity_unknown)
+
+
+def test_invenio_access_argument_permission_for_users(app):
+    """User can access to an action allowed/denied with argument to the user"""
+    InvenioAccess(app)
+    with app.test_request_context():
+        db.session.begin(nested=True)
+        superuser = User(email='superuser@inveniosoftware.org')
+        user_can_all = User(email='all@inveniosoftware.org')
+        user_can_argument_dummy = User(email='argumentA@inveniosoftware.org')
+
+        db.session.add(superuser)
+        db.session.add(user_can_all)
+        db.session.add(user_can_argument_dummy)
+
+        db.session.add(ActionUsers(action='superuser-access', user=superuser))
+
+        db.session.add(ActionUsers(action='argument1',
+                                   user=user_can_all))
+        db.session.add(ActionUsers(action='argument1',
+                                   argument='other',
+                                   user=user_can_all))
+        db.session.add(ActionUsers(action='argument1',
+                                   argument='dummy',
+                                   user=user_can_argument_dummy))
+        db.session.add(ActionUsers(action='argument2',
+                                   argument='other',
+                                   user=user_can_all))
+        db.session.commit()
+
+        permission_argument1 = DynamicPermission(ActionNeed('argument1'))
+        permission_argument1_dummy = DynamicPermission(
+            ParameterizedActionNeed('argument1', 'dummy'))
+        permission_argument1_other = DynamicPermission(
+            ParameterizedActionNeed('argument1', 'other'))
+        permission_argument2 = DynamicPermission(ActionNeed('argument2'))
+        permission_argument2_dummy = DynamicPermission(
+            ParameterizedActionNeed('argument2', 'dummy'))
+        permission_argument2_other = DynamicPermission(
+            ParameterizedActionNeed('argument2', 'other'))
+
+        identity_superuser = FakeIdentity(UserNeed(superuser.id))
+        identity_all = FakeIdentity(UserNeed(user_can_all.id))
+        identity_unknown = AnonymousIdentity()
+        identity_argument_dummy = FakeIdentity(
+            UserNeed(user_can_argument_dummy.id))
+
+        # tests for super user
+        assert permission_argument1.allows(identity_superuser)
+        assert permission_argument1_dummy.allows(identity_superuser)
+        assert permission_argument1_other.allows(identity_superuser)
+        assert permission_argument2.allows(identity_superuser)
+        assert permission_argument2_dummy.allows(identity_superuser)
+        assert permission_argument2_other.allows(identity_superuser)
+
+        # first tests for permissions with argument
+        assert permission_argument1.allows(identity_all)
+        assert permission_argument1_dummy.allows(identity_all)
+        assert permission_argument1_other.allows(identity_all)
+
+        assert not permission_argument1.allows(identity_argument_dummy)
+        assert permission_argument1_dummy.allows(identity_argument_dummy)
+        assert not permission_argument1_other.allows(identity_argument_dummy)
+
+        assert not permission_argument1.allows(identity_unknown)
+        assert not permission_argument1_dummy.allows(identity_unknown)
+        assert not permission_argument1_other.allows(identity_unknown)
+
+        # second tests for permissions with arguments
+#        assert permission_argument2.allows(identity_all)
+#        assert permission_argument2_dummy.allows(identity_all)
+        assert permission_argument2_other.allows(identity_all)
+
+#        assert permission_argument2.allows(identity_argument_dummy)
+#        assert permission_argument2_dummy.allows(identity_argument_dummy)
+        assert not permission_argument2_other.allows(identity_argument_dummy)
+
+#        assert permission_argument2.allows(identity_unknown)
+#        assert permission_argument2_dummy.allows(identity_unknown)
+        assert not permission_argument2_other.allows(identity_unknown)
 
 
 def test_invenio_access_permission_for_roles(app):
