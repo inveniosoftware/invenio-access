@@ -36,7 +36,7 @@
     </ul>
 
     {%- block page_body %}{%- endblock page_body %}
-    <p>The current application is using the next actions. The red ones are not allowed yo your current user.</p>
+    <p>The current application is using the following actions (<span style="color: green">greens</span> are allowed, <span style="color: red">reds</span> are denied for the current user):</p>
     <ul>
         {% for action in actions.keys() %}
             {% if actions[action] %}
