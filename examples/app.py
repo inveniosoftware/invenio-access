@@ -22,14 +22,12 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-
 """Minimal Flask application example for development.
 
 SPHINX-START
 
-Start redis server.
-
-Install requirements:
+First install Invenio-Accces, setup the application and load fixture data by
+running:
 
 .. code-block:: console
 
@@ -38,35 +36,31 @@ Install requirements:
    $ ./app-setup.sh
    $ ./app-fixtures.sh
 
-Run the development server:
+You should also have the `Redis` running on your machine. To know how to
+install and run `redis`, please refer to the
+`redis website <https://redis.io/>`_.
+
+Next, start the development server:
 
 .. code-block:: console
 
-   $ FLASK_APP=app.py flask run --debugger -p 5000
+   $ export FLASK_APP=app.py FLASK_DEBUG=1
+   $ flask run
 
-View the pages using different users:
+and open the example application in your browser:
 
 .. code-block:: console
 
-    $ open http://localhost:5000/
-    $ open http://localhost:5000/role_admin
-    $ open http://localhost:5000/action_open
-    $ open http://localhost:5000/action_read
+    $ open http://127.0.0.1:5000/
 
 The login and passwords, as well as the assigned permissions are listed
 in ./app-fixtures.sh.
 
-To be able to uninstall the example app:
+To reset the example application run:
 
 .. code-block:: console
 
     $ ./app-teardown.sh
-
-.. note::
-
-    If you are using an action in your app which does not have any role or user
-    assigned, the action will be allowed to perform by everyone (Anonymous
-    users included)
 
 SPHINX-END
 """
@@ -83,6 +77,7 @@ from flask_menu import Menu
 from flask_principal import ActionNeed, PermissionDenied, RoleNeed
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_accounts
+from invenio_admin import InvenioAdmin
 from invenio_db import InvenioDB
 
 from invenio_access import InvenioAccess
@@ -90,9 +85,12 @@ from invenio_access.permissions import DynamicPermission
 
 # Create Flask application
 app = Flask(__name__)
+app.config.update({
+    'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+})
 app.secret_key = 'ExampleApp'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'
+    'SQLALCHEMY_DATABASE_URI', 'sqlite:///instance/test.db'
 )
 Babel(app)
 Mail(app)
@@ -102,6 +100,8 @@ InvenioAccounts(app)
 app.register_blueprint(blueprint_accounts)
 
 access = InvenioAccess(app)
+
+InvenioAdmin(app)
 
 action_open = ActionNeed('open')
 access.register_action(action_open)
