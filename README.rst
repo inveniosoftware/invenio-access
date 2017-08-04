@@ -41,18 +41,23 @@
         :target: https://github.com/inveniosoftware/invenio-access/blob/master/LICENSE
 
 
-Invenio module for common role based access control.
+Role-based access control (RBAC) for Invenio.
 
-Features
-========
+Invenio-Access works together with Invenio-Accounts to provide a full-fledge
+authentication and authorization system for Flask and Invenio based on a suite
+of existing Flask extensions such as:
 
-Invenio Access has the following features:
+- Flask-Security
+- Flask-Login
+- Flask-Principal
+- passlib
 
-* It provides a way to restrict access to an invenio application's endpoints
-  for users and roles.
-* It enables administrators to configure the access rights via a Command Line
-  Interface and a View.
-* It stores access rights in the database.
+Features:
+
+* Role-based access control with object level permissions.
+* CLI and administration interface for allowing/denying actions to users, roles
+  or system roles.
+* Support for superuser privileges.
 
 Further documentation is available on
 https://invenio-access.readthedocs.io/
