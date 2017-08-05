@@ -29,7 +29,7 @@ from flask_admin.contrib.sqla import ModelView
 from werkzeug.local import LocalProxy
 from wtforms import SelectField
 
-from .models import ActionRoles, ActionUsers
+from .models import ActionRoles, ActionSystemRoles, ActionUsers
 from .proxies import current_access
 
 _datastore = LocalProxy(lambda: current_app.extensions['security'].datastore)
@@ -102,16 +102,67 @@ class ActionRolesView(ModelView):
     )
 
 
+class ActionSystemRolesView(ModelView):
+    """View for managing access to actions by users with system roles."""
+
+    can_view_details = True
+
+    list_all = ('role_name', 'action', 'exclude', 'argument')
+
+    column_list = list_all
+
+    column_filters = \
+        columns_sortable_list = \
+        columns_searchable_list = \
+        list_all
+
+    column_display_all_relations = True
+
+    column_labels = {
+        'role_name': _("System Role"),
+    }
+
+    form_args = dict(
+        action=dict(
+            choices=LocalProxy(lambda: [
+                (action, action) for action in current_access.actions.keys()
+            ])
+        ),
+        role_name=dict(
+            choices=LocalProxy(lambda: [
+                (action, action) for action
+                in current_access.system_roles.keys()
+            ])
+        )
+    )
+
+    form_columns = ('role_name', 'action', 'exclude', 'argument')
+    form_overrides = dict(
+        action=SelectField,
+        role_name=SelectField,
+    )
+
+
 action_roles_adminview = {
     'model': ActionRoles,
     'modelview': ActionRolesView,
     'category': _('User Management'),
+    'name': _('Access: Roles')
 }
 
 action_users_adminview = {
     'model': ActionUsers,
     'modelview': ActionUsersView,
     'category': _('User Management'),
+    'name': _('Access: Users')
 }
 
-__all__ = ('action_users_adminview', 'action_roles_adminview', )
+action_system_roles_adminview = {
+    'model': ActionSystemRoles,
+    'modelview': ActionSystemRolesView,
+    'category': _('User Management'),
+    'name': _('Access: System Roles')
+}
+
+__all__ = ('action_users_adminview', 'action_roles_adminview',
+           'action_system_roles_adminview')

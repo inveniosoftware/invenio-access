@@ -123,6 +123,8 @@ setup(
             'invenio_access.admin:action_users_adminview',
             'invenio_access_action_roles = '
             'invenio_access.admin:action_roles_adminview',
+            'invenio_access_action_system_roles = '
+            'invenio_access.admin:action_system_roles_adminview',
         ],
         'invenio_base.api_apps': [
             'invenio_access = invenio_access:InvenioAccess',
