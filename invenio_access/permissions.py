@@ -49,7 +49,7 @@ ParameterizedActionNeed.__doc__ = \
 
 SystemRoleNeed = partial(Need, 'system_role')
 SystemRoleNeed.__doc__ = \
-    """A need with the method preset to `"system role"`"""
+    """A need with the method preset to `"system_role"`"""
 
 #
 # Need instances

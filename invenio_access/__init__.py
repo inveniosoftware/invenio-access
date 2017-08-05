@@ -44,7 +44,10 @@ Create a Flask application:
 
 >>> from flask import Flask
 >>> app = Flask('myapp')
->>> app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+>>> app.config.update({
+...     'SQLALCHEMY_DATABASE_URI': 'sqlite://',
+...     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+...     'SQLALCHEMY_ECHO': False})
 
 Initialize Invenio-Access dependencies, which are Invenio-DB and
 Invenio-Accounts, and then Invenio-Access itself:
@@ -333,7 +336,7 @@ to them actions:
 
 >>> from invenio_access import ActionSystemRoles, any_user
 >>> db.session.add(ActionSystemRoles.allow(
-...     view_index_action, role_name='any_user'))
+...     view_index_action, role=any_user))
 
 In order to test system roles from the shell, we have to manually add the need
 into the identity.

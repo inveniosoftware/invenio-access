@@ -307,10 +307,10 @@ def test_invenio_access_permission_for_system_roles(app):
 
         db.session.add(user)
 
-        db.session.add(ActionSystemRoles(action='open',
-                                         role_name='authenticated_user'))
-        db.session.add(ActionSystemRoles(action='write',
-                                         role_name='any_user'))
+        db.session.add(ActionSystemRoles.allow(
+            action=ActionNeed('open'), role=authenticated_user))
+        db.session.add(ActionSystemRoles.allow(
+            action=ActionNeed('write'), role_name='any_user'))
         db.session.commit()
 
         permission_open = DynamicPermission(ActionNeed('open'))

@@ -192,6 +192,15 @@ class ActionSystemRoles(ActionNeedMixin, db.Model):
 
     role_name = db.Column(db.String(40), nullable=False, index=True)
 
+    @classmethod
+    def create(cls, action, **kwargs):
+        """Create new database row using the provided action need."""
+        role = kwargs.pop('role', None)
+        if role:
+            assert role.method == 'system_role'
+            kwargs['role_name'] = role.value
+        return super(ActionSystemRoles, cls).create(action, **kwargs)
+
     @validates('role_name')
     def validate_role_name(self, key, role_name):
         """Checks that the role name has been registered."""
