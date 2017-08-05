@@ -69,6 +69,7 @@ def app(request):
         SECURITY_PASSWORD_SALT='CHANGE_ME_ALSO',
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
         TESTING=True,
     )
     Babel(app)
