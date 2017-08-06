@@ -44,10 +44,7 @@ Create a Flask application:
 
 >>> from flask import Flask
 >>> app = Flask('myapp')
->>> app.config.update({
-...     'SQLALCHEMY_DATABASE_URI': 'sqlite://',
-...     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-...     'SQLALCHEMY_ECHO': False})
+>>> app.config.update({'SQLALCHEMY_DATABASE_URI': 'sqlite://'})
 
 Initialize Invenio-Access dependencies, which are Invenio-DB and
 Invenio-Accounts, and then Invenio-Access itself:
