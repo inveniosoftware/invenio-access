@@ -34,6 +34,7 @@ from flask_mail import Mail
 from flask_principal import ActionNeed
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
+from invenio_db.utils import drop_alembic_version_table
 from mock import patch
 from pkg_resources import EntryPoint
 
@@ -81,51 +82,36 @@ def test_version():
     assert __version__
 
 
-def test_init():
+def test_init(base_app):
     """Test extension initialization."""
-    app = Flask('testapp')
-    Babel(app)
-    Mail(app)
-    InvenioDB(app)
-    InvenioAccounts(app)
+    app = base_app
     ext = InvenioAccess(app)
     assert 'invenio-access' in app.extensions
 
-    app = Flask('testapp')
-    Babel(app)
-    Mail(app)
-    InvenioDB(app)
-    InvenioAccounts(app)
+
+def test_init_app(base_app):
+    """Test extension initialization."""
+    app = base_app
     ext = InvenioAccess()
     assert 'invenio-access' not in app.extensions
     ext.init_app(app)
     assert 'invenio-access' in app.extensions
 
 
-def test_actions():
+def test_actions(base_app):
     """Test if the actions are registered properly."""
-    app = Flask('testapp')
-    Babel(app)
-    Mail(app)
-    InvenioDB(app)
-    InvenioAccounts(app)
-    InvenioAccess(app, entry_point_actions=None)
-    with app.app_context():
+    InvenioAccess(base_app, entry_point_actions=None)
+    with base_app.app_context():
         current_access.register_action(ActionNeed('action_a'))
         assert len(current_access.actions) == 1
         current_access.register_action(ActionNeed('action_b'))
         assert len(current_access.actions) == 2
 
 
-def test_system_roles():
+def test_system_roles(base_app):
     """Test if the system roles are registered properly."""
-    app = Flask('testapp')
-    Babel(app)
-    Mail(app)
-    InvenioDB(app)
-    InvenioAccounts(app)
-    InvenioAccess(app, entry_point_system_roles=None)
-    with app.app_context():
+    InvenioAccess(base_app, entry_point_system_roles=None)
+    with base_app.app_context():
         current_access.register_system_role(SystemRoleNeed('spn_a'))
         assert len(current_access.system_roles) == 1
         current_access.register_system_role(SystemRoleNeed('spn_b'))
@@ -155,6 +141,7 @@ def test_alembic(app):
 
         assert not ext.alembic.compare_metadata()
         db.drop_all()
+        drop_alembic_version_table()
         ext.alembic.upgrade()
 
         assert not ext.alembic.compare_metadata()

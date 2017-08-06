@@ -60,10 +60,10 @@ def _compile_drop_sequence(element, compiler, **kwargs):
 
 
 @pytest.fixture()
-def app(request):
-    """Flask application fixture."""
-    app = Flask('testapp')
-    app.config.update(
+def base_app():
+    """Flask base application fixture."""
+    app_ = Flask('testapp')
+    app_.config.update(
         ACCOUNTS_USE_CELERY=False,
         SECRET_KEY='CHANGE_ME',
         SECURITY_PASSWORD_SALT='CHANGE_ME_ALSO',
@@ -72,29 +72,34 @@ def app(request):
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         TESTING=True,
     )
-    Babel(app)
-    Mail(app)
-    InvenioDB(app)
-    InvenioAccounts(app)
-
-    with app.app_context():
-        db.create_all()
-
-    def teardown():
-        with app.app_context():
-            db.drop_all()
-
-    request.addfinalizer(teardown)
-    return app
+    Babel(app_)
+    Mail(app_)
+    InvenioDB(app_)
+    InvenioAccounts(app_)
+    return app_
 
 
 @pytest.fixture()
-def script_info(request):
+def app(base_app, request):
+    """Flask application fixture."""
+    with base_app.app_context():
+        db.create_all()
+
+    def teardown():
+        with base_app.app_context():
+            db.drop_all()
+
+    request.addfinalizer(teardown)
+    return base_app
+
+
+@pytest.fixture()
+def script_info(base_app, request):
     """Get ScriptInfo object for testing CLI."""
     action_open = ActionNeed('open')
     action_edit = ParameterizedActionNeed('edit', None)
 
-    app_ = app(request)
+    app_ = app(base_app, request)
     ext = InvenioAccess(app_)
     ext.register_action(action_open)
     ext.register_action(action_edit)
@@ -102,11 +107,11 @@ def script_info(request):
 
 
 @pytest.fixture()
-def script_info_cli_list(request):
+def script_info_cli_list(base_app, request):
     """Get ScriptInfo object for testing CLI list command."""
     action_open = ActionNeed('open')
     action_edit = ParameterizedActionNeed('edit', None)
-    app_ = app(request)
+    app_ = app(base_app, request)
     ext = InvenioAccess(app_)
     ext.register_action(action_open)
     ext.register_action(action_edit)
