@@ -42,9 +42,14 @@ Initialization
 
 Create a Flask application:
 
+>>> import os
+>>> db_url = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite://')
 >>> from flask import Flask
 >>> app = Flask('myapp')
->>> app.config.update({'SQLALCHEMY_DATABASE_URI': 'sqlite://'})
+>>> app.config.update({
+...     'SQLALCHEMY_DATABASE_URI': db_url,
+...     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+... })
 
 Initialize Invenio-Access dependencies, which are Invenio-DB and
 Invenio-Accounts, and then Invenio-Access itself:
@@ -62,7 +67,7 @@ let's push one:
 >>> app.app_context().push()
 
 Also, for the examples to work we need to create the database and tables (note,
-in this example we use an in-memory SQLite database):
+in this example we use an in-memory SQLite database by default):
 
 >>> from invenio_db import db
 >>> db.create_all()
