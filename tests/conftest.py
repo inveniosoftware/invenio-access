@@ -34,13 +34,14 @@ from flask import Flask
 from flask.cli import ScriptInfo
 from flask_babelex import Babel
 from flask_mail import Mail
-from flask_principal import ActionNeed
+from flask_principal import ActionNeed, identity_loaded
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import DropConstraint, DropSequence, DropTable
 
 from invenio_access import InvenioAccess
+from invenio_access.loaders import load_permissions_on_identity_loaded
 from invenio_access.permissions import ParameterizedActionNeed
 
 
@@ -86,8 +87,10 @@ def app(base_app, request):
         db.create_all()
 
     def teardown():
+
         with base_app.app_context():
             db.drop_all()
+            identity_loaded.disconnect(load_permissions_on_identity_loaded)
 
     request.addfinalizer(teardown)
     return base_app

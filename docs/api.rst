@@ -57,6 +57,8 @@ System roles
 
 .. autodata:: invenio_access.permissions.authenticated_user
 
+.. autodata:: invenio_access.loaders.load_permissions_on_identity_loaded
+
 Actions
 -------
 

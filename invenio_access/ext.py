@@ -28,9 +28,11 @@ from __future__ import absolute_import, print_function
 
 import pkg_resources
 import six
+from flask_principal import identity_loaded
 from werkzeug.utils import cached_property, import_string
 
 from . import config
+from .loaders import load_permissions_on_identity_loaded
 
 
 class _AccessState(object):
@@ -174,6 +176,12 @@ class InvenioAccess(object):
             entry_point_system_roles=entry_point_system_roles,
             cache=kwargs.get('cache'))
         app.extensions['invenio-access'] = state
+
+        if app.config.get('ACCESS_LOAD_SYSTEM_ROLE_NEEDS', True):
+            identity_loaded.connect_via(app)(
+                load_permissions_on_identity_loaded
+            )
+
         return state
 
     def init_config(self, app):
