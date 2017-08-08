@@ -45,17 +45,21 @@ class ActionUsersView(ModelView):
 
     can_view_details = True
 
-    list_all = ('user_id', 'user.email', 'action', 'exclude', 'argument')
+    list_all = ('user_id', 'user.email', 'action', 'argument', 'exclude')
 
     column_list = list_all
+
     column_default_sort = ('user_id', True)
 
     column_labels = {
         'user.email': _("Email"),
         'user_id': _("User ID"),
+        'exclude': _("Deny"),
     }
 
     column_filters = list_all
+
+    form_columns = ('user', 'action', 'argument', 'exclude')
 
     form_args = dict(
         action=dict(
@@ -74,7 +78,7 @@ class ActionRolesView(ModelView):
 
     can_view_details = True
 
-    list_all = ('role.name', 'action', 'exclude', 'argument')
+    list_all = ('role.name', 'action', 'argument', 'exclude')
 
     column_list = list_all
 
@@ -87,7 +91,10 @@ class ActionRolesView(ModelView):
 
     column_labels = {
         'role.name': _("Role Name"),
+        'exclude': _("Deny"),
     }
+
+    form_columns = ('role', 'action', 'argument', 'exclude')
 
     form_args = dict(
         action=dict(
@@ -107,7 +114,7 @@ class ActionSystemRolesView(ModelView):
 
     can_view_details = True
 
-    list_all = ('role_name', 'action', 'exclude', 'argument')
+    list_all = ('role_name', 'action', 'argument', 'exclude')
 
     column_list = list_all
 
@@ -120,6 +127,7 @@ class ActionSystemRolesView(ModelView):
 
     column_labels = {
         'role_name': _("System Role"),
+        'exclude': _("Deny"),
     }
 
     form_args = dict(
@@ -136,7 +144,7 @@ class ActionSystemRolesView(ModelView):
         )
     )
 
-    form_columns = ('role_name', 'action', 'exclude', 'argument')
+    form_columns = ('role_name', 'action', 'argument', 'exclude')
     form_overrides = dict(
         action=SelectField,
         role_name=SelectField,
