@@ -324,8 +324,8 @@ True
 
 System roles
 ------------
-Invenio-Access, in addition to roles defined by the administrator, provides also
-system roles. System roles are defined by the system and automatically
+Invenio-Access, in addition to roles defined by the administrator, provides
+also system roles. System roles are defined by the system and automatically
 assigned to users.
 
 By default the following system roles exists:

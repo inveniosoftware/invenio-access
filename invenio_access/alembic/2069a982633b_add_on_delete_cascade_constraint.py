@@ -29,7 +29,7 @@ from alembic import op
 revision = '2069a982633b'
 down_revision = '2f63be7b7572'
 branch_labels = ()
-depends_on = None
+depends_on = '35c1075e6360'  # invenio-db "Force naming convention"
 
 
 def upgrade():
