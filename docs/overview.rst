@@ -60,20 +60,20 @@ Protecting resources
 In order to protect a resource, you will usually create a new permission which
 will require one or more action needs. This new permission and the action needs
 are usually expressed explicitly in the source code. In particular note that
-Invenio usually always protect resources via action needs instead of user and
+Invenio usually always protects resources via action needs instead of user and
 role needs.
 
 Granting access
 ---------------
 Subjects (users, roles and system roles) are assigned actions. E.g. a user or
 a role can be assigned the action "read record". If the action has parameters,
-then the assignment of the action to the subject can for *any* parameters or
+then it can be assigned to the subject for *any* parameters or
 for a *specific* parameter (e.g. read *any* record vs read record *42*).
 
 Identity
 --------
 The last entity to cover is an identity. During request handling any user
-(authenticated as well as unauthenticated) is represented as an **identity**.
+(authenticated or unauthenticated) is represented as an **identity**.
 The identity is used to express the *set of needs* that the *current user*
 provides. It is solely an abstraction layer on top of users and roles such
 that we do not have to care if actions are assigned directly to a user or

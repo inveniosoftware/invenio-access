@@ -92,14 +92,14 @@ Last, persist the changees to the database:
 
 Protecting resources
 --------------------
-The basics, of protecting a resource involves:
+The basics of protecting a resource involves:
 
 1. Defining one or more actions.
 2. Create a permission that requires one or more actions.
 3. Check if a permission allows a given identity (i.e. the identity provides
    one more of the required actions).
 
-**1. Define actions**
+**1. Define an action**
 
 First, let's start with defining an action (e.g. view an index page in our
 module) using the action creation factory:
@@ -129,7 +129,7 @@ in detail below how to use permissions in a view):
 >>> permission.allows(anonymous)
 False
 
-Granting acccss
+Granting access
 ---------------
 Checking if the anonymous identity is granted access by a permission is often
 not too interesting, so let's grant our admin role access to our action:
@@ -157,7 +157,7 @@ False
 Notice, that we granted access to Alice by assigning her the role ``admin``
 and granting the role permission on the action.
 
-The Flask-Principal API is pretty rich, and there is multiple other ways
+The Flask-Principal API is pretty rich, and there are multiple other ways
 that you can check if a permission grants access to an identity. For instance
 below is another example, but please explore the Flask-Principal API
 documentation for a full reference:
@@ -224,13 +224,13 @@ When we now check the permission, Alice no longer has access:
 >>> permission.allows(alice_identity)
 False
 
-**Deny takes presedence over allow**
+**Deny takes precedence over allow**
 
-Note, that the deny grant takes presendence over allow grant. Alice was earlier
+Note, that the deny grant takes precedence over allow grant. Alice was earlier
 granted access to the action via her role assignment, however since the deny
-grant takes presendence Alice is ultimately denied access.
+grant takes precedence Alice is ultimately denied access.
 
-This is useful if you for instance want to grant acess to all objects
+This is useful if you for instance want to grant access to all objects
 *except* one.
 
 Protecting views
@@ -286,20 +286,20 @@ In the two above examples for protecting views, you will notice that in one we
 return an HTTP 403 Forbidden error, and in the other we return a HTTP 404 Not
 Found error.
 
-In views, you should always make a consicience decision if you should return
+In views, you should always make a conscious decision if you should return
 401/403 or 404 errors as it has important security considerations.
 
 - **403/401** errors exposes *existence* of an object under a given URL. Hence,
   by using 401/403 errors, the system is "leaking" knowledge that certain
   objects exists in the system. Hence, only use 401/403 errors when this
-  behaviour is desired. In all other cases use 404 errors.
+  behavior is desired. In all other cases use 404 errors.
 - **404** errors does not leak any additional information and
   *should be the default error* used when a permission check fails.
 
 Superuser
 ---------
-Invenio-Access provides a way to grant superuser priviledges to users or roles
-via a superuser action. Granting superuser access to a user implicit gives
+Invenio-Access provides a way to grant superuser privileges to users or roles
+via a superuser action. Granting superuser access to a user implicitly gives
 that user access to any action in the system without explicitly having to grant
 the action.
 
@@ -324,8 +324,8 @@ True
 
 System roles
 ------------
-Invenio-Access in addition to normal administrator defined roles also provides
-system roles, which are roles that are defined by the system and automatically
+Invenio-Access, in addition to roles defined by the administrator, provides also
+system roles. System roles are defined by the system and automatically
 assigned to users.
 
 By default the following system roles exists:
@@ -333,8 +333,8 @@ By default the following system roles exists:
 * Any user (guests and autenticated users)
 * Authenticated user
 
-System roles works very much like normal roles, so you can e.g. assign
-to them actions:
+System roles works very much like normal roles, so you can e.g. assign actions
+to them:
 
 >>> from invenio_access import ActionSystemRoles, any_user
 >>> db.session.add(ActionSystemRoles.allow(
@@ -353,7 +353,7 @@ True
 
 Creating system roles
 ~~~~~~~~~~~~~~~~~~~~~
-Invenio modules may provide additional system roles. You could for instance
+Invenio modules may provide additional system roles. You could, for instance
 create a system role that could be used to grant permissions based on IP
 address.
 
@@ -410,7 +410,7 @@ action representing *any* parameters.
 
 Listing actions
 ---------------
-In order to discover which actions are available in a given installation one
+In order to discover which actions are available in a given installation, one
 can retrieve them via:
 
 >>> sorted(app.extensions['invenio-access'].actions.keys())
