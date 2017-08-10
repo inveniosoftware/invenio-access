@@ -1,8 +1,8 @@
-==========================
- Invenio-Access v1.0.0a12
-==========================
+=========================
+ Invenio-Access v1.0.0b1
+=========================
 
-Invenio-Access v1.0.0a12 was released on May 05, 2017.
+Invenio-Access v1.0.0b1 was released on August 10, 2017.
 
 About
 -----
@@ -17,7 +17,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-access==1.0.0a12
+   $ pip install invenio-access==1.0.0b1
 
 Documentation
 -------------

@@ -24,8 +24,8 @@
 Changes
 =======
 
-Version 1.0.0a12 (released 2017-05-05)
---------------------------------------
+Version 1.0.0b1 (released 2017-08-10)
+-------------------------------------
 
 - Major incompatible rewrite.
 
