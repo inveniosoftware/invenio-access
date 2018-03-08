@@ -29,8 +29,8 @@ from collections import namedtuple
 from functools import partial
 from itertools import chain
 
-from flask_principal import Permission as _Permission
 from flask_principal import ActionNeed, Need
+from flask_principal import Permission as _Permission
 
 from .models import ActionRoles, ActionSystemRoles, ActionUsers, \
     get_action_cache_key
