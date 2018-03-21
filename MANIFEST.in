@@ -13,7 +13,6 @@ include .dockerignore
 include .editorconfig
 include .tx/config
 include LICENSE
-include MAINTAINERS
 include babel.ini
 include docs/requirements.txt
 include pytest.ini

@@ -31,19 +31,19 @@ tests_require = [
 
 extras_require = {
     'admin': [
-        'invenio-admin>=1.0.0a2',
+        'invenio-admin>=1.0.0',
     ],
     'docs': [
         'Sphinx>=1.4.2',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0b3',
+        'invenio-db[mysql]>=1.0.0',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0b3',
+        'invenio-db[postgresql]>=1.0.0',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0b3',
+        'invenio-db>=1.0.0',
     ],
     'tests': tests_require,
 }
@@ -62,7 +62,7 @@ setup_requires = [
 install_requires = [
     'Flask>=0.11.1',
     'Flask-BabelEx>=0.9.2',
-    'invenio-accounts>=1.0.0b3',
+    'invenio-accounts>=1.0.0',
     'six>=1.10',
 ]
 
@@ -142,6 +142,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
     ],
 )
