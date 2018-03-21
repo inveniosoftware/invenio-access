@@ -23,6 +23,7 @@ recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include examples *.html *.py *.sh
+recursive-include examples *.txt
 recursive-include invenio_access *.html
 recursive-include invenio_access *.mo
 recursive-include invenio_access *.po
