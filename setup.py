@@ -30,9 +30,6 @@ tests_require = [
 ]
 
 extras_require = {
-    'admin': [
-        'invenio-admin>=1.0.0',
-    ],
     'docs': [
         'Sphinx>=1.4.2',
     ],
@@ -61,7 +58,7 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'Flask-BabelEx>=0.9.2',
+    'Flask-BabelEx>=0.9.3',
     'invenio-accounts>=1.0.0',
     'six>=1.10',
 ]

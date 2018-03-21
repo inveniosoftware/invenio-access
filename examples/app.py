@@ -53,6 +53,7 @@ from __future__ import absolute_import, print_function
 
 import os
 
+import pkg_resources
 from flask import Flask, g, render_template
 from flask_babelex import Babel
 from flask_login import current_user
@@ -61,7 +62,6 @@ from flask_menu import Menu
 from flask_principal import ActionNeed, PermissionDenied, RoleNeed
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_accounts
-from invenio_admin import InvenioAdmin
 from invenio_db import InvenioDB
 
 from invenio_access import InvenioAccess
@@ -85,7 +85,12 @@ app.register_blueprint(blueprint_accounts)
 
 access = InvenioAccess(app)
 
-InvenioAdmin(app)
+try:
+    pkg_resources.get_distribution('invenio_admin')
+    from invenio_admin import InvenioAdmin
+    InvenioAdmin(app)
+except pkg_resources.DistributionNotFound:
+    pass
 
 action_open = ActionNeed('open')
 access.register_action(action_open)
