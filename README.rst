@@ -9,6 +9,9 @@
  Invenio-Access
 ================
 
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio-access.svg
+        :target: https://github.com/inveniosoftware/invenio-access/blob/master/LICENSE
+
 .. image:: https://img.shields.io/travis/inveniosoftware/invenio-access.svg
         :target: https://travis-ci.org/inveniosoftware/invenio-access
 
