@@ -30,13 +30,13 @@ _current_actions = LocalProxy(
 def lazy_result(f):
     """Decorate function to return LazyProxy."""
     @wraps(f)
-    def decorated(*args, **kwargs):
-        return LocalProxy(lambda: f(*args, **kwargs))
+    def decorated(ctx, param, value):
+        return LocalProxy(lambda: f(ctx, param, value))
     return decorated
 
 
 @lazy_result
-def process_action(ctx, value):
+def process_action(ctx, param, value):
     """Return an action if exists."""
     actions = current_app.extensions['invenio-access'].actions
     if value not in actions:
@@ -45,7 +45,7 @@ def process_action(ctx, value):
 
 
 @lazy_result
-def process_email(ctx, value):
+def process_email(ctx, param, value):
     """Return an user if it exists."""
     user = User.query.filter(User.email == value).first()
     if not user:
@@ -54,7 +54,7 @@ def process_email(ctx, value):
 
 
 @lazy_result
-def process_role(ctx, value):
+def process_role(ctx, param, value):
     """Return a role if it exists."""
     role = Role.query.filter(Role.name == value).first()
     if not role:
