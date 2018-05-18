@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.0.1 (released 2018-05-18)
+
+- Removal of Click warning messages.
+
+
 Version 1.0.0 (released 2018-03-23)
 
 - Initial public release.
