@@ -9,16 +9,23 @@
 """Test Indentity loaders."""
 
 from flask import current_app, g
-from flask_login import current_user
 from flask_principal import AnonymousIdentity, UserNeed, identity_changed, \
     identity_loaded
-from flask_security import current_user
 from flask_security.utils import login_user, logout_user
 from invenio_accounts import testutils
 
 from invenio_access import InvenioAccess
 from invenio_access.loaders import load_permissions_on_identity_loaded
 from invenio_access.permissions import any_user, authenticated_user
+
+
+def test_load_permissions_on_request_loaded(app):
+    """Checks that the needs are loaded during request in the user Identity."""
+    InvenioAccess(app)
+    with app.test_request_context():
+        with app.test_client() as client:
+            client.get('/')
+            assert g.identity.provides == {any_user}
 
 
 def test_load_permissions_on_identity_loaded(app):
