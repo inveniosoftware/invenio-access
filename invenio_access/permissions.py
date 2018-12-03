@@ -210,4 +210,4 @@ class DynamicPermission(Permission):
         """Constructor."""
         super(DynamicPermission, self).__init__(*args, **kwargs)
         warnings.warn("DynamicPermission is scheduled for removal.",
-                      PendingDeprecationWarning)
+                      DeprecationWarning)
