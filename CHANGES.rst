@@ -7,6 +7,9 @@
 
 Changes
 =======
+
+Version 1.1.0 (released 2018-12-14)
+
 Version 1.0.2 (released 2018-10-31)
 
 - Additional test for AnyonymousIdentity loaded on request
