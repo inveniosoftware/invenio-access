@@ -81,26 +81,24 @@ def app(base_app, request):
 
 
 @pytest.fixture()
-def script_info(base_app, request):
+def script_info(app):
     """Get ScriptInfo object for testing CLI."""
     action_open = ActionNeed('open')
     action_edit = ParameterizedActionNeed('edit', None)
 
-    app_ = app(base_app, request)
-    ext = InvenioAccess(app_)
+    ext = InvenioAccess(app)
     ext.register_action(action_open)
     ext.register_action(action_edit)
-    return ScriptInfo(create_app=lambda info: app_)
+    return ScriptInfo(create_app=lambda info: app)
 
 
 @pytest.fixture()
-def script_info_cli_list(base_app, request):
+def script_info_cli_list(app):
     """Get ScriptInfo object for testing CLI list command."""
     action_open = ActionNeed('open')
     action_edit = ParameterizedActionNeed('edit', None)
-    app_ = app(base_app, request)
-    ext = InvenioAccess(app_)
+    ext = InvenioAccess(app)
     ext.register_action(action_open)
     ext.register_action(action_edit)
 
-    return ScriptInfo(create_app=lambda info: app_)
+    return ScriptInfo(create_app=lambda info: app)
