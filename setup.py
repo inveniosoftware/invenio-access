@@ -25,13 +25,13 @@ tests_require = [
     'pydocstyle>=1.0.0',
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
-    'pytest>=2.8.0',
+    'pytest>=2.8.0,<5.0.0',
     'redis>=2.10.3',
 ]
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.4.2',
+        'Sphinx>=1.8.4',
     ],
     'mysql': [
         'invenio-db[mysql]>=1.0.0',
