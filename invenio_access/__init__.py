@@ -408,11 +408,11 @@ from flask_principal import ActionNeed
 from .ext import InvenioAccess
 from .factory import action_factory
 from .models import ActionRoles, ActionSystemRoles, ActionUsers
-from .permissions import any_user, authenticated_user, DynamicPermission, \
-    ParameterizedActionNeed, Permission, superuser_access, SystemRoleNeed
+from .permissions import DynamicPermission, ParameterizedActionNeed, \
+    Permission, SystemRoleNeed, any_user, authenticated_user, \
+    superuser_access
 from .proxies import current_access
 from .version import __version__
-
 
 __all__ = (
     '__version__',
