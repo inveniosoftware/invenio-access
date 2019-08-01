@@ -23,9 +23,6 @@ Permissions
 .. autoclass:: invenio_access.permissions.Permission
    :members:
 
-.. autoclass:: invenio_access.permissions.DynamicPermission
-   :members:
-
 Needs
 -----
 

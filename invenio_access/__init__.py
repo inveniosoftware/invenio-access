@@ -408,9 +408,8 @@ from flask_principal import ActionNeed
 from .ext import InvenioAccess
 from .factory import action_factory
 from .models import ActionRoles, ActionSystemRoles, ActionUsers
-from .permissions import DynamicPermission, ParameterizedActionNeed, \
-    Permission, SystemRoleNeed, any_user, authenticated_user, \
-    superuser_access
+from .permissions import ParameterizedActionNeed, Permission, SystemRoleNeed, \
+    any_user, authenticated_user, superuser_access
 from .proxies import current_access
 from .version import __version__
 
@@ -421,7 +420,6 @@ __all__ = (
     'action_factory',
     'current_access',
     'ActionNeed',
-    'DynamicPermission',  # Deprecated in favor of Permission.
     'InvenioAccess',
     'ParameterizedActionNeed',
     'Permission',

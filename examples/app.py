@@ -65,7 +65,7 @@ from invenio_accounts.views import blueprint as blueprint_accounts
 from invenio_db import InvenioDB
 
 from invenio_access import InvenioAccess
-from invenio_access.permissions import DynamicPermission
+from invenio_access.permissions import Permission
 
 # Create Flask application
 app = Flask(__name__)
@@ -111,7 +111,7 @@ def index():
     identity = g.identity
     actions = {}
     for action in access.actions.values():
-        actions[action.value] = DynamicPermission(action).allows(identity)
+        actions[action.value] = Permission(action).allows(identity)
 
     if current_user.is_anonymous:
         return render_template("invenio_access/open.html",
@@ -124,7 +124,7 @@ def index():
                                identity=identity)
 
 
-admin_permission = DynamicPermission(RoleNeed('admin'))
+admin_permission = Permission(RoleNeed('admin'))
 
 
 @app.route('/role_admin')
@@ -136,7 +136,7 @@ def role_admin():
     identity = g.identity
     actions = {}
     for action in access.actions.values():
-        actions[action.value] = DynamicPermission(action).allows(identity)
+        actions[action.value] = Permission(action).allows(identity)
 
     message = 'You are opening a page requiring the "admin-access" permission'
     return render_template("invenio_access/limited.html",
@@ -145,7 +145,7 @@ def role_admin():
                            identity=identity)
 
 
-open_permission = DynamicPermission(action_open)
+open_permission = Permission(action_open)
 
 
 @app.route('/action_open')
@@ -155,7 +155,7 @@ def action_open():
     identity = g.identity
     actions = {}
     for action in access.actions.values():
-        actions[action.value] = DynamicPermission(action).allows(identity)
+        actions[action.value] = Permission(action).allows(identity)
 
     message = 'You are opening a page requiring the "open" permission'
     return render_template("invenio_access/limited.html",
@@ -164,7 +164,7 @@ def action_open():
                            identity=identity)
 
 
-read_permission = DynamicPermission(action_read)
+read_permission = Permission(action_read)
 
 
 @app.route('/action_read')
@@ -174,7 +174,7 @@ def action_read():
     identity = g.identity
     actions = {}
     for action in access.actions.values():
-        actions[action.value] = DynamicPermission(action).allows(identity)
+        actions[action.value] = Permission(action).allows(identity)
 
     message = 'You are opening a page requiring the "read" permission'
     return render_template("invenio_access/limited.html",

@@ -181,33 +181,3 @@ class Permission(_Permission):
         """
         self._load_permissions()
         return self._permissions.excludes
-
-
-class DynamicPermission(Permission):
-    """Represents set of required needs.
-
-    Works like :py:class:`~.Permission` except that any action not
-    allowed/restricted to any users, roles or system roles are allowed by
-    default instead of restricted.
-
-    .. deprecated:: 1.0.0
-
-        DynamicPermission is deprecated in favor of :py:class:`~.Permission`.
-
-    .. warning::
-
-        This class is going to be removed in a future version.
-
-        The class works significantly different from normal permission class in
-        that if ``ActionNeed`` or :py:data:`~.ParameterizedActionNeed` is not
-        allowed or restricted to any user or role then it is **ALLOWED** to
-        anybody.
-    """
-
-    allow_by_default = True
-
-    def __init__(self, *args, **kwargs):
-        """Constructor."""
-        super(DynamicPermission, self).__init__(*args, **kwargs)
-        warnings.warn("DynamicPermission is scheduled for removal.",
-                      DeprecationWarning)
