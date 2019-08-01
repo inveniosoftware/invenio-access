@@ -12,6 +12,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+import warnings
 
 import pytest
 from flask import Flask
@@ -26,7 +27,7 @@ from sqlalchemy.schema import DropConstraint, DropSequence, DropTable
 
 from invenio_access import InvenioAccess
 from invenio_access.loaders import load_permissions_on_identity_loaded
-from invenio_access.permissions import ParameterizedActionNeed
+from invenio_access.permissions import ParameterizedActionNeed, Permission
 
 
 @compiles(DropTable, 'postgresql')
@@ -102,3 +103,42 @@ def script_info_cli_list(app):
     ext.register_action(action_edit)
 
     return ScriptInfo(create_app=lambda info: app)
+
+
+@pytest.fixture()
+def dynamic_permission():
+    """Dyanmic permission fixture."""
+    def _get_dynamic_permission(*args):
+        """Get dynamic permission."""
+        return DynamicPermission(*args)
+    return _get_dynamic_permission
+
+
+class DynamicPermission(Permission):
+    """Represents set of required needs.
+
+    Works like :py:class:`~.Permission` except that any action not
+    allowed/restricted to any users, roles or system roles are allowed by
+    default instead of restricted.
+
+    .. deprecated:: 1.0.0
+
+        DynamicPermission is deprecated in favor of :py:class:`~.Permission`.
+
+    .. warning::
+
+        This class is going to be removed in a future version.
+
+        The class works significantly different from normal permission class in
+        that if ``ActionNeed`` or :py:data:`~.ParameterizedActionNeed` is not
+        allowed or restricted to any user or role then it is **ALLOWED** to
+        anybody.
+    """
+
+    allow_by_default = True
+
+    def __init__(self, *args, **kwargs):
+        """Constructor."""
+        super(DynamicPermission, self).__init__(*args, **kwargs)
+        warnings.warn("DynamicPermission is scheduled for removal.",
+                      DeprecationWarning)

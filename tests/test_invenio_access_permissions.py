@@ -18,28 +18,28 @@ from invenio_db import db
 
 from invenio_access import InvenioAccess
 from invenio_access.models import ActionRoles, ActionSystemRoles, ActionUsers
-from invenio_access.permissions import DynamicPermission, \
-    ParameterizedActionNeed, Permission, any_user, authenticated_user
+from invenio_access.permissions import ParameterizedActionNeed, Permission, \
+    any_user, authenticated_user
 
 
 class FakeIdentity(object):
-    """Fake class to test DynamicPermission."""
+    """Fake class to test dynamic_permission."""
 
     def __init__(self, *provides):
         self.provides = set(provides)
 
 
-def test_invenio_access_permissions_deny(app):
+def test_invenio_access_permissions_deny(app, dynamic_permission):
     """User without any provides can't access to a place limited to user 0"""
     InvenioAccess(app)
     with app.test_request_context():
-        permission = DynamicPermission(UserNeed(0))
+        permission = dynamic_permission(UserNeed(0))
 
         fake_identity = FakeIdentity()
         assert not permission.allows(fake_identity)
 
 
-def test_invenio_access_dynamic_permission(app):
+def test_invenio_access_dynamic_permission(app, dynamic_permission):
     """DynamicPermission allows by default."""
     fake_identity = FakeIdentity()
 
@@ -47,7 +47,7 @@ def test_invenio_access_dynamic_permission(app):
     with app.test_request_context():
         db.session.begin(nested=True)
         user = User(email='test@inveniosoftware.org')
-        permission = DynamicPermission(ActionNeed('read'))
+        permission = dynamic_permission(ActionNeed('read'))
 
         # The permission is granted if nobody is assigned the "read" permission
         assert permission.allows(fake_identity)
@@ -98,7 +98,7 @@ def test_invenio_access_system_role_name(app):
             ActionSystemRoles(action='read', role_name='unknown')
 
 
-def test_invenio_access_permission_for_users(app):
+def test_invenio_access_permission_for_users(app, dynamic_permission):
     """User can access to an action allowed/denied to the user"""
     InvenioAccess(app)
     with app.test_request_context():
@@ -125,9 +125,9 @@ def test_invenio_access_permission_for_users(app):
 
         db.session.commit()
 
-        permission_open = DynamicPermission(ActionNeed('open'))
-        permission_read = DynamicPermission(ActionNeed('read'))
-        permission_not_logged = DynamicPermission(ActionNeed('not_logged'))
+        permission_open = dynamic_permission(ActionNeed('open'))
+        permission_read = dynamic_permission(ActionNeed('read'))
+        permission_not_logged = dynamic_permission(ActionNeed('not_logged'))
 
         identity_superuser = FakeIdentity(UserNeed(superuser.id))
         identity_all = FakeIdentity(UserNeed(user_can_all.id))
@@ -155,7 +155,7 @@ def test_invenio_access_permission_for_users(app):
         assert not permission_read.allows(identity_unknown)
 
 
-def test_invenio_access_argument_permission_for_users(app):
+def test_invenio_access_argument_permission_for_users(app, dynamic_permission):
     """User can access to an action allowed/denied with argument to the user"""
     InvenioAccess(app)
     with app.test_request_context():
@@ -183,15 +183,15 @@ def test_invenio_access_argument_permission_for_users(app):
                                    user=user_can_all))
         db.session.commit()
 
-        permission_argument1 = DynamicPermission(ActionNeed('argument1'))
-        permission_argument1_dummy = DynamicPermission(
+        permission_argument1 = dynamic_permission(ActionNeed('argument1'))
+        permission_argument1_dummy = dynamic_permission(
             ParameterizedActionNeed('argument1', 'dummy'))
-        permission_argument1_other = DynamicPermission(
+        permission_argument1_other = dynamic_permission(
             ParameterizedActionNeed('argument1', 'other'))
-        permission_argument2 = DynamicPermission(ActionNeed('argument2'))
-        permission_argument2_dummy = DynamicPermission(
+        permission_argument2 = dynamic_permission(ActionNeed('argument2'))
+        permission_argument2_dummy = dynamic_permission(
             ParameterizedActionNeed('argument2', 'dummy'))
-        permission_argument2_other = DynamicPermission(
+        permission_argument2_other = dynamic_permission(
             ParameterizedActionNeed('argument2', 'other'))
 
         identity_superuser = FakeIdentity(UserNeed(superuser.id))
@@ -235,7 +235,7 @@ def test_invenio_access_argument_permission_for_users(app):
         assert not permission_argument2_other.allows(identity_unknown)
 
 
-def test_invenio_access_permission_for_roles(app):
+def test_invenio_access_permission_for_roles(app, dynamic_permission):
     """User with a role can access to an action allowed to the role"""
     InvenioAccess(app)
     with app.test_request_context():
@@ -261,8 +261,8 @@ def test_invenio_access_permission_for_roles(app):
         db.session.commit()
 
     with app.app_context():
-        permission_open = DynamicPermission(ActionNeed('open'))
-        permission_read = DynamicPermission(ActionNeed('read'))
+        permission_open = dynamic_permission(ActionNeed('open'))
+        permission_read = dynamic_permission(ActionNeed('read'))
 
         identity_superuser = FakeIdentity(RoleNeed('superuser'))
         identity_all = FakeIdentity(RoleNeed('admin'))
@@ -282,7 +282,7 @@ def test_invenio_access_permission_for_roles(app):
         assert permission_read.allows(identity_read)
 
 
-def test_invenio_access_permission_for_system_roles(app):
+def test_invenio_access_permission_for_system_roles(app, dynamic_permission):
     """User can access to an action allowed/denied to their system roles."""
     InvenioAccess(app)
     with app.test_request_context():
@@ -297,8 +297,8 @@ def test_invenio_access_permission_for_system_roles(app):
             action=ActionNeed('write'), role_name='any_user'))
         db.session.commit()
 
-        permission_open = DynamicPermission(ActionNeed('open'))
-        permission_write = DynamicPermission(ActionNeed('write'))
+        permission_open = dynamic_permission(ActionNeed('open'))
+        permission_write = dynamic_permission(ActionNeed('write'))
 
         identity_anon_user = FakeIdentity(any_user)
         identity_auth_user = FakeIdentity(authenticated_user, any_user)

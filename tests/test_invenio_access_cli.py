@@ -19,8 +19,7 @@ from flask_security.utils import login_user
 from invenio_accounts.cli import roles_add, roles_create, users_create
 
 from invenio_access.cli import access
-from invenio_access.permissions import DynamicPermission, \
-    ParameterizedActionNeed
+from invenio_access.permissions import ParameterizedActionNeed
 
 
 def test_access_cli_allow_action_empty(script_info):
@@ -133,7 +132,7 @@ def test_access_cli_list(script_info_cli_list):
     assert result.output.find("open") != -1
 
 
-def test_access_matrix(script_info_cli_list):
+def test_access_matrix(script_info_cli_list, dynamic_permission):
     """Test of combinations of cli commands."""
     script_info = script_info_cli_list
     runner = CliRunner()
@@ -202,11 +201,11 @@ def test_access_matrix(script_info_cli_list):
     )
     assert result.exit_code == 0
 
-    permission_open = DynamicPermission(ActionNeed('open'))
-    permission_edit = DynamicPermission(ActionNeed('edit'))
+    permission_open = dynamic_permission(ActionNeed('open'))
+    permission_edit = dynamic_permission(ActionNeed('edit'))
 
-    permission_edit_1 = DynamicPermission(ParameterizedActionNeed('edit', 1))
-    permission_edit_2 = DynamicPermission(ParameterizedActionNeed('edit', 2))
+    permission_edit_1 = dynamic_permission(ParameterizedActionNeed('edit', 1))
+    permission_edit_2 = dynamic_permission(ParameterizedActionNeed('edit', 2))
 
     user_permissions = {
         'admin@inveniosoftware.org': {
