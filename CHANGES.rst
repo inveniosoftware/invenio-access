@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.0 (released 2019-08-02)
+
+- Removes DynamicPermission
+
 Version 1.1.0 (released 2018-12-14)
 
 Version 1.0.2 (released 2018-10-31)
