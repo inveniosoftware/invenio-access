@@ -105,11 +105,12 @@ class Permission(_Permission):
     def __init__(self, *needs):
         r"""Initialize permission.
 
-        :param \*needs: The needs for this permission.
+        :param needs: The needs for this permission.
         """
         self._permissions = None
         self.explicit_needs = set(needs)
         self.explicit_needs.add(superuser_access)
+        self.explicit_excludes = set()
 
     @staticmethod
     def _cache_key(action_need):
@@ -124,45 +125,58 @@ class Permission(_Permission):
         result = _P(needs=set(), excludes=set())
         if not self.allow_by_default:
             result.needs.update(self.explicit_needs)
+            result.excludes.update(self.explicit_excludes)
 
         for explicit_need in self.explicit_needs:
             if explicit_need.method == 'action':
-                action = current_access.get_action_cache(
-                    self._cache_key(explicit_need)
-                )
-                if action is None:
-                    action = _P(needs=set(), excludes=set())
-
-                    actionsusers = ActionUsers.query_by_action(
-                        explicit_need
-                    ).all()
-
-                    actionsroles = ActionRoles.query_by_action(
-                        explicit_need
-                    ).join(
-                        ActionRoles.role
-                    ).all()
-
-                    actionssystem = ActionSystemRoles.query_by_action(
-                        explicit_need
-                    ).all()
-
-                    for db_action in chain(
-                            actionsusers, actionsroles, actionssystem):
-                        if db_action.exclude:
-                            action.excludes.add(db_action.need)
-                        else:
-                            action.needs.add(db_action.need)
-
-                    current_access.set_action_cache(
-                        self._cache_key(explicit_need),
-                        action
-                    )
                 # in-place update of results
-                result.update(action)
+                result.update(self._load_action(explicit_need))
             elif self.allow_by_default:
                 result.needs.add(explicit_need)
+
+        for explicit_exclude in self.explicit_excludes:
+            if explicit_exclude.method == 'action':
+                # in-place update of results
+                result.update(self._load_action(explicit_exclude))
+            elif self.allow_by_default:
+                result.excludes.add(explicit_exclude)
+
         self._permissions = result
+
+    def _load_action(self, explicit_action):
+        """Load permissions associated to a specific action."""
+        action = current_access.get_action_cache(
+            self._cache_key(explicit_action)
+        )
+        if action is None:
+            action = _P(needs=set(), excludes=set())
+
+            actionsusers = ActionUsers.query_by_action(
+                explicit_action
+            ).all()
+
+            actionsroles = ActionRoles.query_by_action(
+                explicit_action
+            ).join(
+                ActionRoles.role
+            ).all()
+
+            actionssystem = ActionSystemRoles.query_by_action(
+                explicit_action
+            ).all()
+
+            for db_action in chain(
+                    actionsusers, actionsroles, actionssystem):
+                if db_action.exclude:
+                    action.excludes.add(db_action.need)
+                else:
+                    action.needs.add(db_action.need)
+
+            current_access.set_action_cache(
+                self._cache_key(explicit_action),
+                action
+            )
+        return(action)
 
     @property
     def needs(self):
