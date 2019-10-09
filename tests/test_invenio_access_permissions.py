@@ -82,6 +82,42 @@ def test_invenio_access_permission(app):
         assert permission.allows(fake_identity)
 
 
+def test_invenio_access_permission_denied(app):
+    """Permission is always denied when excluded."""
+    fake_identity = FakeIdentity()
+
+    InvenioAccess(app)
+    with app.test_request_context():
+        db.session.begin(nested=True)
+        # Create two users
+        user_one = User(email='test@inveniosoftware.org')
+        user_two = User(email='test2@inveniosoftware.org')
+
+        # Need to commit session to get user ids
+        db.session.add(ActionUsers(action='read', user=user_one))
+        db.session.add(ActionUsers(action='read', user=user_two))
+        db.session.commit()
+
+        # Create permission
+        permission = Permission(ActionNeed('read'))
+        # Allow user one
+        permission.explicit_needs.add(UserNeed(user_one.id))
+        # Forbid user two
+        permission.explicit_excludes.add(UserNeed(user_two.id))
+
+        # Identity without user needs is not allowed
+        assert not permission.allows(fake_identity)
+
+        # Identity with user one need is allowed
+        fake_identity.provides.add(UserNeed(user_one.id))
+        assert permission.allows(fake_identity)
+
+        # Identity with user two need not allowed
+        # Excludes have priority over needs (from Flask-Principal)
+        fake_identity.provides.add(UserNeed(user_two.id))
+        assert not permission.allows(fake_identity)
+
+
 def test_invenio_access_system_role_name(app):
     """Check that ActionSystemRoles cannot be created with undeclared names.
     """
