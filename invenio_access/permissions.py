@@ -105,7 +105,7 @@ class Permission(_Permission):
     def __init__(self, *needs):
         r"""Initialize permission.
 
-        :param needs: The needs for this permission.
+        :param \*needs: The needs for this permission.
         """
         self._permissions = None
         self.explicit_needs = set(needs)
@@ -176,7 +176,7 @@ class Permission(_Permission):
                 self._cache_key(explicit_action),
                 action
             )
-        return(action)
+        return action
 
     @property
     def needs(self):
