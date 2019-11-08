@@ -84,38 +84,54 @@ def test_invenio_access_permission(app):
 
 def test_invenio_access_permission_denied(app):
     """Permission is always denied when excluded."""
-    fake_identity = FakeIdentity()
 
     InvenioAccess(app)
     with app.test_request_context():
         db.session.begin(nested=True)
-        # Create two users
+        # Create three users
         user_one = User(email='test@inveniosoftware.org')
         user_two = User(email='test2@inveniosoftware.org')
-
+        user_three = User(email='test3@inveniosoftware.org')
         # Need to commit session to get user ids
         db.session.add(ActionUsers(action='read', user=user_one))
         db.session.add(ActionUsers(action='read', user=user_two))
+        db.session.add(ActionUsers(action='read', user=user_three))
+        # db.session.add(ActionUsers(action='write', user=user_three))
         db.session.commit()
-
-        # Create permission
+        # Create read permission that only ...
         permission = Permission(ActionNeed('read'))
-        # Allow user one
+        # ... explicitly allows user 1
         permission.explicit_needs.add(UserNeed(user_one.id))
-        # Forbid user two
+        # ... explicitly denies user 2
         permission.explicit_excludes.add(UserNeed(user_two.id))
+        # ... explicitly denies write action
+        permission.explicit_excludes.add(ActionNeed('write'))
 
-        # Identity without user needs is not allowed
-        assert not permission.allows(fake_identity)
-
-        # Identity with user one need is allowed
+        # Test 1 - Identity with user 1 need is allowed
+        fake_identity = FakeIdentity()
         fake_identity.provides.add(UserNeed(user_one.id))
+
         assert permission.allows(fake_identity)
 
-        # Identity with user two need not allowed
+        # Test 2 - Identity with user 1 AND user 2 need is NOT allowed
         # Excludes have priority over needs (from Flask-Principal)
         fake_identity.provides.add(UserNeed(user_two.id))
+
         assert not permission.allows(fake_identity)
+
+        # Test 3 - Identity (user 3) with action write is not allowed
+        fake_identity = FakeIdentity()
+        fake_identity.provides.add(ActionNeed('write'))
+
+        assert not permission.allows(fake_identity)
+
+        # Test 4 - Even with Permission allowing by default,
+        # action write is still not allowed
+        permission.allow_by_default = True
+
+        assert not permission.allows(fake_identity)
+
+        permission.allow_by_default = False
 
 
 def test_invenio_access_system_role_name(app):
