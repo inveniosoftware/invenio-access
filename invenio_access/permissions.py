@@ -8,7 +8,6 @@
 
 """Permission and action needs for Invenio."""
 
-import warnings
 from collections import namedtuple
 from functools import partial
 from itertools import chain
@@ -20,9 +19,9 @@ from .models import ActionRoles, ActionSystemRoles, ActionUsers, \
     get_action_cache_key
 from .proxies import current_access
 
-_Need = namedtuple('Need', ['method', 'value', 'argument'])
+_Need = namedtuple("Need", ["method", "value", "argument"])
 
-ParameterizedActionNeed = partial(_Need, 'action')
+ParameterizedActionNeed = partial(_Need, "action")
 
 ParameterizedActionNeed.__doc__ = \
     """A need having the method preset to `"action"` and a parameter.
@@ -31,31 +30,31 @@ ParameterizedActionNeed.__doc__ = \
     to ``ActionNeed``.
     """
 
-SystemRoleNeed = partial(Need, 'system_role')
+SystemRoleNeed = partial(Need, "system_role")
 SystemRoleNeed.__doc__ = \
-    """A need with the method preset to `"system_role"`"""
+    """A need with the method preset to `"system_role"`."""
 
 #
 # Need instances
 #
-superuser_access = ActionNeed('superuser-access')
+superuser_access = ActionNeed("superuser-access")
 """Superuser access aciton which allow access to everything."""
 
-any_user = SystemRoleNeed('any_user')
+any_user = SystemRoleNeed("any_user")
 """Any user system role.
 
 This role is used to assign all possible users (authenticated and guests)
 to an action.
 """
 
-authenticated_user = SystemRoleNeed('authenticated_user')
+authenticated_user = SystemRoleNeed("authenticated_user")
 """Authenticated user system role.
 
 This role is used to assign all authenticated users to an action.
 """
 
 
-class _P(namedtuple('Permission', ['needs', 'excludes'])):
+class _P(namedtuple("Permission", ["needs", "excludes"])):
     """Helper for simple permission updates."""
 
     def update(self, permission):
@@ -117,64 +116,79 @@ class Permission(_Permission):
         """Helper method to generate cache key."""
         return get_action_cache_key(
             action_need.value,
-            action_need.argument if hasattr(action_need, 'argument') else None
+            action_need.argument if hasattr(action_need, "argument") else None,
         )
 
+    @staticmethod
+    def _split_actionsneeds(needs):
+        """Split needs into sets of ActionNeed and any other *Need."""
+        action_needs, other_needs = set(), set()
+        for need in needs:
+            if need.method == "action":
+                action_needs.add(need)
+            else:
+                other_needs.add(need)
+        return action_needs, other_needs
+
     def _load_permissions(self):
-        """Load permissions associated to actions."""
+        """Load permissions for all needs, expanding actions."""
         result = _P(needs=set(), excludes=set())
-        if not self.allow_by_default:
-            result.needs.update(self.explicit_needs)
-            result.excludes.update(self.explicit_excludes)
 
-        for explicit_need in self.explicit_needs:
-            if explicit_need.method == 'action':
-                # in-place update of results
-                result.update(self._load_action(explicit_need))
-            elif self.allow_by_default:
-                result.needs.add(explicit_need)
+        # split ActionNeeds and any other Need in separates Sets
+        action_needs, explicit_needs = self._split_actionsneeds(
+            self.explicit_needs)
+        action_excludes, explicit_excludes = self._split_actionsneeds(
+            self.explicit_excludes)
 
-        for explicit_exclude in self.explicit_excludes:
-            if explicit_exclude.method == 'action':
-                # in-place update of results
-                result.update(self._load_action(explicit_exclude))
-            elif self.allow_by_default:
-                result.excludes.add(explicit_exclude)
+        # add all explicit needs/excludes to the result permissions
+        result.needs.update(explicit_needs)
+        result.excludes.update(explicit_excludes)
+
+        # expand all ActionNeeds to get all needs/excludes and add them to the
+        # result permissions
+        for need in action_needs | action_excludes:
+            result.update(self._expand_action(need))
+
+        # "allow_by_default = False" means that when needs are empty,
+        # then it should deny access.
+        # By default, `flask_principal.Permission.allows` will allow access
+        # if needs are empty!
+        needs_empty = len(result.needs) == 0
+        deny_access_when_empty_needs = not self.allow_by_default
+        if needs_empty and deny_access_when_empty_needs:
+            # Add at least one dummy need so that it will always deny access
+            result.needs.update(action_needs)
 
         self._permissions = result
 
-    def _load_action(self, explicit_action):
-        """Load permissions associated to a specific action."""
+    def _expand_action(self, explicit_action):
+        """Expand action to user/roles needs and excludes."""
         action = current_access.get_action_cache(
             self._cache_key(explicit_action)
         )
         if action is None:
             action = _P(needs=set(), excludes=set())
 
-            actionsusers = ActionUsers.query_by_action(
-                explicit_action
-            ).all()
+            actionsusers = ActionUsers.query_by_action(explicit_action).all()
 
-            actionsroles = ActionRoles.query_by_action(
-                explicit_action
-            ).join(
-                ActionRoles.role
-            ).all()
+            actionsroles = (
+                ActionRoles.query_by_action(explicit_action)
+                .join(ActionRoles.role)
+                .all()
+            )
 
             actionssystem = ActionSystemRoles.query_by_action(
                 explicit_action
             ).all()
 
-            for db_action in chain(
-                    actionsusers, actionsroles, actionssystem):
+            for db_action in chain(actionsusers, actionsroles, actionssystem):
                 if db_action.exclude:
                     action.excludes.add(db_action.need)
                 else:
                     action.needs.add(db_action.need)
 
             current_access.set_action_cache(
-                self._cache_key(explicit_action),
-                action
+                self._cache_key(explicit_action), action
             )
         return action
 

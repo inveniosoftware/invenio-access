@@ -184,7 +184,7 @@ def process_deny_action(processors, action, argument):
 def remove_action(action, argument):
     """Remove existing action authorization.
 
-    It is possible to specify multible emails and/or roles that
+    It is possible to specify multiple emails and/or roles that
     should be unassigned from the given action.
     """
 
