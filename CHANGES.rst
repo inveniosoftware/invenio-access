@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.3.0 (released 2019-11-15)
+
+- Adds explicit excludes of needs feature to load permission
+
 Version 1.2.0 (released 2019-08-02)
 
 - Removes DynamicPermission
