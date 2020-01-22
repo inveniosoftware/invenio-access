@@ -60,7 +60,7 @@ install_requires = [
     'Flask>=0.11.1',
     'Flask-BabelEx>=0.9.3',
     'invenio-accounts>=1.0.2',
-    'six>=1.10',
+    'six>=1.12.0',
 ]
 
 packages = find_packages()
