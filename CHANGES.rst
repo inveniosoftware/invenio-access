@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.3.1 (released 2020-01-22)
+
+- increase minimal six version
+
 Version 1.3.0 (released 2019-11-15)
 
 - Adds explicit excludes of needs feature to load permission
