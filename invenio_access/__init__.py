@@ -398,7 +398,7 @@ In order to discover which actions are available in a given installation, one
 can retrieve them via:
 
 >>> sorted(app.extensions['invenio-access'].actions.keys())
-['superuser-access']
+['admin-access', 'superuser-access']
 """
 
 from __future__ import absolute_import, print_function
@@ -423,6 +423,6 @@ __all__ = (
     'InvenioAccess',
     'ParameterizedActionNeed',
     'Permission',
-    'superuser_access'
+    'superuser_access',
     'SystemRoleNeed',
 )

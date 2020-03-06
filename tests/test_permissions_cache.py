@@ -13,10 +13,10 @@ from __future__ import absolute_import, print_function
 
 import time
 
+from cachelib import RedisCache, SimpleCache
 from flask_principal import ActionNeed, Need, RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db
-from werkzeug.contrib.cache import RedisCache, SimpleCache
 
 from invenio_access import InvenioAccess, current_access
 from invenio_access.models import ActionRoles, ActionSystemRoles, ActionUsers

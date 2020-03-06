@@ -6,13 +6,8 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-#FIXME see https://github.com/inveniosoftware/invenio-access/issues/129
-dist: trusty
-
 notifications:
   email: false
-
-sudo: false
 
 language: python
 
@@ -43,16 +38,18 @@ env:
   - REQUIREMENTS=devel EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio"
 
 python:
-  - "2.7"
-  - "3.5"
+  - "3.6"
+  - "3.7"
 
 before_install:
+  - "pip uninstall -y six"
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
   - "requirements-builder --level=min setup.py > .travis-lowest-requirements.txt"
   - "requirements-builder --level=pypi setup.py > .travis-release-requirements.txt"
   - "requirements-builder --level=dev --req requirements-devel.txt setup.py > .travis-devel-requirements.txt"
-  - "mysql -e 'CREATE DATABASE IF NOT EXISTS invenio; GRANT ALL ON invenio.* TO 'root';' -uroot"
+  - "mysql -e 'CREATE DATABASE IF NOT EXISTS invenio;'"
+  - "mysql -e 'GRANT ALL ON invenio.* TO 'root'@'localhost';' -uroot;"
   - "psql -c 'CREATE DATABASE invenio;' -U postgres"
 
 install:
@@ -71,7 +68,8 @@ deploy:
   password:
     secure: "WUU11aLRd9ttsk+pvnXJu6Kq4cXhgcjT0UcDMQ1rtOZg+FulHOXMEKqPiHWZxob01hmRkYKHGF0yM6kEE1cvTP2dSPC91YVwQvANmoV9TUXU35vEOlY4iOcZhfKGzM67Sx7Idh78ildCSm834+nP7iTB60TtNqxWDn839S9GpvHxyJLwblOkYxZWIrlGJ2dE41NxjGUDnmU/Js8s+yCORN1ckkIMGbO2ZkSCqwmWj+DhceEz9JBgeEyO5x2Zp0uqaUtM4gnUA+dkWqAhwLvwtsLvI7zF5ihHZGYEeHdRdEG8J43t+2MieTq+LkAh+mggTrfP5BeCnA0kATCuHeIYycgXVOX8fCaH789x9dsIkWXHGXsFz9Qb7pYKUCQZXOhMwCecaM4mXspIHjl1GZZx5FBQ3hkZu/ogIoAUmjd8q1gLi5oq+ZNIExXoPuzRnXQT5/qTapV+c+r7w1BIOX03Z2+RxyDCZsdIiICAYzAv5kQjFqyTB9nosNFuDyn1ZZIHWXCZ8lAJnbTj/ha3cafH1957K/r6RItl+rEpZCT0DnaG0ChBqdqqze33/+L45Bp95ALA+nEB1FcyqVGFTl8J68YFBHGeW7U+IvwuC16S03cRGbe0s1xtcxilshT27PnyBERyM9r1Ub61QytlOt6a9FlVbxpgCIbffhWxfAbjHBw="
   distributions: "compile_catalog sdist bdist_wheel"
+  skip_existing: true
   on:
     tags: true
-    python: "2.7"
+    python: "3.6"
     condition: $DEPLOY = true

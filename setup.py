@@ -17,7 +17,7 @@ history = open('CHANGES.rst').read()
 
 tests_require = [
     'SQLAlchemy-Continuum>=1.2.1',
-    'Werkzeug>=0.11.2',
+    'cachelib>=0.1',
     'check-manifest>=0.25',
     'coverage>=4.0',
     'isort>=4.3.0',
@@ -57,10 +57,10 @@ setup_requires = [
 ]
 
 install_requires = [
-    'Flask>=0.11.1',
-    'Flask-BabelEx>=0.9.3',
-    'invenio-accounts>=1.0.2',
-    'six>=1.12.0',
+    'invenio-admin>=1.2.0',
+    'invenio-accounts>=1.2.0',
+    'invenio-base>=1.2.2',
+    'invenio-i18n>=1.2.0',
 ]
 
 packages = find_packages()
