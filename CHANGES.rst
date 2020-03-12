@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.4.0 (released 2020-03-12)
+
+- drop Python 2.7 support
+- change Flask dependency management to centralised by invenio-base
+
 Version 1.3.1 (released 2020-01-22)
 
 - increase minimal six version
