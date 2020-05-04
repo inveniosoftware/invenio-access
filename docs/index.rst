@@ -20,7 +20,6 @@ Invenio-Access.
    installation
    configuration
    usage
-   examplesapp
 
 
 API Reference

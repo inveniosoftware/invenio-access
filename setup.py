@@ -17,7 +17,7 @@ history = open('CHANGES.rst').read()
 
 tests_require = [
     'SQLAlchemy-Continuum>=1.2.1',
-    'Werkzeug>=0.11.2',
+    'Werkzeug>=0.11.2,<1.0.0',
     'check-manifest>=0.25',
     'coverage>=4.0',
     'isort>=4.3.0',
@@ -31,7 +31,7 @@ tests_require = [
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.8.4',
+        'Sphinx>=1.8.4,<3',
     ],
     'mysql': [
         'invenio-db[mysql]>=1.0.0',
@@ -59,7 +59,8 @@ setup_requires = [
 install_requires = [
     'Flask>=0.11.1',
     'Flask-BabelEx>=0.9.3',
-    'invenio-accounts>=1.0.2',
+    'Flask-Admin>=1.5.6',
+    'invenio-accounts>=1.2.1',
     'six>=1.12.0',
 ]
 
@@ -134,10 +135,9 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Development Status :: 5 - Production/Stable',
     ],

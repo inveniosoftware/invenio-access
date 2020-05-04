@@ -65,8 +65,5 @@ target/
 .kdev4/
 *.kdev4
 
-# Examples
-examples/instance
-
 # tests
 test.db

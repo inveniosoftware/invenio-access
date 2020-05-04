@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.3.2 (released 2020-05-07)
+
+- set Sphinx ``<3`` because of errors related to application context
+- stop using example app
+
 Version 1.3.1 (released 2020-01-22)
 
 - increase minimal six version
