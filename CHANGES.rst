@@ -8,7 +8,7 @@
 Changes
 =======
 
-Version 1.4.1 (released TBD)
+Version 1.4.1 (released 2020-05-07)
 
 - set Sphinx ``<3`` because of errors related to application context
 - stop using example app
