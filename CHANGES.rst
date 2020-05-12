@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.3.3 (released 2020-05-12)
+
+- set invenio-accounts minor version to 1.1.4 due to invenio bundles
+  version incompatibilities
+
 Version 1.3.2 (released 2020-05-07)
 
 - set Sphinx ``<3`` because of errors related to application context
