@@ -60,7 +60,7 @@ install_requires = [
     'Flask>=0.11.1',
     'Flask-BabelEx>=0.9.3',
     'Flask-Admin>=1.5.6',
-    'invenio-accounts>=1.2.1',
+    'invenio-accounts>=1.1.4',
     'six>=1.12.0',
 ]
 
