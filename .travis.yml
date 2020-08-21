@@ -57,6 +57,7 @@ before_install:
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
   - "travis_retry pip install -e .[${EXTRAS}]"
+  - "travis_retry pip install git+https://github.com/ppanero/docker-services.git#egg=docker-services"
 
 script:
   - "./run-tests.sh"
