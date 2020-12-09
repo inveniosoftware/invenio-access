@@ -27,3 +27,4 @@ recursive-include invenio_access *.po
 recursive-include invenio_access *.pot
 recursive-include invenio_access *.py
 recursive-include tests *.py
+recursive-include .github/workflows *.yml
