@@ -18,20 +18,14 @@ history = open('CHANGES.rst').read()
 tests_require = [
     'SQLAlchemy-Continuum>=1.2.1',
     'cachelib>=0.1',
-    'check-manifest>=0.25',
-    'coverage>=4.0',
-    'isort>=4.3.0',
     'mock>=1.0.0',
-    'pydocstyle>=1.0.0',
-    'pytest-cov>=1.8.0',
-    'pytest-pep8>=1.0.6',
-    'pytest>=3.6.0',
-    'redis>=2.10.3'
+    'redis>=2.10.5',
+    'pytest-invenio>=1.4.0'
 ]
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.8.4,<3',
+        'Sphinx>=3',
     ],
     'mysql': [
         'invenio-db[mysql]>=1.0.0',
