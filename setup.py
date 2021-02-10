@@ -89,6 +89,7 @@ setup(
             'any_user = invenio_access.permissions:any_user',
             'authenticated_user = '
             'invenio_access.permissions:authenticated_user',
+            'system_process = invenio_access.permissions:system_process',
         ],
         'invenio_admin.views': [
             'invenio_access_action_users = '

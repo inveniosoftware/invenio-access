@@ -12,7 +12,7 @@ from collections import namedtuple
 from functools import partial
 from itertools import chain
 
-from flask_principal import ActionNeed, Need
+from flask_principal import ActionNeed, Identity, Need
 from flask_principal import Permission as _Permission
 
 from .models import ActionRoles, ActionSystemRoles, ActionUsers, \
@@ -52,6 +52,25 @@ authenticated_user = SystemRoleNeed("authenticated_user")
 
 This role is used to assign all authenticated users to an action.
 """
+
+system_process = SystemRoleNeed("system_process")
+"""System role for processes initiated by Invenio itself."""
+
+#
+# Identities
+#
+
+# the primary requirement for the system user's ID is to be unique
+# the IDs of users provided by Invenio-Accounts are positive integers
+# the ID of an AnonymousIdentity from Flask-Principle is None
+# and the documentation for Flask-Principal makes use of strings for some IDs
+system_user_id = "system"
+"""The user ID of the system itself, used in its Identity."""
+
+system_identity = Identity(system_user_id)
+"""Identity used by system processes."""
+
+system_identity.provides.add(system_process)
 
 
 class _P(namedtuple("Permission", ["needs", "excludes"])):
