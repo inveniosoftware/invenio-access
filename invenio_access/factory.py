@@ -8,8 +8,6 @@
 
 """Factory method for creating new action needs."""
 
-from __future__ import absolute_import, print_function
-
 from functools import partial
 
 from flask_principal import ActionNeed

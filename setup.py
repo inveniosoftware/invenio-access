@@ -16,11 +16,9 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'SQLAlchemy-Continuum>=1.2.1',
     'cachelib>=0.1',
-    'mock>=1.0.0',
+    'pytest-invenio>=1.4.1',
     'redis>=2.10.5',
-    'pytest-invenio>=1.4.0'
 ]
 
 extras_require = {
@@ -28,13 +26,13 @@ extras_require = {
         'Sphinx>=3',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0',
+        'invenio-db[mysql,versioning]>=1.0.8',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0',
+        'invenio-db[postgresql,versioning]>=1.0.8',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0',
+        'invenio-db[sqlite,versioning]>=1.0.8',
     ],
     'tests': tests_require,
 }
@@ -53,7 +51,7 @@ setup_requires = [
 install_requires = [
     'invenio-admin>=1.2.0',
     'invenio-accounts>=1.2.1',
-    'invenio-base>=1.2.2',
+    'invenio-base>=1.2.3',
     'invenio-i18n>=1.2.0',
 ]
 

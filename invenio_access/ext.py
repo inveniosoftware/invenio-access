@@ -8,8 +8,6 @@
 
 """Invenio module for common role based access control."""
 
-from __future__ import absolute_import, print_function
-
 import pkg_resources
 import six
 from flask_principal import identity_loaded

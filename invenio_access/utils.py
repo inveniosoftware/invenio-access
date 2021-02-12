@@ -8,8 +8,6 @@
 
 """Utility functions for Invenio-Access."""
 
-from __future__ import absolute_import, print_function
-
 from flask_principal import Identity, RoleNeed, UserNeed
 
 

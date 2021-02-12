@@ -8,8 +8,6 @@
 
 """Database models for access module."""
 
-from __future__ import absolute_import, print_function
-
 from flask_principal import RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db

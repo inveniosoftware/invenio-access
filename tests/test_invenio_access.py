@@ -6,20 +6,15 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-
 """Module tests."""
 
-from __future__ import absolute_import, print_function
+from unittest.mock import patch
 
 import pytest
 from flask import Flask
-from flask_babelex import Babel
-from flask_mail import Mail
 from flask_principal import ActionNeed
-from invenio_accounts import InvenioAccounts
-from invenio_db import InvenioDB, db
+from invenio_db import db
 from invenio_db.utils import drop_alembic_version_table
-from mock import patch
 from pkg_resources import EntryPoint
 
 from invenio_access import InvenioAccess, current_access

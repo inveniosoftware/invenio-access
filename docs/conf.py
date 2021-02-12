@@ -8,8 +8,6 @@
 
 """Sphinx configuration."""
 
-from __future__ import print_function
-
 import os
 import sys
 
@@ -324,3 +322,10 @@ intersphinx_mapping = {
 
 # Autodoc configuraton.
 autoclass_content = 'both'
+
+# Push an app context so that LocalProxy in
+# invenio_access.proxies:current_access can be included in the docs.
+from flask import Flask
+app = Flask('app')
+app.extensions['invenio-access'] = None
+app.app_context().push()
