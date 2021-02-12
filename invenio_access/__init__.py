@@ -401,8 +401,6 @@ can retrieve them via:
 ['admin-access', 'superuser-access']
 """
 
-from __future__ import absolute_import, print_function
-
 from flask_principal import ActionNeed
 
 from .ext import InvenioAccess

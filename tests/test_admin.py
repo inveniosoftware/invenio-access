@@ -8,16 +8,8 @@
 
 """Test for admin view."""
 
-from flask import current_app
-from invenio_accounts import InvenioAccounts
-from werkzeug.local import LocalProxy
-
 from invenio_access.admin import action_roles_adminview, \
     action_system_roles_adminview, action_users_adminview
-
-_datastore = LocalProxy(
-    lambda: current_app.extensions['security'].datastore
-)
 
 
 def test_admin(app):
