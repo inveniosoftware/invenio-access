@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.4.2 (released 2021-02-16)
+
+- adds a new system role "system_process".
+- adds a new identity providing the system process role.
+
 Version 1.4.1 (released 2020-05-07)
 
 - set Sphinx ``<3`` because of errors related to application context
