@@ -127,7 +127,8 @@ class Permission(_Permission):
         """
         self._permissions = None
         self.explicit_needs = set(needs)
-        self.explicit_needs.add(superuser_access)
+        if not self.allow_by_default:
+            self.explicit_needs.add(superuser_access)
         self.explicit_excludes = set()
 
     @staticmethod

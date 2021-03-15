@@ -435,7 +435,7 @@ def test_system_roles(access_app):
     assert permission_write.allows(superuser)
 
 
-def test_allow_by_default(access_app, dynamic_permission):
+def test_allow_by_default(access_app, dynamic_permission, monkeypatch):
     """Test that dynamic permissions allows access by default."""
     anonymous, superuser = create_users("anonymous", "superuser")
     act_access_backoffice = ActionNeed("access-backoffice")
@@ -449,3 +449,9 @@ def test_allow_by_default(access_app, dynamic_permission):
     superuser = get_superuser()
     assert permission.allows(superuser)
     assert dyn_permission.allows(superuser)
+
+    # Allow access if `allow_by_default` property is set to `True`.
+    monkeypatch.setattr(
+        'invenio_access.permissions.Permission.allow_by_default', True)
+    permission, = create_permissions({"needs": [act_access_backoffice]})
+    assert permission.allows(anonymous)
