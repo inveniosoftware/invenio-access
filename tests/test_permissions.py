@@ -51,9 +51,9 @@ class WithUserIdentity(object):
 
     def __init__(self, user, *provides):
         self.user = user
-        self.id = user.id
+        self.id = user.get_id()
         self.provides = set(provides)
-        self.provides.add(UserNeed(user.id))
+        self.provides.add(UserNeed(user.get_id()))
         assert ActionNeed not in self.provides
 
 

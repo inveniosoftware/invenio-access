@@ -16,10 +16,11 @@ def get_identity(user):
 
     Primarily useful for testing.
     """
-    identity = Identity(user.id)
+    id_ = user.get_id()
+    identity = Identity(id_)
 
-    if hasattr(user, 'id'):
-        identity.provides.add(UserNeed(user.id))
+    if id_ is not None:
+        identity.provides.add(UserNeed(id_))
 
     for role in getattr(user, 'roles', []):
         identity.provides.add(RoleNeed(role.name))

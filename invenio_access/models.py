@@ -15,6 +15,7 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.event import listen
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy_utils import Timestamp, UUIDType
 
 from .proxies import current_access
 
@@ -117,7 +118,7 @@ class ActionUsers(ActionNeedMixin, db.Model):
         name='access_actionsusers_unique'),
     )
 
-    user_id = db.Column(db.Integer(),
+    user_id = db.Column(UUIDType(),
                         db.ForeignKey(User.id, ondelete='CASCADE'),
                         nullable=False, index=True)
 
@@ -128,7 +129,8 @@ class ActionUsers(ActionNeedMixin, db.Model):
     @property
     def need(self):
         """Return UserNeed instance."""
-        return UserNeed(self.user_id)
+        # str() because current_user.get_id() always returns unicode strings.
+        return UserNeed(str(self.user_id))
 
 
 class ActionRoles(ActionNeedMixin, db.Model):

@@ -41,7 +41,7 @@ def test_load_permissions_on_identity_loaded(app):
         user = testutils.create_test_user('test@example.org')
         login_user(user)
         assert g.identity.provides == {
-            any_user, authenticated_user, UserNeed(user.id)
+            any_user, authenticated_user, UserNeed(user.get_id())
         }
         logout_user()
         # FIXME: The user is still authenticatd when the identity loader

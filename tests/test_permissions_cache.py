@@ -46,7 +46,7 @@ def test_invenio_access_permission_cache(app, dynamic_permission):
 
         permission_open = dynamic_permission(ActionNeed('open'))
 
-        identity_open = FakeIdentity(UserNeed(user_can_open.id))
+        identity_open = FakeIdentity(UserNeed(user_can_open.get_id()))
 
         assert not permission_open.allows(identity_open)
         assert current_access.get_action_cache('open') == (
@@ -69,7 +69,7 @@ def test_invenio_access_permission_cache(app, dynamic_permission):
                                    user=user_can_open_1))
         db.session.flush()
 
-        identity_open_1 = FakeIdentity(UserNeed(user_can_open_1.id))
+        identity_open_1 = FakeIdentity(UserNeed(user_can_open_1.get_id()))
         permission_open_1 = dynamic_permission(
             ParameterizedActionNeed('open', '1'))
         assert not permission_open.allows(identity_open_1)
@@ -104,7 +104,7 @@ def test_invenio_access_permission_cache_redis(app, dynamic_permission):
 
         db.session.flush()
 
-        identity_open = FakeIdentity(UserNeed(user_can_open.id))
+        identity_open = FakeIdentity(UserNeed(user_can_open.get_id()))
 
         permission_open = dynamic_permission(ActionNeed('open'))
         assert not permission_open.allows(identity_open)
@@ -129,7 +129,7 @@ def test_invenio_access_permission_cache_redis(app, dynamic_permission):
 
         db.session.flush()
 
-        identity_open_1 = FakeIdentity(UserNeed(user_can_open_1.id))
+        identity_open_1 = FakeIdentity(UserNeed(user_can_open_1.get_id()))
         permission_open_1 = dynamic_permission(
             ParameterizedActionNeed('open', '1'))
         assert not permission_open.allows(identity_open_1)
@@ -193,7 +193,7 @@ def test_intenio_access_cache_performance(app, dynamic_permission):
         def test_permissions():
             """Iterates over all users checking its permissions."""
             for i in range(users_number):
-                identity = FakeIdentity(UserNeed(users[i].id))
+                identity = FakeIdentity(UserNeed(users[i].get_id()))
 
                 # Allowed permission
                 permission_allowed_both = dynamic_permission(
@@ -263,12 +263,12 @@ def test_invenio_access_permission_cache_users_updates(
         db.session.flush()
 
         # Creation identities to test.
-        identity_user_1 = FakeIdentity(UserNeed(user_1.id))
-        identity_user_2 = FakeIdentity(UserNeed(user_2.id))
-        identity_user_3 = FakeIdentity(UserNeed(user_3.id))
-        identity_user_4 = FakeIdentity(UserNeed(user_4.id))
-        identity_user_5 = FakeIdentity(UserNeed(user_5.id))
-        identity_user_6 = FakeIdentity(UserNeed(user_6.id))
+        identity_user_1 = FakeIdentity(UserNeed(user_1.get_id()))
+        identity_user_2 = FakeIdentity(UserNeed(user_2.get_id()))
+        identity_user_3 = FakeIdentity(UserNeed(user_3.get_id()))
+        identity_user_4 = FakeIdentity(UserNeed(user_4.get_id()))
+        identity_user_5 = FakeIdentity(UserNeed(user_5.get_id()))
+        identity_user_6 = FakeIdentity(UserNeed(user_6.get_id()))
 
         # Test if user 1 can open. In this case, the cache should store only
         # this object.
