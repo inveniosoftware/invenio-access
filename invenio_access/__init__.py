@@ -33,6 +33,7 @@ Create a Flask application:
 >>> app.config.update({
 ...     'SQLALCHEMY_DATABASE_URI': db_url,
 ...     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+...     'SECRET_KEY': 'CHANGE_ME',
 ... })
 
 Initialize Invenio-Access dependencies, which are Invenio-DB and
@@ -261,10 +262,10 @@ anonymous requests are denied in both cases:
 
 >>> with app.test_client() as c:
 ...     c.get('/')
-<Response streamed [403 FORBIDDEN]>
+<WrapperTestResponse streamed [403 FORBIDDEN]>
 >>> with app.test_client() as c:
 ...     c.get('/objects/42')
-<Response streamed [404 NOT FOUND]>
+<WrapperTestResponse streamed [404 NOT FOUND]>
 
 In the two above examples for protecting views, you will notice that in one we
 return an HTTP 403 Forbidden error, and in the other we return a HTTP 404 Not
