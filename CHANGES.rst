@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.4.3 (released 2022-03-30)
+
+- add support for Flask 2.1, Werkzeug 2.1 and Click 8.1
+- bump dependency on invenio-base, invenio-accounts and invenio-i18n
+
 Version 1.4.2 (released 2021-02-16)
 
 - adds a new system role "system_process".
