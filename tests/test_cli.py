@@ -8,7 +8,6 @@
 
 """Module tests."""
 
-from click.testing import CliRunner
 from flask import g
 from flask_principal import ActionNeed
 from flask_security.core import _security
@@ -19,120 +18,108 @@ from invenio_access.cli import access
 from invenio_access.permissions import ParameterizedActionNeed
 
 
-def test_access_cli_allow_action_empty(script_info):
+def test_access_cli_allow_action_empty(cli_app):
     """Test add action role in access CLI."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
     result = runner.invoke(
-        access, ['allow', 'open'], obj=script_info)
+        access, ['allow', 'open'])
     assert result.exit_code != 0
 
 
-def test_access_cli_allow_action_unknown_email(script_info):
+def test_access_cli_allow_action_unknown_email(cli_app):
     """Test add action role in access CLI."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
     result = runner.invoke(
-        access, ['allow', 'open', 'user', 'unknown'],
-        obj=script_info)
+        access, ['allow', 'open', 'user', 'unknown'])
     assert result.exit_code != 0
 
 
-def test_access_cli_allow_action_unknown_role(script_info):
+def test_access_cli_allow_action_unknown_role(cli_app):
     """Test add action role in access CLI."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
     result = runner.invoke(
         access,
-        ['allow', 'open', 'role', 'unknown'],
-        obj=script_info)
+        ['allow', 'open', 'role', 'unknown'])
     assert result.exit_code != 0
 
 
-def test_access_cli_allow_action_user(script_info):
+def test_access_cli_allow_action_user(cli_app):
     """Test add action role in access CLI."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
     # User creation
     result = runner.invoke(
         users_create,
         ['a@example.org', '--password', '123456'],
-        obj=script_info
+
     )
     assert result.exit_code == 0
     result = runner.invoke(
-        access, ['allow', 'invalid', 'user', 'a@example.org'], obj=script_info)
+        access, ['allow', 'invalid', 'user', 'a@example.org'])
     assert result.exit_code != 0
     result = runner.invoke(
-        access, ['allow', 'open', 'user', 'a@example.org'], obj=script_info)
+        access, ['allow', 'open', 'user', 'a@example.org'])
     assert result.exit_code == 0
 
 
-def test_any_all_global(script_info):
+def test_any_all_global(cli_app):
     """Test any/all/global subcommands."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
-    result = runner.invoke(access, ['remove', 'open', 'global'],
-                           obj=script_info)
+    result = runner.invoke(access, ['remove', 'open', 'global'])
     assert result.exit_code == 0
 
-    result = runner.invoke(access, ['remove', 'open', 'global'],
-                           obj=script_info)
+    result = runner.invoke(access, ['remove', 'open', 'global'])
     assert result.exit_code == 0
 
 
-def test_access_cli_allow_action_role(script_info):
+def test_access_cli_allow_action_role(cli_app):
     """Test add action role in access CLI."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
     # Role creation
     result = runner.invoke(
         roles_create,
-        ['open_role'],
-        obj=script_info)
+        ['open_role'])
     assert result.exit_code == 0
 
     result = runner.invoke(
         access,
-        ['allow', 'open', 'role', 'open_role'],
-        obj=script_info
-    )
+        ['allow', 'open', 'role', 'open_role'])
     assert result.exit_code == 0
 
 
-def test_access_cli_deny_action_role(script_info):
+def test_access_cli_deny_action_role(cli_app):
     """Test add action role in access CLI."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
     # Role creation
     result = runner.invoke(
         roles_create,
-        ['edit_role'],
-        obj=script_info)
+        ['edit_role'])
     assert result.exit_code == 0
     result = runner.invoke(
         access,
-        ['deny', 'edit', 'role', 'edit_role'],
-        obj=script_info
-    )
+        ['deny', 'edit', 'role', 'edit_role'])
     assert result.exit_code == 0
 
 
-def test_access_cli_list(script_info_cli_list):
+def test_access_cli_list(cli_app):
     """Test of list cli command."""
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
     result = runner.invoke(
         access, ['list'],
-        obj=script_info_cli_list
     )
     assert result.exit_code == 0
     assert result.output.find("open") != -1
 
 
-def test_access_matrix(script_info_cli_list, dynamic_permission):
+def test_access_matrix(cli_app, dynamic_permission):
     """Test of combinations of cli commands."""
-    script_info = script_info_cli_list
-    runner = CliRunner()
+    runner = cli_app.test_cli_runner()
 
     user_roles = {
         'admin@inveniosoftware.org': ['admin'],
@@ -150,22 +137,20 @@ def test_access_matrix(script_info_cli_list, dynamic_permission):
     for role in {role for roles in user_roles.values() for role in roles}:
         # Role creation
         result = runner.invoke(
-            roles_create, [role], obj=script_info
-        )
+            roles_create, [role])
         assert result.exit_code == 0
 
     for email, roles in user_roles.items():
         result = runner.invoke(
             users_create,
             [email, '--password', '123456', '-a'],
-            obj=script_info
         )
         assert result.exit_code == 0
 
         for role in roles:
             # Role creation
             result = runner.invoke(
-                roles_add, [email, role], obj=script_info
+                roles_add, [email, role],
             )
             assert result.exit_code == 0
 
@@ -180,21 +165,18 @@ def test_access_matrix(script_info_cli_list, dynamic_permission):
         result = runner.invoke(
             access,
             ['allow', action] + list(role_args(roles)),
-            obj=script_info
         )
         assert result.exit_code == 0
 
     result = runner.invoke(
         access,
         ['deny', 'edit', 'user', 'admin-edit@inveniosoftware.org'],
-        obj=script_info
     )
     assert result.exit_code == 0
 
     result = runner.invoke(
         access,
         ['allow', '-a', '1', 'edit', 'user', 'info@inveniosoftware.org'],
-        obj=script_info
     )
     assert result.exit_code == 0
 
@@ -250,7 +232,7 @@ def test_access_matrix(script_info_cli_list, dynamic_permission):
     }
 
     for email, permissions in user_permissions.items():
-        with script_info.create_app(None).test_request_context():
+        with cli_app.test_request_context():
             user = _security.datastore.find_user(email=email)
             login_user(user)
             identity = g.identity
@@ -262,14 +244,12 @@ def test_access_matrix(script_info_cli_list, dynamic_permission):
     result = runner.invoke(
         access,
         ['remove', 'edit'],
-        obj=script_info
     )
     assert result.exit_code == 2
 
     result = runner.invoke(
         access,
         ['show', '-e', 'admin-edit@inveniosoftware.org'],
-        obj=script_info
     )
     assert result.exit_code == 0
     assert 'user:admin-edit@inveniosoftware.org:edit::deny' in result.output
@@ -277,7 +257,6 @@ def test_access_matrix(script_info_cli_list, dynamic_permission):
     result = runner.invoke(
         access,
         ['show', '-r', 'editor'],
-        obj=script_info
     )
     assert 'role:editor:edit::allow\n' == result.output
     assert result.exit_code == 0
@@ -290,21 +269,18 @@ def test_access_matrix(script_info_cli_list, dynamic_permission):
         result = runner.invoke(
             access,
             ['remove', action] + list(role_args(roles)),
-            obj=script_info
         )
         assert result.exit_code == 0
 
     result = runner.invoke(
         access,
         ['remove', 'edit', 'user', 'admin-edit@inveniosoftware.org'],
-        obj=script_info
     )
     assert result.exit_code == 0
 
     result = runner.invoke(
         access,
         ['remove', '-a', '1', 'edit', 'user', 'info@inveniosoftware.org'],
-        obj=script_info
     )
     assert result.exit_code == 0
 
@@ -312,7 +288,6 @@ def test_access_matrix(script_info_cli_list, dynamic_permission):
     result = runner.invoke(
         access,
         ['show', '-r', 'admin-edit@inveniosoftware.org'],
-        obj=script_info
     )
     assert result.exit_code == 0
     assert result.output == ''

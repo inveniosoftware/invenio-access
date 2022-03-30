@@ -23,5 +23,4 @@ python -m check_manifest --ignore ".*-requirements.txt"
 eval "$(docker-services-cli up --db ${DB:-postgresql} --cache ${CACHE:-redis} --env)"
 python -m pytest
 tests_exit_code=$?
-python -m sphinx.cmd.build -qnNW docs docs/_build/html
 exit "$tests_exit_code"

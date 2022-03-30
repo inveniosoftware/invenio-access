@@ -33,6 +33,16 @@ def lazy_result(f):
     return decorated
 
 
+def resultcallback(group):
+    """Compatibility layer for Click 7 and 8."""
+    if hasattr(group, 'result_callback') and group.result_callback is not None:
+        decorator = group.result_callback()
+    else:
+        # Click < 8.0
+        decorator = group.resultcallback()
+    return decorator
+
+
 @lazy_result
 def process_action(ctx, param, value):
     """Return an action if exists."""
@@ -123,7 +133,7 @@ def allow_role(role):
     return processor
 
 
-@allow_action.resultcallback()
+@resultcallback(allow_action)
 @with_appcontext
 def process_allow_action(processors, action, argument):
     """Process allow action."""
@@ -164,7 +174,7 @@ def deny_role(role):
     return processor
 
 
-@deny_action.resultcallback()
+@resultcallback(deny_action)
 @with_appcontext
 def process_deny_action(processors, action, argument):
     """Process deny action."""
@@ -219,7 +229,7 @@ def remove_role(role):
     return processor
 
 
-@remove_action.resultcallback()
+@resultcallback(remove_action)
 @with_appcontext
 def process_remove_action(processors, action, argument):
     """Process action removals."""
