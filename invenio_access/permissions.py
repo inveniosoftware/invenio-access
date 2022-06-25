@@ -15,24 +15,21 @@ from itertools import chain
 from flask_principal import ActionNeed, Identity, Need
 from flask_principal import Permission as _Permission
 
-from .models import ActionRoles, ActionSystemRoles, ActionUsers, \
-    get_action_cache_key
+from .models import ActionRoles, ActionSystemRoles, ActionUsers, get_action_cache_key
 from .proxies import current_access
 
 _Need = namedtuple("Need", ["method", "value", "argument"])
 
 ParameterizedActionNeed = partial(_Need, "action")
 
-ParameterizedActionNeed.__doc__ = \
-    """A need having the method preset to `"action"` and a parameter.
+ParameterizedActionNeed.__doc__ = """A need having the method preset to `"action"` and a parameter.
 
     If it is called with `argument=None` then this need is equivalent
     to ``ActionNeed``.
     """
 
 SystemRoleNeed = partial(Need, "system_role")
-SystemRoleNeed.__doc__ = \
-    """A need with the method preset to `"system_role"`."""
+SystemRoleNeed.__doc__ = """A need with the method preset to `"system_role"`."""
 
 #
 # Need instances
@@ -154,10 +151,10 @@ class Permission(_Permission):
         result = _P(needs=set(), excludes=set())
 
         # split ActionNeeds and any other Need in separates Sets
-        action_needs, explicit_needs = self._split_actionsneeds(
-            self.explicit_needs)
+        action_needs, explicit_needs = self._split_actionsneeds(self.explicit_needs)
         action_excludes, explicit_excludes = self._split_actionsneeds(
-            self.explicit_excludes)
+            self.explicit_excludes
+        )
 
         # add all explicit needs/excludes to the result permissions
         result.needs.update(explicit_needs)
@@ -182,9 +179,7 @@ class Permission(_Permission):
 
     def _expand_action(self, explicit_action):
         """Expand action to user/roles needs and excludes."""
-        action = current_access.get_action_cache(
-            self._cache_key(explicit_action)
-        )
+        action = current_access.get_action_cache(self._cache_key(explicit_action))
         if action is None:
             action = _P(needs=set(), excludes=set())
 
@@ -196,9 +191,7 @@ class Permission(_Permission):
                 .all()
             )
 
-            actionssystem = ActionSystemRoles.query_by_action(
-                explicit_action
-            ).all()
+            actionssystem = ActionSystemRoles.query_by_action(explicit_action).all()
 
             for db_action in chain(actionsusers, actionsroles, actionssystem):
                 if db_action.exclude:
@@ -206,9 +199,7 @@ class Permission(_Permission):
                 else:
                     action.needs.add(db_action.need)
 
-            current_access.set_action_cache(
-                self._cache_key(explicit_action), action
-            )
+            current_access.set_action_cache(self._cache_key(explicit_action), action)
         return action
 
     @property

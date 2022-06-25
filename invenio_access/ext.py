@@ -20,8 +20,9 @@ from .loaders import load_permissions_on_identity_loaded
 class _AccessState(object):
     """Access state storing registered actions."""
 
-    def __init__(self, app, entry_point_actions=None,
-                 entry_point_system_roles=None, cache=None):
+    def __init__(
+        self, app, entry_point_actions=None, entry_point_system_roles=None, cache=None
+    ):
         """Initialize state.
 
         :param app: The Flask application.
@@ -43,9 +44,8 @@ class _AccessState(object):
     @cached_property
     def cache(self):
         """Return a cache instance."""
-        cache = self._cache or self.app.config.get('ACCESS_CACHE')
-        return import_string(cache) if isinstance(cache, six.string_types) \
-            else cache
+        cache = self._cache or self.app.config.get("ACCESS_CACHE")
+        return import_string(cache) if isinstance(cache, six.string_types) else cache
 
     def set_action_cache(self, action_key, data):
         """Store action needs and excludes.
@@ -57,8 +57,7 @@ class _AccessState(object):
         """
         if self.cache:
             self.cache.set(
-                self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                action_key, data
+                self.app.config["ACCESS_ACTION_CACHE_PREFIX"] + action_key, data
             )
 
     def get_action_cache(self, action_key):
@@ -72,8 +71,7 @@ class _AccessState(object):
         data = None
         if self.cache:
             data = self.cache.get(
-                self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                action_key
+                self.app.config["ACCESS_ACTION_CACHE_PREFIX"] + action_key
             )
         return data
 
@@ -86,8 +84,7 @@ class _AccessState(object):
         """
         if self.cache:
             self.cache.delete(
-                self.app.config['ACCESS_ACTION_CACHE_PREFIX'] +
-                action_key
+                self.app.config["ACCESS_ACTION_CACHE_PREFIX"] + action_key
             )
 
     def register_action(self, action):
@@ -140,9 +137,13 @@ class InvenioAccess(object):
         if app:
             self._state = self.init_app(app, **kwargs)
 
-    def init_app(self, app, entry_point_actions='invenio_access.actions',
-                 entry_point_system_roles='invenio_access.system_roles',
-                 **kwargs):
+    def init_app(
+        self,
+        app,
+        entry_point_actions="invenio_access.actions",
+        entry_point_system_roles="invenio_access.system_roles",
+        **kwargs
+    ):
         """Flask application initialization.
 
         :param app: The Flask application.
@@ -154,15 +155,15 @@ class InvenioAccess(object):
         """
         self.init_config(app)
         state = _AccessState(
-            app, entry_point_actions=entry_point_actions,
+            app,
+            entry_point_actions=entry_point_actions,
             entry_point_system_roles=entry_point_system_roles,
-            cache=kwargs.get('cache'))
-        app.extensions['invenio-access'] = state
+            cache=kwargs.get("cache"),
+        )
+        app.extensions["invenio-access"] = state
 
-        if app.config.get('ACCESS_LOAD_SYSTEM_ROLE_NEEDS', True):
-            identity_loaded.connect_via(app)(
-                load_permissions_on_identity_loaded
-            )
+        if app.config.get("ACCESS_LOAD_SYSTEM_ROLE_NEEDS", True):
+            identity_loaded.connect_via(app)(load_permissions_on_identity_loaded)
 
         return state
 
@@ -172,7 +173,7 @@ class InvenioAccess(object):
         :param app: The Flask application.
         """
         for k in dir(config):
-            if k.startswith('ACCESS_'):
+            if k.startswith("ACCESS_"):
                 app.config.setdefault(k, getattr(config, k))
 
     def __getattr__(self, name):

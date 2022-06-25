@@ -410,12 +410,14 @@ can retrieve them via:
 try:
     # Werkzeug <2.1
     from werkzeug import security
+
     security.safe_str_cmp
 except AttributeError:
     # Werkzeug >=2.1
     import hmac
 
     from werkzeug import security
+
     security.safe_str_cmp = hmac.compare_digest
 
 from flask_principal import ActionNeed
@@ -423,22 +425,28 @@ from flask_principal import ActionNeed
 from .ext import InvenioAccess
 from .factory import action_factory
 from .models import ActionRoles, ActionSystemRoles, ActionUsers
-from .permissions import ParameterizedActionNeed, Permission, SystemRoleNeed, \
-    any_user, authenticated_user, superuser_access
+from .permissions import (
+    ParameterizedActionNeed,
+    Permission,
+    SystemRoleNeed,
+    any_user,
+    authenticated_user,
+    superuser_access,
+)
 from .proxies import current_access
 
-__version__ = '1.4.4'
+__version__ = "1.4.4"
 
 __all__ = (
-    '__version__',
-    'any_user',
-    'authenticated_user',
-    'action_factory',
-    'current_access',
-    'ActionNeed',
-    'InvenioAccess',
-    'ParameterizedActionNeed',
-    'Permission',
-    'superuser_access',
-    'SystemRoleNeed',
+    "__version__",
+    "any_user",
+    "authenticated_user",
+    "action_factory",
+    "current_access",
+    "ActionNeed",
+    "InvenioAccess",
+    "ParameterizedActionNeed",
+    "Permission",
+    "superuser_access",
+    "SystemRoleNeed",
 )

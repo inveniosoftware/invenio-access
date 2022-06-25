@@ -27,31 +27,32 @@ from invenio_access.loaders import load_permissions_on_identity_loaded
 from invenio_access.permissions import ParameterizedActionNeed, Permission
 
 
-@compiles(DropTable, 'postgresql')
+@compiles(DropTable, "postgresql")
 def _compile_drop_table(element, compiler, **kwargs):
-    return compiler.visit_drop_table(element) + ' CASCADE'
+    return compiler.visit_drop_table(element) + " CASCADE"
 
 
-@compiles(DropConstraint, 'postgresql')
+@compiles(DropConstraint, "postgresql")
 def _compile_drop_constraint(element, compiler, **kwargs):
-    return compiler.visit_drop_constraint(element) + ' CASCADE'
+    return compiler.visit_drop_constraint(element) + " CASCADE"
 
 
-@compiles(DropSequence, 'postgresql')
+@compiles(DropSequence, "postgresql")
 def _compile_drop_sequence(element, compiler, **kwargs):
-    return compiler.visit_drop_sequence(element) + ' CASCADE'
+    return compiler.visit_drop_sequence(element) + " CASCADE"
 
 
 @pytest.fixture()
 def base_app():
     """Flask base application fixture."""
-    app_ = Flask('testapp')
+    app_ = Flask("testapp")
     app_.config.update(
         ACCOUNTS_USE_CELERY=False,
-        SECRET_KEY='CHANGE_ME',
-        SECURITY_PASSWORD_SALT='CHANGE_ME_ALSO',
+        SECRET_KEY="CHANGE_ME",
+        SECURITY_PASSWORD_SALT="CHANGE_ME_ALSO",
         SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
+            "SQLALCHEMY_DATABASE_URI", "sqlite:///test.db"
+        ),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         TESTING=True,
     )
@@ -89,8 +90,8 @@ def access_app(app):
 @pytest.fixture()
 def cli_app(app):
     """Get CLI app object for testing CLI."""
-    action_open = ActionNeed('open')
-    action_edit = ParameterizedActionNeed('edit', None)
+    action_open = ActionNeed("open")
+    action_edit = ParameterizedActionNeed("edit", None)
 
     ext = InvenioAccess(app)
     ext.register_action(action_open)
@@ -101,9 +102,11 @@ def cli_app(app):
 @pytest.fixture()
 def dynamic_permission():
     """Dynamic permission fixture."""
+
     def _get_dynamic_permission(*args):
         """Get dynamic permission."""
         return DynamicPermission(*args)
+
     return _get_dynamic_permission
 
 
@@ -133,5 +136,4 @@ class DynamicPermission(Permission):
     def __init__(self, *args, **kwargs):
         """Constructor."""
         super(DynamicPermission, self).__init__(*args, **kwargs)
-        warnings.warn("DynamicPermission is scheduled for removal.",
-                      DeprecationWarning)
+        warnings.warn("DynamicPermission is scheduled for removal.", DeprecationWarning)

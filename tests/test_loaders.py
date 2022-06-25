@@ -9,8 +9,12 @@
 """Test Indentity loaders."""
 
 from flask import current_app, g
-from flask_principal import AnonymousIdentity, UserNeed, identity_changed, \
-    identity_loaded
+from flask_principal import (
+    AnonymousIdentity,
+    UserNeed,
+    identity_changed,
+    identity_loaded,
+)
 from flask_security.utils import login_user, logout_user
 from invenio_accounts import testutils
 
@@ -24,7 +28,7 @@ def test_load_permissions_on_request_loaded(app):
     InvenioAccess(app)
     with app.test_request_context():
         with app.test_client() as client:
-            client.get('/')
+            client.get("/")
             assert g.identity.provides == {any_user}
 
 
@@ -33,16 +37,15 @@ def test_load_permissions_on_identity_loaded(app):
     InvenioAccess(app)
 
     with app.test_request_context():
-        identity_changed.send(current_app._get_current_object(),
-                              identity=AnonymousIdentity())
+        identity_changed.send(
+            current_app._get_current_object(), identity=AnonymousIdentity()
+        )
         assert g.identity.provides == {any_user}
 
     with app.test_request_context():
-        user = testutils.create_test_user('test@example.org')
+        user = testutils.create_test_user("test@example.org")
         login_user(user)
-        assert g.identity.provides == {
-            any_user, authenticated_user, UserNeed(user.id)
-        }
+        assert g.identity.provides == {any_user, authenticated_user, UserNeed(user.id)}
         logout_user()
         # FIXME: The user is still authenticatd when the identity loader
         # is called during logout. We could filter on AnonymousIdentity, but
@@ -53,8 +56,9 @@ def test_load_permissions_on_identity_loaded(app):
         # }
         # Forcing the identity to reload again cleans the mess. In practice
         # this won't be needed as the identity is reloaded between requests.
-        identity_changed.send(current_app._get_current_object(),
-                              identity=AnonymousIdentity())
+        identity_changed.send(
+            current_app._get_current_object(), identity=AnonymousIdentity()
+        )
         assert g.identity.provides == {any_user}
 
 
@@ -63,10 +67,10 @@ def test_disabled_loader(app):
     app.config.update(ACCESS_LOAD_SYSTEM_ROLE_NEEDS=False)
     InvenioAccess(app)
 
-    assert load_permissions_on_identity_loaded not in \
-        identity_loaded.receivers.values()
+    assert load_permissions_on_identity_loaded not in identity_loaded.receivers.values()
 
     with app.test_request_context():
-        identity_changed.send(current_app._get_current_object(),
-                              identity=AnonymousIdentity())
+        identity_changed.send(
+            current_app._get_current_object(), identity=AnonymousIdentity()
+        )
         assert g.identity.provides == set()

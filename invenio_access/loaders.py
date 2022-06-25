@@ -18,12 +18,8 @@ def load_permissions_on_identity_loaded(sender, identity):
     Every user gets the **any_user** Need.
     Authenticated users get in addition the **authenticated_user** Need.
     """
-    identity.provides.add(
-        any_user
-    )
+    identity.provides.add(any_user)
     # if the user is not anonymous
     if current_user.is_authenticated:
         # Add the need provided to authenticated users
-        identity.provides.add(
-            authenticated_user
-        )
+        identity.provides.add(authenticated_user)

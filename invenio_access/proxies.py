@@ -12,7 +12,5 @@
 from flask import current_app
 from werkzeug.local import LocalProxy
 
-current_access = LocalProxy(
-    lambda: current_app.extensions['invenio-access']
-)
+current_access = LocalProxy(lambda: current_app.extensions["invenio-access"])
 """Helper proxy to access state object."""

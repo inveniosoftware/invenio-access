@@ -18,10 +18,10 @@ def get_identity(user):
     """
     identity = Identity(user.id)
 
-    if hasattr(user, 'id'):
+    if hasattr(user, "id"):
         identity.provides.add(UserNeed(user.id))
 
-    for role in getattr(user, 'roles', []):
+    for role in getattr(user, "roles", []):
         identity.provides.add(RoleNeed(role.name))
 
     identity.user = user

@@ -28,8 +28,9 @@ class ActionNeedMixin(object):
     action = db.Column(db.String(80), index=True)
     """Name of the action."""
 
-    exclude = db.Column(db.Boolean(name='exclude'), nullable=False,
-                        default=False, server_default='0')
+    exclude = db.Column(
+        db.Boolean(name="exclude"), nullable=False, default=False, server_default="0"
+    )
     """If set to True, deny the action, otherwise allow it."""
 
     argument = db.Column(db.String(255), nullable=True, index=True)
@@ -47,14 +48,9 @@ class ActionNeedMixin(object):
             argument for the new action need.
         :returns: An :class:`invenio_access.models.ActionNeedMixin` instance.
         """
-        assert action.method == 'action'
-        argument = kwargs.pop('argument', None) or getattr(
-            action, 'argument', None)
-        return cls(
-            action=action.value,
-            argument=argument,
-            **kwargs
-        )
+        assert action.method == "action"
+        argument = kwargs.pop("argument", None) or getattr(action, "argument", None)
+        return cls(action=action.value, argument=argument, **kwargs)
 
     @classmethod
     def allow(cls, action, **kwargs):
@@ -85,12 +81,14 @@ class ActionNeedMixin(object):
         :returns: A query object.
         """
         query = cls.query.filter_by(action=action.value)
-        argument = argument or getattr(action, 'argument', None)
+        argument = argument or getattr(action, "argument", None)
         if argument is not None:
-            query = query.filter(db.or_(
-                cls.argument == str(argument),
-                cls.argument.is_(None),
-            ))
+            query = query.filter(
+                db.or_(
+                    cls.argument == str(argument),
+                    cls.argument.is_(None),
+                )
+            )
         else:
             query = query.filter(cls.argument.is_(None))
         return query
@@ -110,20 +108,28 @@ class ActionUsers(ActionNeedMixin, db.Model):
     It relates an allowed action with a user.
     """
 
-    __tablename__ = 'access_actionsusers'
+    __tablename__ = "access_actionsusers"
 
-    __table_args__ = (UniqueConstraint(
-        'action', 'exclude', 'argument', 'user_id',
-        name='access_actionsusers_unique'),
+    __table_args__ = (
+        UniqueConstraint(
+            "action",
+            "exclude",
+            "argument",
+            "user_id",
+            name="access_actionsusers_unique",
+        ),
     )
 
-    user_id = db.Column(db.Integer(),
-                        db.ForeignKey(User.id, ondelete='CASCADE'),
-                        nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer(),
+        db.ForeignKey(User.id, ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
-    user = db.relationship("User",
-                           backref=db.backref("actionusers",
-                                              cascade="all, delete-orphan"))
+    user = db.relationship(
+        "User", backref=db.backref("actionusers", cascade="all, delete-orphan")
+    )
 
     @property
     def need(self):
@@ -137,20 +143,28 @@ class ActionRoles(ActionNeedMixin, db.Model):
     It relates an allowed action with a role.
     """
 
-    __tablename__ = 'access_actionsroles'
+    __tablename__ = "access_actionsroles"
 
-    __table_args__ = (UniqueConstraint(
-        'action', 'exclude', 'argument', 'role_id',
-        name='access_actionsroles_unique'),
+    __table_args__ = (
+        UniqueConstraint(
+            "action",
+            "exclude",
+            "argument",
+            "role_id",
+            name="access_actionsroles_unique",
+        ),
     )
 
-    role_id = db.Column(db.Integer(),
-                        db.ForeignKey(Role.id, ondelete='CASCADE'),
-                        nullable=False, index=True)
+    role_id = db.Column(
+        db.Integer(),
+        db.ForeignKey(Role.id, ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
-    role = db.relationship("Role",
-                           backref=db.backref("actionusers",
-                                              cascade="all, delete-orphan"))
+    role = db.relationship(
+        "Role", backref=db.backref("actionusers", cascade="all, delete-orphan")
+    )
 
     @property
     def need(self):
@@ -165,11 +179,16 @@ class ActionSystemRoles(ActionNeedMixin, db.Model):
     Example: "any user"
     """
 
-    __tablename__ = 'access_actionssystemroles'
+    __tablename__ = "access_actionssystemroles"
 
-    __table_args__ = (UniqueConstraint(
-        'action', 'exclude', 'argument', 'role_name',
-        name='access_actionssystemroles_unique'),
+    __table_args__ = (
+        UniqueConstraint(
+            "action",
+            "exclude",
+            "argument",
+            "role_name",
+            name="access_actionssystemroles_unique",
+        ),
     )
 
     role_name = db.Column(db.String(40), nullable=False, index=True)
@@ -177,13 +196,13 @@ class ActionSystemRoles(ActionNeedMixin, db.Model):
     @classmethod
     def create(cls, action, **kwargs):
         """Create new database row using the provided action need."""
-        role = kwargs.pop('role', None)
+        role = kwargs.pop("role", None)
         if role:
-            assert role.method == 'system_role'
-            kwargs['role_name'] = role.value
+            assert role.method == "system_role"
+            kwargs["role_name"] = role.value
         return super(ActionSystemRoles, cls).create(action, **kwargs)
 
-    @validates('role_name')
+    @validates("role_name")
     def validate_role_name(self, key, role_name):
         """Checks that the role name has been registered."""
         assert role_name in current_access.system_roles
@@ -200,45 +219,55 @@ def get_action_cache_key(name, argument):
     tokens = [str(name)]
     if argument:
         tokens.append(str(argument))
-    return '::'.join(tokens)
+    return "::".join(tokens)
 
 
 def removed_or_inserted_action(mapper, connection, target):
     """Remove the action from cache when an item is inserted or deleted."""
-    current_access.delete_action_cache(get_action_cache_key(target.action,
-                                                            target.argument))
+    current_access.delete_action_cache(
+        get_action_cache_key(target.action, target.argument)
+    )
 
 
 def changed_action(mapper, connection, target):
     """Remove the action from cache when an item is updated."""
-    action_history = get_history(target, 'action')
-    argument_history = get_history(target, 'argument')
+    action_history = get_history(target, "action")
+    argument_history = get_history(target, "argument")
     owner_history = get_history(
         target,
-        'user' if isinstance(target, ActionUsers) else
-        'role' if isinstance(target, ActionRoles) else 'role_name')
+        "user"
+        if isinstance(target, ActionUsers)
+        else "role"
+        if isinstance(target, ActionRoles)
+        else "role_name",
+    )
 
-    if action_history.has_changes() or argument_history.has_changes() \
-       or owner_history.has_changes():
+    if (
+        action_history.has_changes()
+        or argument_history.has_changes()
+        or owner_history.has_changes()
+    ):
         current_access.delete_action_cache(
-            get_action_cache_key(target.action, target.argument))
+            get_action_cache_key(target.action, target.argument)
+        )
         current_access.delete_action_cache(
             get_action_cache_key(
-                action_history.deleted[0] if action_history.deleted
-                else target.action,
-                argument_history.deleted[0] if argument_history.deleted
-                else target.argument)
+                action_history.deleted[0] if action_history.deleted else target.action,
+                argument_history.deleted[0]
+                if argument_history.deleted
+                else target.argument,
+            )
         )
 
 
-listen(ActionUsers, 'after_insert', removed_or_inserted_action)
-listen(ActionUsers, 'after_delete', removed_or_inserted_action)
-listen(ActionUsers, 'after_update', changed_action)
+listen(ActionUsers, "after_insert", removed_or_inserted_action)
+listen(ActionUsers, "after_delete", removed_or_inserted_action)
+listen(ActionUsers, "after_update", changed_action)
 
-listen(ActionRoles, 'after_insert', removed_or_inserted_action)
-listen(ActionRoles, 'after_delete', removed_or_inserted_action)
-listen(ActionRoles, 'after_update', changed_action)
+listen(ActionRoles, "after_insert", removed_or_inserted_action)
+listen(ActionRoles, "after_delete", removed_or_inserted_action)
+listen(ActionRoles, "after_update", changed_action)
 
-listen(ActionSystemRoles, 'after_insert', removed_or_inserted_action)
-listen(ActionSystemRoles, 'after_delete', removed_or_inserted_action)
-listen(ActionSystemRoles, 'after_update', changed_action)
+listen(ActionSystemRoles, "after_insert", removed_or_inserted_action)
+listen(ActionSystemRoles, "after_delete", removed_or_inserted_action)
+listen(ActionSystemRoles, "after_update", changed_action)

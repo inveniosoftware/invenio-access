@@ -14,8 +14,13 @@ from invenio_accounts.models import Role, User
 from invenio_db import db
 
 from invenio_access.models import ActionRoles, ActionSystemRoles, ActionUsers
-from invenio_access.permissions import ParameterizedActionNeed, Permission, \
-    any_user, authenticated_user, superuser_access
+from invenio_access.permissions import (
+    ParameterizedActionNeed,
+    Permission,
+    any_user,
+    authenticated_user,
+    superuser_access,
+)
 
 # Test cases summary
 
@@ -59,7 +64,7 @@ class WithUserIdentity(object):
 
 def get_superuser():
     """Create a superuser user."""
-    superuser, = create_users("superpowers")
+    (superuser,) = create_users("superpowers")
     expand(superuser_access, ("allow", superuser))
     return superuser
 
@@ -116,11 +121,7 @@ def expand(action_need, *user_or_roles):
         if is_user:
             # User
             kwargs = dict(user=user_role.user)
-            method = (
-                ActionUsers.allow
-                if allow_deny == "allow"
-                else ActionUsers.deny
-            )
+            method = ActionUsers.allow if allow_deny == "allow" else ActionUsers.deny
         elif isinstance(user_role, Need) and user_role.method == "system_role":
             # SystemRoleNeed
             kwargs = dict(role=user_role)
@@ -132,11 +133,7 @@ def expand(action_need, *user_or_roles):
         else:
             # Role
             kwargs = dict(role=user_role)
-            method = (
-                ActionRoles.allow
-                if allow_deny == "allow"
-                else ActionRoles.deny
-            )
+            method = ActionRoles.allow if allow_deny == "allow" else ActionRoles.deny
 
         obj = method(action=action_need, argument=argument, **kwargs)
         db.session.add(obj)
@@ -148,7 +145,7 @@ def test_allow_by_user_id(access_app):
     """Ensure allow permission by user id."""
     admin, reader = create_users("admin", "reader")
 
-    permission, = create_permissions({"needs": {UserNeed(admin.id)}})
+    (permission,) = create_permissions({"needs": {UserNeed(admin.id)}})
 
     assert permission.allows(admin)
     assert permission.allows(get_superuser())
@@ -159,7 +156,7 @@ def test_deny_by_user_id(access_app):
     """Ensure deny permission when user is denied."""
     admin, reader = create_users("admin", "reader")
 
-    permission, = create_permissions(
+    (permission,) = create_permissions(
         {"excludes": [UserNeed(admin.id), UserNeed(reader.id)]}
     )
 
@@ -172,7 +169,7 @@ def test_allow_deny_by_user_id(access_app):
     """Ensure allow/deny permission when same user is allowed and denied."""
     admin, reader = create_users("admin", "reader")
 
-    permission, = create_permissions(
+    (permission,) = create_permissions(
         {
             "needs": [UserNeed(admin.id)],
             "excludes": [UserNeed(admin.id), UserNeed(reader.id)],
@@ -191,9 +188,7 @@ def test_allow_by_role(access_app):
     administrators, readers = create_roles("administrators", "readers")
     assign_roles({admin: [administrators], reader: [readers]})
 
-    permission, = create_permissions(
-        {"needs": [RoleNeed(administrators.name)]}
-    )
+    (permission,) = create_permissions({"needs": [RoleNeed(administrators.name)]})
 
     assert permission.allows(admin)
     assert not permission.allows(reader)
@@ -206,7 +201,7 @@ def test_deny_by_role(access_app):
     administrators, readers = create_roles("administrators", "readers")
     assign_roles({admin: [administrators], reader: [readers]})
 
-    permission, = create_permissions(
+    (permission,) = create_permissions(
         {
             "needs": [RoleNeed(administrators.name)],
             "excludes": [
@@ -228,7 +223,7 @@ def test_allow_by_user_id_and_role(access_app):
     administrators, readers = create_roles("administrators", "readers")
     assign_roles({admin: [administrators], reader: [readers]})
 
-    permission, = create_permissions(
+    (permission,) = create_permissions(
         {"needs": [UserNeed(reader.id), RoleNeed(administrators.name)]}
     )
 
@@ -243,11 +238,9 @@ def test_deny_by_user_id_and_role(access_app):
     administrators, readers, any_user = create_roles(
         "administrators", "readers", "any_user"
     )
-    assign_roles(
-        {admin: [administrators, any_user], reader: [readers, any_user]}
-    )
+    assign_roles({admin: [administrators, any_user], reader: [readers, any_user]})
 
-    permission, = create_permissions(
+    (permission,) = create_permissions(
         {
             "needs": [UserNeed(reader.id), RoleNeed(administrators.name)],
             "excludes": [RoleNeed(any_user.name)],
@@ -265,10 +258,8 @@ def test_allow_by_action_expands_to_user_id(access_app):
     administrators, readers = create_roles("administrators", "readers")
     assign_roles({admin: [administrators], reader: [readers]})
 
-    act_access_backoffice = expand(
-        ActionNeed("access-backoffice"), ("allow", admin)
-    )
-    permission, = create_permissions({"needs": [act_access_backoffice]})
+    act_access_backoffice = expand(ActionNeed("access-backoffice"), ("allow", admin))
+    (permission,) = create_permissions({"needs": [act_access_backoffice]})
 
     assert permission.allows(admin)
     assert not permission.allows(reader)
@@ -288,7 +279,7 @@ def test_deny_by_action_expands_to_user_id(access_app):
         ("deny", admin),
         ("deny", reader),
     )
-    permission, = create_permissions({"needs": [act_access_backoffice]})
+    (permission,) = create_permissions({"needs": [act_access_backoffice]})
 
     assert not permission.allows(admin)
     assert not permission.allows(reader)
@@ -304,7 +295,7 @@ def test_allow_by_action_expands_to_role(access_app):
     act_access_backoffice = expand(
         ActionNeed("access-backoffice"), ("allow", administrators)
     )
-    permission, = create_permissions({"needs": [act_access_backoffice]})
+    (permission,) = create_permissions({"needs": [act_access_backoffice]})
 
     assert permission.allows(admin)
     assert not permission.allows(reader)
@@ -324,7 +315,7 @@ def test_deny_by_action_expands_to_role(access_app):
         ("deny", administrators),
         ("deny", readers),
     )
-    permission, = create_permissions({"needs": [act_access_backoffice]})
+    (permission,) = create_permissions({"needs": [act_access_backoffice]})
 
     assert not permission.allows(admin)
     assert not permission.allows(reader)
@@ -342,7 +333,7 @@ def test_allow_by_action_expands_to_user_id_and_role(access_app):
         ("allow", administrators),
         ("allow", reader),
     )
-    permission, = create_permissions({"needs": [act_access_backoffice]})
+    (permission,) = create_permissions({"needs": [act_access_backoffice]})
 
     assert permission.allows(admin)
     assert permission.allows(reader)
@@ -362,7 +353,7 @@ def test_deny_by_action_expands_to_user_id_and_role(access_app):
         ("deny", administrators),
         ("deny", reader),
     )
-    permission, = create_permissions({"needs": [act_access_backoffice]})
+    (permission,) = create_permissions({"needs": [act_access_backoffice]})
 
     assert not permission.allows(admin)
     assert not permission.allows(reader)
@@ -411,9 +402,7 @@ def test_system_role_name(access_app):
 def test_system_roles(access_app):
     """User can access to an action allowed/denied to their system roles."""
     authenticated, anonymous = create_users("authenticated", "anonymous")
-    assign_roles(
-        {authenticated: [any_user, authenticated_user], anonymous: [any_user]}
-    )
+    assign_roles({authenticated: [any_user, authenticated_user], anonymous: [any_user]})
 
     act_read = ActionNeed("read")
     act_write = ActionNeed("write")
@@ -440,7 +429,7 @@ def test_allow_by_default(access_app, dynamic_permission):
     anonymous, superuser = create_users("anonymous", "superuser")
     act_access_backoffice = ActionNeed("access-backoffice")
 
-    permission, = create_permissions({"needs": [act_access_backoffice]})
+    (permission,) = create_permissions({"needs": [act_access_backoffice]})
     dyn_permission = dynamic_permission(act_access_backoffice)
 
     assert not permission.allows(anonymous)
