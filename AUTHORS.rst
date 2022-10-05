@@ -17,6 +17,7 @@ Contributors
 - Javier Martin Montull
 - Jiri Kuncar
 - Krzysztof Nowak
+- KTH
 - Lars Holm Nielsen
 - Leonardo Rossi
 - Nicola Tarocco
