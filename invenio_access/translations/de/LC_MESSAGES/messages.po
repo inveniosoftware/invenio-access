@@ -14,14 +14,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: invenio-access 1.4.4\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2022-05-26 17:53+0200\n"
+"POT-Creation-Date: 2022-10-12 09:03+0000\n"
 "PO-Revision-Date: 2016-08-18 12:08+0000\n"
 "Last-Translator: chriz_uniba <christina.zeller@uni-bamberg.de>, 2022\n"
 "Language-Team: German (https://www.transifex.com/inveniosoftware/teams/23537/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -33,32 +33,32 @@ msgstr "E-Mail"
 msgid "User ID"
 msgstr "BenutzerIn-ID"
 
-#: invenio_access/admin.py:41 invenio_access/admin.py:78
-#: invenio_access/admin.py:114
+#: invenio_access/admin.py:41 invenio_access/admin.py:75
+#: invenio_access/admin.py:108
 msgid "Deny"
 msgstr "Ablehnen"
 
-#: invenio_access/admin.py:77
+#: invenio_access/admin.py:74
 msgid "Role Name"
 msgstr "Rollenname"
 
-#: invenio_access/admin.py:113
+#: invenio_access/admin.py:107
 msgid "System Role"
 msgstr "Systemrolle"
 
-#: invenio_access/admin.py:141 invenio_access/admin.py:148
-#: invenio_access/admin.py:155
+#: invenio_access/admin.py:136 invenio_access/admin.py:143
+#: invenio_access/admin.py:150
 msgid "User Management"
 msgstr "BenutzerInverwaltung"
 
-#: invenio_access/admin.py:142
+#: invenio_access/admin.py:137
 msgid "Access: Roles"
 msgstr "Zugang: Rollen"
 
-#: invenio_access/admin.py:149
+#: invenio_access/admin.py:144
 msgid "Access: Users"
 msgstr "Zugang: BenutzerInnen"
 
-#: invenio_access/admin.py:156
+#: invenio_access/admin.py:151
 msgid "Access: System Roles"
 msgstr "Zugang: Systemrollen"

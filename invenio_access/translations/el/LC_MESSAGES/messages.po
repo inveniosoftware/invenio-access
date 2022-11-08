@@ -5,7 +5,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
-# Jiří Kunčar <jiri.kuncar@gmail.com>, 2016
+# Tibor Simko <tibor.simko@cern.ch>, 2016
+# Theodoros Theodoropoulos, 2016
 # 
 #, fuzzy
 msgid ""
@@ -14,14 +15,14 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2022-10-12 09:03+0000\n"
 "PO-Revision-Date: 2016-08-18 12:08+0000\n"
-"Last-Translator: Jiří Kunčar <jiri.kuncar@gmail.com>, 2016\n"
-"Language-Team: Czech (https://www.transifex.com/inveniosoftware/teams/23537/cs/)\n"
+"Last-Translator: Theodoros Theodoropoulos, 2016\n"
+"Language-Team: Greek (https://www.transifex.com/inveniosoftware/teams/23537/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: invenio_access/admin.py:39
 msgid "Email"
@@ -29,7 +30,7 @@ msgstr "Email"
 
 #: invenio_access/admin.py:40
 msgid "User ID"
-msgstr "ID uživatele"
+msgstr "ID Χρήστη"
 
 #: invenio_access/admin.py:41 invenio_access/admin.py:75
 #: invenio_access/admin.py:108
@@ -38,7 +39,7 @@ msgstr ""
 
 #: invenio_access/admin.py:74
 msgid "Role Name"
-msgstr "Název role"
+msgstr "Όνομα Ρόλου"
 
 #: invenio_access/admin.py:107
 msgid "System Role"
@@ -47,7 +48,7 @@ msgstr ""
 #: invenio_access/admin.py:136 invenio_access/admin.py:143
 #: invenio_access/admin.py:150
 msgid "User Management"
-msgstr "Správa uživatelů"
+msgstr "Διαχείριση Χρήστη"
 
 #: invenio_access/admin.py:137
 msgid "Access: Roles"
