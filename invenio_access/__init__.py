@@ -435,7 +435,7 @@ from .permissions import (
 )
 from .proxies import current_access
 
-__version__ = "1.4.4"
+__version__ = "1.4.5"
 
 __all__ = (
     "__version__",
