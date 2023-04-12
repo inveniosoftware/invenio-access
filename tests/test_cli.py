@@ -147,7 +147,6 @@ def test_access_matrix(cli_app, dynamic_permission):
             yield role
 
     for action, roles in action_roles.items():
-
         result = runner.invoke(
             access,
             ["allow", action] + list(role_args(roles)),
@@ -251,7 +250,6 @@ def test_access_matrix(cli_app, dynamic_permission):
     # Remove all permissions.
     #
     for action, roles in action_roles.items():
-
         result = runner.invoke(
             access,
             ["remove", action] + list(role_args(roles)),
