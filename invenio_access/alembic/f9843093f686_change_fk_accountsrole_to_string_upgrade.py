@@ -34,6 +34,7 @@ def upgrade():
         existing_type=sa.Integer,
         type_=sa.String(80),
         postgresql_using="role_id::integer",
+        nullable=False,
     )
     op.create_foreign_key(
         op.f("fk_access_actionsroles_role_id_accounts_role"),
@@ -41,7 +42,7 @@ def upgrade():
         "accounts_role",
         ["role_id"],
         ["id"],
-        ondelete="CASCADE",
+        ondelete="CASCADE"
     )
 
 

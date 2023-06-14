@@ -29,6 +29,7 @@ def downgrade():
         existing_type=sa.String(80),
         type_=sa.Integer,
         postgresql_using="role_id::integer",
+        nullable=False,
     )
     op.create_foreign_key(
         op.f("fk_access_actionsroles_role_id_accounts_role"),
