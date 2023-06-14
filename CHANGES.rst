@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 2.0.0 (released 2022-06-14)
+
+- upgrade invenio-accounts dependency
+- models: change role_id FK of ActionRoles to string
+
 Version 1.4.4 (released 2022-04-01)
 
 - fix compat issue with Werkzeug 2.1
