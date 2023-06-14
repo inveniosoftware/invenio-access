@@ -42,7 +42,7 @@ def upgrade():
         "accounts_role",
         ["role_id"],
         ["id"],
-        ondelete="CASCADE"
+        ondelete="CASCADE",
     )
 
 
