@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015-2019 CERN.
+# Copyright (C) 2015-2023 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -84,7 +84,7 @@ def create_roles(*names):
     """Helper to create roles."""
     roles = []
     for name in names:
-        role = Role(name=name)
+        role = Role(id=name, name=name)
         db.session.add(role)
         roles.append(role)
     db.session.commit()

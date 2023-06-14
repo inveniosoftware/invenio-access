@@ -42,9 +42,12 @@ Invenio-Accounts, and then Invenio-Access itself:
 >>> from invenio_db import InvenioDB
 >>> from invenio_accounts import InvenioAccounts
 >>> from invenio_access import InvenioAccess
+>>> from invenio_i18n import InvenioI18N
+
 >>> ext_db = InvenioDB(app)
 >>> ext_accounts = InvenioAccounts(app)
 >>> ext_access = InvenioAccess(app)
+>>> ext_i18n = InvenioI18N(app)
 
 The following examples needs to run in a Flask application context, so
 let's push one:
