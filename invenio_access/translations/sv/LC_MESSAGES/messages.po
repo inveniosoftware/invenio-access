@@ -6,7 +6,8 @@
 # 
 # Translators:
 # Tibor Simko <tibor.simko@cern.ch>, 2016
-# Sam Arbid, 2022
+# Sam Arbid, 2023
+# Rim Sharif, 2023
 # 
 #, fuzzy
 msgid ""
@@ -15,8 +16,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2022-10-12 09:03+0000\n"
 "PO-Revision-Date: 2016-08-18 12:08+0000\n"
-"Last-Translator: Sam Arbid, 2022\n"
-"Language-Team: Swedish (https://www.transifex.com/inveniosoftware/teams/23537/sv/)\n"
+"Last-Translator: Rim Sharif, 2023\n"
+"Language-Team: Swedish (https://app.transifex.com/inveniosoftware/teams/23537/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,7 +31,7 @@ msgstr "Epost"
 
 #: invenio_access/admin.py:40
 msgid "User ID"
-msgstr "Användarid"
+msgstr "AnvändarId"
 
 #: invenio_access/admin.py:41 invenio_access/admin.py:75
 #: invenio_access/admin.py:108
@@ -39,7 +40,7 @@ msgstr "Neka"
 
 #: invenio_access/admin.py:74
 msgid "Role Name"
-msgstr "Rollnamn"
+msgstr "Roll"
 
 #: invenio_access/admin.py:107
 msgid "System Role"
@@ -48,7 +49,7 @@ msgstr "Systemroll"
 #: invenio_access/admin.py:136 invenio_access/admin.py:143
 #: invenio_access/admin.py:150
 msgid "User Management"
-msgstr "Användarhantering"
+msgstr "Hantera användare"
 
 #: invenio_access/admin.py:137
 msgid "Access: Roles"
