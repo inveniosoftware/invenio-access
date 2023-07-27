@@ -22,7 +22,7 @@ def get_identity(user):
         identity.provides.add(UserNeed(user.id))
 
     for role in getattr(user, "roles", []):
-        identity.provides.add(RoleNeed(role.name))
+        identity.provides.add(RoleNeed(role.id))
 
     identity.user = user
     return identity
