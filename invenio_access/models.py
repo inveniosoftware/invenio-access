@@ -235,11 +235,11 @@ def changed_action(mapper, connection, target):
     argument_history = get_history(target, "argument")
     owner_history = get_history(
         target,
-        "user"
-        if isinstance(target, ActionUsers)
-        else "role"
-        if isinstance(target, ActionRoles)
-        else "role_name",
+        (
+            "user"
+            if isinstance(target, ActionUsers)
+            else "role" if isinstance(target, ActionRoles) else "role_name"
+        ),
     )
 
     if (
@@ -253,9 +253,11 @@ def changed_action(mapper, connection, target):
         current_access.delete_action_cache(
             get_action_cache_key(
                 action_history.deleted[0] if action_history.deleted else target.action,
-                argument_history.deleted[0]
-                if argument_history.deleted
-                else target.argument,
+                (
+                    argument_history.deleted[0]
+                    if argument_history.deleted
+                    else target.argument
+                ),
             )
         )
 
