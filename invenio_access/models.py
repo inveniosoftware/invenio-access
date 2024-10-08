@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -80,7 +81,7 @@ class ActionNeedMixin(object):
             set as ``None``. (Default: ``None``)
         :returns: A query object.
         """
-        query = cls.query.filter_by(action=action.value)
+        query = db.session.query(cls).filter_by(action=action.value)
         argument = argument or getattr(action, "argument", None)
         if argument is not None:
             query = query.filter(
@@ -235,11 +236,11 @@ def changed_action(mapper, connection, target):
     argument_history = get_history(target, "argument")
     owner_history = get_history(
         target,
-        "user"
-        if isinstance(target, ActionUsers)
-        else "role"
-        if isinstance(target, ActionRoles)
-        else "role_name",
+        (
+            "user"
+            if isinstance(target, ActionUsers)
+            else "role" if isinstance(target, ActionRoles) else "role_name"
+        ),
     )
 
     if (
@@ -253,9 +254,11 @@ def changed_action(mapper, connection, target):
         current_access.delete_action_cache(
             get_action_cache_key(
                 action_history.deleted[0] if action_history.deleted else target.action,
-                argument_history.deleted[0]
-                if argument_history.deleted
-                else target.argument,
+                (
+                    argument_history.deleted[0]
+                    if argument_history.deleted
+                    else target.argument
+                ),
             )
         )
 
