@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -80,7 +81,7 @@ class ActionNeedMixin(object):
             set as ``None``. (Default: ``None``)
         :returns: A query object.
         """
-        query = cls.query.filter_by(action=action.value)
+        query = db.session.query(cls).filter_by(action=action.value)
         argument = argument or getattr(action, "argument", None)
         if argument is not None:
             query = query.filter(
