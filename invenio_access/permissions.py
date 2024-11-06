@@ -219,3 +219,7 @@ class Permission(_Permission):
         """
         self._load_permissions()
         return self._permissions.excludes
+
+
+system_permission = Permission(system_process)
+"""Used to restrict access to system process."""
