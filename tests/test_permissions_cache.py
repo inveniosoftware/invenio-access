@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,7 +11,7 @@
 
 import time
 
-from cachelib import RedisCache, SimpleCache
+from cachelib import SimpleCache
 from flask_principal import ActionNeed, Need, RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db
@@ -86,10 +87,9 @@ def test_invenio_access_permission_cache(app, dynamic_permission):
     )
 
 
-def test_invenio_access_permission_cache_redis(app, dynamic_permission):
+def test_invenio_access_permission_cache_redis(app, redis_cache, dynamic_permission):
     """Caching the user using redis."""
-    cache = RedisCache()
-    InvenioAccess(app, cache=cache)
+    InvenioAccess(app, cache=redis_cache)
     user_can_all = User(email="all@inveniosoftware.org")
     user_can_open = User(email="open@inveniosoftware.org")
     user_can_open_1 = User(email="open1@inveniosoftware.org")

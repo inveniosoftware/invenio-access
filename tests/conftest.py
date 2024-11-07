@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -9,9 +10,11 @@
 """Pytest configuration."""
 
 import os
+import re
 import warnings
 
 import pytest
+from cachelib import RedisCache
 from flask import Flask
 from flask.cli import ScriptInfo
 from flask_mail import Mail
@@ -50,6 +53,10 @@ def base_app():
         ACCOUNTS_USE_CELERY=False,
         SECRET_KEY="CHANGE_ME",
         SECURITY_PASSWORD_SALT="CHANGE_ME_ALSO",
+        CACHE_REDIS_URL=os.environ.get("CACHE_REDIS_URL", "redis://127.0.0.1:6379/0"),
+        CELERY_RESULT_BACKEND=os.environ.get(
+            "CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/2"
+        ),
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             "SQLALCHEMY_DATABASE_URI", "sqlite:///test.db"
         ),
@@ -96,6 +103,18 @@ def cli_app(app):
     ext.register_action(action_open)
     ext.register_action(action_edit)
     return app
+
+
+@pytest.fixture()
+def redis_cache(app):
+    """Redis cache."""
+    matches = re.search(
+        r".*/(?P<host>.*):(?P<port>\d\d\d\d).*",
+        app.config["CACHE_REDIS_URL"],
+    )
+    redis_host = matches["host"]
+    redis_port = matches["port"]
+    return RedisCache(redis_host, redis_port)
 
 
 @pytest.fixture()
