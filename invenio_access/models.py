@@ -170,7 +170,7 @@ class ActionRoles(ActionNeedMixin, db.Model):
     @property
     def need(self):
         """Return RoleNeed instance."""
-        return RoleNeed(self.role.name)
+        return RoleNeed(self.role.id)
 
 
 class ActionSystemRoles(ActionNeedMixin, db.Model):
