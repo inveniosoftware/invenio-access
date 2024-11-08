@@ -8,7 +8,13 @@
 Changes
 =======
 
-Version 2.0.0 (released 2022-06-14)
+Version 2.1.0 (released 2024-11-08)
+
+- permissions: add system permission
+- tests: move to reusable workflows
+- i18n: pull and push translations
+
+Version 2.0.0 (released 2024-06-14)
 
 - upgrade invenio-accounts dependency
 - models: change role_id FK of ActionRoles to string
