@@ -8,6 +8,15 @@
 Changes
 =======
 
+Version 3.0.0 (released 2024-11-13)
+
+- i18n:push translations
+- i18n:pulled translations
+- setup: move invenio-admin to optional
+- model: make forward compatible to sqlalchemy >= 2
+- permissions: add system permisssion
+- test: make redis configurable
+
 Version 2.0.0 (released 2022-06-14)
 
 - upgrade invenio-accounts dependency
