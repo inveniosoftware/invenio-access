@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version 4.0.0 (released 2024-12-04)
+
+- setup: bump major dependencies
+
 Version 3.0.2 (released 2024-12-04)
 
 - fix: add translation flag for publishing
