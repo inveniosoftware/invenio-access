@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version 3.0.2 (released 2024-12-04)
+
+- fix: add translation flag for publishing
+
 Version 3.0.1 (released 2024-11-28)
 
 - setup: pin dependencies
