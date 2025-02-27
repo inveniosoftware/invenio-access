@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -9,6 +10,7 @@
 """Command line interface for Invenio-Access."""
 
 from functools import wraps
+from warnings import warn
 
 import click
 from flask import current_app
@@ -43,6 +45,18 @@ def resultcallback(group):
     return decorator
 
 
+def commit(f):
+    """Decorate to commit to database."""
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        ret = f(*args, **kwargs)
+        db.session.commit()
+        return ret
+
+    return decorated
+
+
 @lazy_result
 def process_action(ctx, param, value):
     """Return an action if exists."""
@@ -71,23 +85,145 @@ def process_role(ctx, param, value):
 
 
 option_argument = click.option(
-    "-a",
-    "--argument",
-    default=None,
-    metavar="VALUE",
-    help="Value for parameterized action.",
+    "-a", "--argument", default=None, help="Value for parameterized action."
 )
-option_email = click.option(
-    "-e",
-    "--email",
-    multiple=True,
-    default=[],
-    metavar="EMAIL",
-    help="User email address(es).",
+option_action = click.option("--action", callback=process_action, required=True)
+option_user = click.option("--user", callback=process_email, required=True)
+option_role = click.option("--role", callback=process_role, required=True)
+
+
+#
+# Access commands
+#
+@click.group()
+@with_appcontext
+def access():
+    """Account commands."""
+
+
+@access.command()
+@option_user
+@option_action
+@option_argument
+@commit
+def allow_action_for_user(user, action, argument):
+    """Allow action for user."""
+    db.session.add(ActionUsers.allow(action, argument=argument, user_id=user.id))
+
+
+@access.command()
+@option_role
+@option_action
+@option_argument
+@commit
+def allow_action_for_role(role, action, argument):
+    """Allow action for role."""
+    db.session.add(ActionRoles.allow(action, argument=argument, role_id=role.id))
+
+
+@access.command()
+@option_user
+@option_action
+@option_argument
+@commit
+def deny_action_for_user(user, action, argument):
+    """Deny an action from a user identified by an email address."""
+    db.session.add(ActionUsers.deny(action, argument=argument, user_id=user.id))
+
+
+@access.command()
+@option_role
+@option_action
+@option_argument
+@commit
+def deny_action_for_role(role, action, argument):
+    """Deny an action from role."""
+    db.session.add(ActionRoles.deny(action, argument=argument, role_id=role.id))
+
+
+@access.command()
+@option_action
+@option_argument
+@commit
+def remove_action_global(action, argument):
+    """Remove global action rule."""
+    ActionUsers.query_by_action(action, argument=argument).filter(
+        ActionUsers.user_id.is_(None)
+    ).delete(synchronize_session=False)
+
+
+@access.command()
+@option_user
+@option_action
+@option_argument
+@commit
+def remove_action_from_user(user, action, argument):
+    """Remove a action for a user."""
+    ActionUsers.query_by_action(action, argument=argument).filter(
+        ActionUsers.user_id == user.id
+    ).delete(synchronize_session=False)
+
+
+@access.command()
+@option_role
+@option_action
+@option_argument
+@commit
+def remove_action_from_role(role, action, argument):
+    """Remove a action for a role."""
+    ActionRoles.query_by_action(action, argument=argument).filter(
+        ActionRoles.role_id == role.id
+    ).delete(synchronize_session=False)
+
+
+@access.command(name="list")
+def list_actions():
+    """List all registered actions."""
+    for name, action in _current_actions.items():
+        show_has_argument = "*" if hasattr(action, "argument") else ""
+        click.echo(f"{name}:{show_has_argument}")
+
+
+@access.command(name="show")
+@click.option(
+    "-e", "--email", multiple=True, default=[], help="User email address(es)."
 )
-option_role = click.option(
+@click.option(
     "-r", "--role", multiple=True, default=[], metavar="ROLE", help="Role name(s)."
 )
+def show_actions(email, role):
+    """Show all assigned actions."""
+    if email:
+        actions = (
+            ActionUsers.query.join(ActionUsers.user).filter(User.email.in_(email)).all()
+        )
+        for action in actions:
+            argument = "" if action.argument is None else action.argument
+            exclude = "deny" if action.exclude else "allow"
+            color = "red" if action.exclude else "green"
+            click.secho(
+                f"user:{action.user.email}:{action.action}:{argument}:{exclude}",
+                fg=color,
+            )
+
+    if role:
+        actions = (
+            ActionRoles.query.filter(Role.name.in_(role)).join(ActionRoles.role).all()
+        )
+        for action in actions:
+            argument = "" if action.argument is None else action.argument
+            exclude = "deny" if action.exclude else "allow"
+            color = "red" if action.exclude else "green"
+            click.secho(
+                f"role:{action.role.name}:{action.action}:{argument}:{exclude}",
+                fg=color,
+            )
+
+
+################################
+# deprecated implementation
+################################
+
 argument_action = click.argument(
     "action", callback=process_action, nargs=1, required=True, metavar="ACTION"
 )
@@ -97,14 +233,6 @@ argument_user = click.argument(
 argument_role = click.argument(
     "role", callback=process_role, nargs=1, required=True, metavar="ROLE"
 )
-
-
-#
-# Access commands
-#
-@click.group()
-def access():
-    """Account commands."""
 
 
 #
@@ -121,6 +249,11 @@ def allow_action(action, argument):
 @argument_user
 def allow_user(user):
     """Allow a user identified by an email address."""
+    warn(
+        "Please use the new command allow-action-for-user instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def processor(action, argument):
         db.session.add(ActionUsers.allow(action, argument=argument, user_id=user.id))
@@ -132,6 +265,11 @@ def allow_user(user):
 @argument_role
 def allow_role(role):
     """Allow a role identified by an email address."""
+    warn(
+        "Please use the new command allow-action-for-role instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def processor(action, argument):
         db.session.add(ActionRoles.allow(action, argument=argument, role_id=role.id))
@@ -162,6 +300,11 @@ def deny_action(action, argument):
 @argument_user
 def deny_user(user):
     """Deny a user identified by an email address."""
+    warn(
+        "Please use the new command deny-action-for-user instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def processor(action, argument):
         db.session.add(ActionUsers.deny(action, argument=argument, user_id=user.id))
@@ -173,6 +316,11 @@ def deny_user(user):
 @argument_role
 def deny_role(role):
     """Deny a role identified by an email address."""
+    warn(
+        "Please use the new command deny-action-for-role instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def processor(action, argument):
         db.session.add(ActionRoles.deny(action, argument=argument, role_id=role.id))
@@ -206,6 +354,11 @@ def remove_action(action, argument):
 @remove_action.command("global")
 def remove_global():
     """Remove global action rule."""
+    warn(
+        "Please use the new command remove-action-global instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def processor(action, argument):
         ActionUsers.query_by_action(action, argument=argument).filter(
@@ -219,6 +372,11 @@ def remove_global():
 @argument_user
 def remove_user(user):
     """Remove a action for a user."""
+    warn(
+        "Please use the new command remove-action-from-user instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def processor(action, argument):
         ActionUsers.query_by_action(action, argument=argument).filter(
@@ -232,6 +390,11 @@ def remove_user(user):
 @argument_role
 def remove_role(role):
     """Remove a action for a role."""
+    warn(
+        "Please use the new command remove-action-from-role instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def processor(action, argument):
         ActionRoles.query_by_action(action, argument=argument).filter(
@@ -248,48 +411,3 @@ def process_remove_action(processors, action, argument):
     for processor in processors:
         processor(action, argument)
     db.session.commit()
-
-
-@access.command(name="list")
-@with_appcontext
-def list_actions():
-    """List all registered actions."""
-    for name, action in _current_actions.items():
-        click.echo("{0}:{1}".format(name, "*" if hasattr(action, "argument") else ""))
-
-
-@access.command(name="show")
-@option_email
-@option_role
-@with_appcontext
-def show_actions(email, role):
-    """Show all assigned actions."""
-    if email:
-        actions = (
-            ActionUsers.query.join(ActionUsers.user).filter(User.email.in_(email)).all()
-        )
-        for action in actions:
-            click.secho(
-                "user:{0}:{1}:{2}:{3}".format(
-                    action.user.email,
-                    action.action,
-                    "" if action.argument is None else action.argument,
-                    "deny" if action.exclude else "allow",
-                ),
-                fg="red" if action.exclude else "green",
-            )
-
-    if role:
-        actions = (
-            ActionRoles.query.filter(Role.name.in_(role)).join(ActionRoles.role).all()
-        )
-        for action in actions:
-            click.secho(
-                "role:{0}:{1}:{2}:{3}".format(
-                    action.role.name,
-                    action.action,
-                    "" if action.argument is None else action.argument,
-                    "deny" if action.exclude else "allow",
-                ),
-                fg="red" if action.exclude else "green",
-            )
