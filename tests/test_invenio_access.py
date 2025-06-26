@@ -2,12 +2,14 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Module tests."""
 
+from importlib.metadata import EntryPoint
 from unittest.mock import patch
 
 import pytest
@@ -15,7 +17,6 @@ from flask import Flask
 from flask_principal import ActionNeed
 from invenio_db import db
 from invenio_db.utils import drop_alembic_version_table
-from pkg_resources import EntryPoint
 
 from invenio_access import InvenioAccess, current_access
 from invenio_access.permissions import SystemRoleNeed
@@ -41,12 +42,24 @@ def _mock_entry_points(group=None):
     """Mocking funtion of entrypoints."""
     data = {
         "invenio_access.actions": [
-            MockEntryPointAction("open", "demo.actions"),
-            MockEntryPointAction("close", "demo.actions"),
+            MockEntryPointAction(
+                name="open", value="demo.actions", group="invenio_access.actions"
+            ),
+            MockEntryPointAction(
+                name="close", value="demo.actions", group="invenio_access.actions"
+            ),
         ],
         "invenio_access.system_roles": [
-            MockEntryPointSystemRole("any_user", "demo.specrole"),
-            MockEntryPointSystemRole("authenticated_user", "demo.specrole"),
+            MockEntryPointSystemRole(
+                name="any_user",
+                value="demo.specrole",
+                group="invenio_access.system_roles",
+            ),
+            MockEntryPointSystemRole(
+                name="authenticated_user",
+                value="demo.specrole",
+                group="invenio_access.system_roles",
+            ),
         ],
     }
     names = data.keys() if group is None else [group]
@@ -98,7 +111,7 @@ def test_system_roles(base_app):
         assert len(current_access.system_roles) == 2
 
 
-@patch("pkg_resources.iter_entry_points", _mock_entry_points)
+@patch("importlib.metadata.entry_points", _mock_entry_points)
 def test_entrypoints():
     """Test if the entrypoints are registering actions and roles properly."""
     app = Flask("testapp")
