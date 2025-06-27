@@ -105,7 +105,14 @@ class _AccessState(object):
 
         :param entry_point_group: The entrypoint for extensions.
         """
-        for ep in entry_points(group=entry_point_group):
+        # NOTE
+        # the set call is a quick fix for python3.9. it is not
+        # necessary for python3.12 and can be removed after we drop
+        # python3.9 support.
+        # in python3.9 for tests the superuser-access entrypoint
+        # exists twice
+        eps = set(entry_points(group=entry_point_group))
+        for ep in eps:
             self.register_action(ep.load())
 
     def register_system_role(self, system_role):
@@ -124,7 +131,10 @@ class _AccessState(object):
 
         :param entry_point_group: The entrypoint for extensions.
         """
-        for ep in entry_points(group=entry_point_group):
+        # NOTE
+        # see above on load_entry_point_actions
+        eps = set(entry_points(group=entry_point_group))
+        for ep in eps:
             self.register_system_role(ep.load())
 
 
