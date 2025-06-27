@@ -2,15 +2,17 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Invenio module for common role based access control."""
 
-import pkg_resources
+
 import six
 from flask_principal import identity_loaded
+from invenio_base.utils import entry_points
 from werkzeug.utils import cached_property, import_string
 
 from . import config
@@ -103,7 +105,14 @@ class _AccessState(object):
 
         :param entry_point_group: The entrypoint for extensions.
         """
-        for ep in pkg_resources.iter_entry_points(group=entry_point_group):
+        # NOTE
+        # the set call is a quick fix for python3.9. it is not
+        # necessary for python3.12 and can be removed after we drop
+        # python3.9 support.
+        # in python3.9 for tests the superuser-access entrypoint
+        # exists twice
+        eps = set(entry_points(group=entry_point_group))
+        for ep in eps:
             self.register_action(ep.load())
 
     def register_system_role(self, system_role):
@@ -122,7 +131,10 @@ class _AccessState(object):
 
         :param entry_point_group: The entrypoint for extensions.
         """
-        for ep in pkg_resources.iter_entry_points(group=entry_point_group):
+        # NOTE
+        # see above on load_entry_point_actions
+        eps = set(entry_points(group=entry_point_group))
+        for ep in eps:
             self.register_system_role(ep.load())
 
 
