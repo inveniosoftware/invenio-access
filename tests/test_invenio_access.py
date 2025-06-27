@@ -62,10 +62,7 @@ def _mock_entry_points(group=None):
             ),
         ],
     }
-    names = data.keys() if group is None else [group]
-    for key in names:
-        for entry_point in data[key]:
-            yield entry_point
+    return data[group] if group else data
 
 
 def test_version():
