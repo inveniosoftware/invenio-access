@@ -1,13 +1,22 @@
 ..
     This file is part of Invenio.
     Copyright (C) 2015-2022 CERN.
-    Copyright (C) 2024 Graz University of Technology.
+    Copyright (C) 2024-2025 Graz University of Technology.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 4.1.0 (released 2025-07-03)
+
+- fix(tests): m.entry_points returns a list if group
+- tmp(fix): for python3.9
+- fix: pkg_resources DeprecationWarning
+- refactor(cli): introduce readable commands
+- fix: setuptools require underscores instead of dashes
+- i18n: removed obsolete translations
 
 Version 4.0.0 (released 2024-12-04)
 
