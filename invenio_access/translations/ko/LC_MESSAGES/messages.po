@@ -5,7 +5,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 # 
 # Translators:
-# Martin Jantson <martinjantson97@gmail.com>, 2022
+# Minjae Kwon, 2023
 # 
 #, fuzzy
 msgid ""
@@ -14,49 +14,49 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2024-08-06 08:44+0000\n"
 "PO-Revision-Date: 2016-08-18 12:08+0000\n"
-"Last-Translator: Martin Jantson <martinjantson97@gmail.com>, 2022\n"
-"Language-Team: Estonian (https://app.transifex.com/inveniosoftware/teams/23537/et/)\n"
+"Last-Translator: Minjae Kwon, 2023\n"
+"Language-Team: Korean (https://app.transifex.com/inveniosoftware/teams/23537/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
-"Language: et\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: invenio_access/admin.py:39
 msgid "Email"
-msgstr "E-mail"
+msgstr "이메일"
 
 #: invenio_access/admin.py:40
 msgid "User ID"
-msgstr "Kasutaja ID"
+msgstr "사용자 ID"
 
 #: invenio_access/admin.py:41 invenio_access/admin.py:75
 #: invenio_access/admin.py:108
 msgid "Deny"
-msgstr "Keeldu"
+msgstr "거부"
 
 #: invenio_access/admin.py:74
 msgid "Role Name"
-msgstr "Rolli nimetus"
+msgstr "역할명"
 
 #: invenio_access/admin.py:107
 msgid "System Role"
-msgstr "Süsteemi Roll"
+msgstr "시스템 역할"
 
 #: invenio_access/admin.py:136 invenio_access/admin.py:143
 #: invenio_access/admin.py:150
 msgid "User Management"
-msgstr "Kasutajate haldus"
+msgstr "유저 관리"
 
 #: invenio_access/admin.py:137
 msgid "Access: Roles"
-msgstr "Juurdepääs: Rollid"
+msgstr "접근: 권한"
 
 #: invenio_access/admin.py:144
 msgid "Access: Users"
-msgstr "Juurdepääs: Kasutajad"
+msgstr "접근: 사용자"
 
 #: invenio_access/admin.py:151
 msgid "Access: System Roles"
-msgstr "Juurdepääs: Süsteemi Rollid"
+msgstr "접근: 시스템 권한"
