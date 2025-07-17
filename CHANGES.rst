@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v4.2.0 (released 2025-07-17)
+
+- i18n: pulled translations
+
 Version 4.1.0 (released 2025-07-03)
 
 - fix(tests): m.entry_points returns a list if group
