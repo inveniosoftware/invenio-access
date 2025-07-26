@@ -16,6 +16,7 @@ from invenio_base.utils import entry_points
 from werkzeug.utils import cached_property, import_string
 
 from . import config
+from .context import set_identity
 from .loaders import load_permissions_on_identity_loaded
 
 
@@ -176,6 +177,8 @@ class InvenioAccess(object):
 
         if app.config.get("ACCESS_LOAD_SYSTEM_ROLE_NEEDS", True):
             identity_loaded.connect_via(app)(load_permissions_on_identity_loaded)
+
+        identity_loaded.connect_via(app)(set_identity)
 
         return state
 
