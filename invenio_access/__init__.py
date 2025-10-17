@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2022 CERN.
 # Copyright (C) 2024-2025 Graz University of Technology.
+# Copyright (C) 2025 KTH Royal Institute of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -439,7 +440,7 @@ from .permissions import (
 )
 from .proxies import current_access
 
-__version__ = "4.2.0"
+__version__ = "4.2.1"
 
 __all__ = (
     "__version__",
