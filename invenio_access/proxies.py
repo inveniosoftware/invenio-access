@@ -8,7 +8,6 @@
 
 """Helper proxy to the state object."""
 
-
 from flask import current_app
 from werkzeug.local import LocalProxy
 

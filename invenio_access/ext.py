@@ -9,7 +9,6 @@
 
 """Invenio module for common role based access control."""
 
-
 import six
 from flask_principal import identity_loaded
 from invenio_base.utils import entry_points
