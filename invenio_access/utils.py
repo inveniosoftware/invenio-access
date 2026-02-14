@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2026 KTH Royal Institute of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -22,7 +23,7 @@ def get_identity(user):
         identity.provides.add(UserNeed(user.id))
 
     for role in getattr(user, "roles", []):
-        identity.provides.add(RoleNeed(role.name))
+        identity.provides.add(RoleNeed(role.id))
 
     identity.user = user
     return identity

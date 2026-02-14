@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
 # Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2026 KTH Royal Institute of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -170,7 +171,7 @@ class ActionRoles(ActionNeedMixin, db.Model):
     @property
     def need(self):
         """Return RoleNeed instance."""
-        return RoleNeed(self.role.name)
+        return RoleNeed(self.role.id)
 
 
 class ActionSystemRoles(ActionNeedMixin, db.Model):

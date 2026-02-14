@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
+# Copyright (C) 2026 KTH Royal Institute of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -96,7 +97,7 @@ def assign_roles(users_roles):
     for user, roles in users_roles.items():
         for role in roles:
             if not isinstance(role, Need):
-                role = RoleNeed(role.name)
+                role = RoleNeed(role.id)
             user.provides.add(role)
 
 
