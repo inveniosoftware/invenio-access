@@ -10,6 +10,10 @@
 Changes
 =======
 
+Version v5.1.0 (released 2026-02-17)
+
+- feat: change role.name to role.id for identity.provides RoleNeed
+
 Version v5.0.0 (released 2026-01-27)
 
 - chore(black): update formatting to >= 26.0
