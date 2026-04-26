@@ -1,6 +1,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2023 CERN.
+# Copyright (C) 2026 CESNET z.s.p.o.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -18,12 +19,12 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "f9843093f686"
-down_revision = (
-    "f2522cdd5fcd",
-    "842a62b56e60",
-)  # Depends on invenio-accounts revision id (f2522cdd5fcd)
+down_revision = "842a62b56e60"
 branch_labels = ()
-depends_on = None
+depends_on = [
+    # invenio_accounts/alembic/f2522cdd5fcd_change_accountsrole_primary_key_to_string.py
+    "f2522cdd5fcd",
+]
 
 
 def upgrade():
