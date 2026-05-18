@@ -12,8 +12,10 @@ from collections import namedtuple
 from functools import partial
 from itertools import chain
 
-from flask_principal import ActionNeed, Identity, Need
+from flask_principal import ActionNeed, Identity, Need, RoleNeed
 from flask_principal import Permission as _Permission
+from invenio_accounts.models import Role
+from invenio_db import db
 
 from .models import ActionRoles, ActionSystemRoles, ActionUsers, get_action_cache_key
 from .proxies import current_access
@@ -138,21 +140,23 @@ class Permission(_Permission):
     @staticmethod
     def _split_actionsneeds(needs):
         """Split needs into sets of ActionNeed and any other *Need."""
-        action_needs, other_needs = set(), set()
+        action_needs, role_needs, other_needs = set(), set(), set()
         for need in needs:
             if need.method == "action":
                 action_needs.add(need)
+            elif need.method == "role":
+                role_needs.add(need)
             else:
                 other_needs.add(need)
-        return action_needs, other_needs
+        return action_needs, role_needs, other_needs
 
     def _load_permissions(self):
         """Load permissions for all needs, expanding actions."""
         result = _P(needs=set(), excludes=set())
 
         # split ActionNeeds and any other Need in separates Sets
-        action_needs, explicit_needs = self._split_actionsneeds(self.explicit_needs)
-        action_excludes, explicit_excludes = self._split_actionsneeds(
+        action_needs, role_needs, explicit_needs = self._split_actionsneeds(self.explicit_needs)
+        action_excludes, role_excludes, explicit_excludes = self._split_actionsneeds(
             self.explicit_excludes
         )
 
@@ -165,6 +169,16 @@ class Permission(_Permission):
         for need in action_needs | action_excludes:
             result.update(self._expand_action(need))
 
+        # desambiguate roles ids and names
+        for need in role_needs:
+            result.needs.add(need)
+            if need_with_name := self._desambiguate_role_id(need):
+                result.needs.add(need_with_name)
+        for need in role_excludes:
+            result.excludes.add(need)
+            if need_with_name := self._desambiguate_role_id(need):
+                result.excludes.add(need_with_name)
+
         # "allow_by_default = False" means that when needs are empty,
         # then it should deny access.
         # By default, `flask_principal.Permission.allows` will allow access
@@ -176,6 +190,11 @@ class Permission(_Permission):
             result.needs.update(action_needs)
 
         self._permissions = result
+
+    def _desambiguate_role_id(self, role_action):
+        """."""
+        role = db.session.query(Role).filter(Role.id==role_action.value).one_or_none()
+        return RoleNeed(str(role.name)) if role else None
 
     def _expand_action(self, explicit_action):
         """Expand action to user/roles needs and excludes."""
