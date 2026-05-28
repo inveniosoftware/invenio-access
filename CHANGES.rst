@@ -10,6 +10,11 @@
 Changes
 =======
 
+Version v6.0.0 (released 2026-05-28)
+
+- chore(setup): bump dependencies
+- fix: better dependencies after communities tests
+
 Version v5.1.0 (released 2026-02-17)
 
 - feat: change role.name to role.id for identity.provides RoleNeed
