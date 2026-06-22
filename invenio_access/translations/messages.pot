@@ -1,58 +1,58 @@
 # Translations template for invenio-access.
-# Copyright (C) 2024 CERN
+# Copyright (C) 2026 CERN
 # This file is distributed under the same license as the invenio-access
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-access 2.0.0\n"
+"Project-Id-Version: invenio-access 6.0.0\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2024-08-06 08:44+0000\n"
+"POT-Creation-Date: 2026-06-22 20:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.15.0\n"
+"Generated-By: Babel 2.18.0\n"
 
-#: invenio_access/admin.py:39
+#: invenio_access/admin.py:34
 msgid "Email"
 msgstr ""
 
-#: invenio_access/admin.py:40
+#: invenio_access/admin.py:35
 msgid "User ID"
 msgstr ""
 
-#: invenio_access/admin.py:41 invenio_access/admin.py:75
-#: invenio_access/admin.py:108
+#: invenio_access/admin.py:36 invenio_access/admin.py:70
+#: invenio_access/admin.py:103
 msgid "Deny"
 msgstr ""
 
-#: invenio_access/admin.py:74
+#: invenio_access/admin.py:69
 msgid "Role Name"
 msgstr ""
 
-#: invenio_access/admin.py:107
+#: invenio_access/admin.py:102
 msgid "System Role"
 msgstr ""
 
-#: invenio_access/admin.py:136 invenio_access/admin.py:143
-#: invenio_access/admin.py:150
+#: invenio_access/admin.py:131 invenio_access/admin.py:138
+#: invenio_access/admin.py:145
 msgid "User Management"
 msgstr ""
 
-#: invenio_access/admin.py:137
+#: invenio_access/admin.py:132
 msgid "Access: Roles"
 msgstr ""
 
-#: invenio_access/admin.py:144
+#: invenio_access/admin.py:139
 msgid "Access: Users"
 msgstr ""
 
-#: invenio_access/admin.py:151
+#: invenio_access/admin.py:146
 msgid "Access: System Roles"
 msgstr ""
 
