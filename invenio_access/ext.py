@@ -148,7 +148,7 @@ class InvenioAccess(object):
         app,
         entry_point_actions="invenio_access.actions",
         entry_point_system_roles="invenio_access.system_roles",
-        **kwargs
+        **kwargs,
     ):
         """Flask application initialization.
 
