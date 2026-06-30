@@ -67,3 +67,4 @@ target/
 
 # tests
 test.db
+uv.lock
