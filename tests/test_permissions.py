@@ -5,7 +5,7 @@
 """Tests for Permission class."""
 
 import pytest
-from flask_principal import ActionNeed, Need, RoleNeed, UserNeed
+from flask_principal import ActionNeed, Identity, Need, RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
 from invenio_db import db
 
@@ -434,3 +434,28 @@ def test_allow_by_default(access_app, dynamic_permission):
     superuser = get_superuser()
     assert permission.allows(superuser)
     assert dyn_permission.allows(superuser)
+
+
+def test_allows_evaluates_needs_and_excludes_once():
+    """allows() reads each of needs/excludes once, not twice."""
+    counts = {"needs": 0, "excludes": 0}
+
+    class _CountingPermission(Permission):
+        @property
+        def needs(self):
+            counts["needs"] += 1
+            return {any_user}
+
+        @property
+        def excludes(self):
+            counts["excludes"] += 1
+            return {RoleNeed("nobody")}
+
+    identity = Identity(1)
+    identity.provides.add(any_user)
+
+    # Non-matching exclude so allows() reaches the excludes check and returns
+    # True; the stock flask_principal allows() would read each property twice.
+    assert _CountingPermission().allows(identity) is True
+    assert counts["needs"] == 1
+    assert counts["excludes"] == 1

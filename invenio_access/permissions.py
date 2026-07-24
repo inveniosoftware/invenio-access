@@ -215,6 +215,23 @@ class Permission(_Permission):
         self._load_permissions()
         return self._permissions.excludes
 
+    def allows(self, identity):
+        """Check whether the identity can access this permission.
+
+        Note: Flask-Principal reads `self.needs` and `self.excludes` twice when they're
+        not empty, which in our case are "dynamic" properties that can be expensive. We
+        override this and read each property only once.
+        """
+        needs = self.needs
+        if needs and not needs.intersection(identity.provides):
+            return False
+
+        excludes = self.excludes
+        if excludes and excludes.intersection(identity.provides):
+            return False
+
+        return True
+
 
 system_permission = Permission(system_process)
 """Used to restrict access to system process."""
