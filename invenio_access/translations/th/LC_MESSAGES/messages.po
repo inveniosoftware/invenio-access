@@ -5,7 +5,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
-# Jesús Martín <jesusmartin@sallep.net>, 2022
+# Suthep Yonphimai <tomztt@gmail.com>, 2026
 # 
 #, fuzzy
 msgid ""
@@ -14,49 +14,49 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2026-06-22 20:32+0000\n"
 "PO-Revision-Date: 2016-08-18 12:08+0000\n"
-"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2022\n"
-"Language-Team: Spanish (https://app.transifex.com/inveniosoftware/teams/23537/es/)\n"
+"Last-Translator: Suthep Yonphimai <tomztt@gmail.com>, 2026\n"
+"Language-Team: Thai (https://app.transifex.com/inveniosoftware/teams/23537/th/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Language: th\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: invenio_access/admin.py:34
 msgid "Email"
-msgstr "Correo"
+msgstr "อีเมล"
 
 #: invenio_access/admin.py:35
 msgid "User ID"
-msgstr "ID de usuario"
+msgstr "รหัสผู้ใช้"
 
 #: invenio_access/admin.py:36 invenio_access/admin.py:70
 #: invenio_access/admin.py:103
 msgid "Deny"
-msgstr "Denegar"
+msgstr "ปฏิเสธ"
 
 #: invenio_access/admin.py:69
 msgid "Role Name"
-msgstr "Nombre del rol"
+msgstr "ชื่อบทบาท"
 
 #: invenio_access/admin.py:102
 msgid "System Role"
-msgstr "Rol del sistema"
+msgstr "บทบาทระบบ"
 
 #: invenio_access/admin.py:131 invenio_access/admin.py:138
 #: invenio_access/admin.py:145
 msgid "User Management"
-msgstr "Gestión de usuarios"
+msgstr "การจัดการผู้ใช้"
 
 #: invenio_access/admin.py:132
 msgid "Access: Roles"
-msgstr "Acceso: Roles"
+msgstr "การเข้าถึง: บทบาท"
 
 #: invenio_access/admin.py:139
 msgid "Access: Users"
-msgstr "Acceso: Usuarios"
+msgstr "การเข้าถึง: ผู้ใช้"
 
 #: invenio_access/admin.py:146
 msgid "Access: System Roles"
-msgstr "Acceso: Roles del Sistema"
+msgstr "การเข้าถึง: บทบาทระบบ"
