@@ -23,6 +23,46 @@ class FakeIdentity(object):
         self.provides = provides
 
 
+class CountingCache(SimpleCache):
+    """Simple cache that counts backend reads."""
+
+    def __init__(self):
+        super().__init__()
+        self.get_calls = 0
+
+    def get(self, key):
+        """Get a value and count the backend read."""
+        self.get_calls += 1
+        return super().get(key)
+
+
+def test_invenio_access_request_cache(app):
+    """Action expansion values are read once per HTTP request."""
+    cache = CountingCache()
+    InvenioAccess(app, cache=cache)
+    initial = ({UserNeed(1)}, set())
+    current_access.set_action_cache("open", initial)
+
+    with app.test_request_context():
+        assert current_access.get_action_cache("open") == initial
+        assert current_access.get_action_cache("open") == initial
+        assert cache.get_calls == 1
+
+        changed = ({UserNeed(2)}, set())
+        current_access.set_action_cache("open", changed)
+        assert current_access.get_action_cache("open") == changed
+        assert cache.get_calls == 1
+
+        current_access.delete_action_cache("open")
+        assert current_access.get_action_cache("open") is None
+        assert cache.get_calls == 2
+
+    current_access.set_action_cache("open", initial)
+    with app.test_request_context():
+        assert current_access.get_action_cache("open") == initial
+        assert cache.get_calls == 3
+
+
 def test_invenio_access_permission_cache(app, dynamic_permission):
     """Caching the user using memory caching."""
     cache = SimpleCache()
