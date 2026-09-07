@@ -5,6 +5,7 @@
 """Invenio module for common role based access control."""
 
 import six
+from flask import request
 from flask_principal import identity_loaded
 from invenio_base.utils import entry_points
 from werkzeug.utils import cached_property, import_string
@@ -51,6 +52,8 @@ class _AccessState(object):
         :param action_key: The unique action name.
         :param data: The action to be saved.
         """
+        if self._request_cache is not None:
+            self._request_cache[action_key] = data
         if self.cache:
             self.cache.set(
                 self.app.config["ACCESS_ACTION_CACHE_PREFIX"] + action_key, data
@@ -64,11 +67,16 @@ class _AccessState(object):
         :param action_key: The unique action name.
         :returns: The action stored in cache or ``None``.
         """
+        if self._request_cache is not None and action_key in self._request_cache:
+            return self._request_cache[action_key]
+
         data = None
         if self.cache:
             data = self.cache.get(
                 self.app.config["ACCESS_ACTION_CACHE_PREFIX"] + action_key
             )
+        if self._request_cache is not None:
+            self._request_cache[action_key] = data
         return data
 
     def delete_action_cache(self, action_key):
@@ -78,10 +86,23 @@ class _AccessState(object):
 
         :param action_key: The unique action name.
         """
+        if self._request_cache is not None:
+            self._request_cache.pop(action_key, None)
         if self.cache:
             self.cache.delete(
                 self.app.config["ACCESS_ACTION_CACHE_PREFIX"] + action_key
             )
+
+    @property
+    def _request_cache(self):
+        """Get the action cache local to the current HTTP request."""
+        if request:
+            cache = getattr(request, "_invenio_access_action_cache", None)
+            if cache is None:
+                cache = {}
+                request._invenio_access_action_cache = cache
+            return cache
+        return None
 
     def register_action(self, action):
         """Register an action to be showed in the actions list.
