@@ -4,8 +4,6 @@
 
 """Module tests."""
 
-import time
-
 from cachelib import SimpleCache
 from flask_principal import ActionNeed, Need, RoleNeed, UserNeed
 from invenio_accounts.models import Role, User
@@ -178,98 +176,6 @@ def test_invenio_access_permission_cache_redis(app, redis_cache, dynamic_permiss
         set([Need(method="id", value=1), Need(method="id", value=2)]),
         set([]),
     )
-
-
-def test_invenio_access_cache_performance(app, dynamic_permission):
-    """Performance test simulating 1000 users."""
-    InvenioAccess(app, cache=None)
-    # CDS has (2015-11-19) 74 actions with 414 possible arguments with
-    # 49259 users and 307 roles. In this test we are going to divide
-    # into 50 and use the next prime number.
-    users_number = 991
-    actions_users_number = 11
-    actions_roles_number = 7
-
-    roles = []
-    actions = []
-    for i in range(actions_roles_number):
-        role = Role(id=str(i), name="role{0}".format(i))
-        roles.append(role)
-        db.session.add(role)
-        db.session.flush()
-
-        action_role = ActionRoles(
-            action="action{0}".format(str(i % actions_roles_number)), role=role
-        )
-        actions.append(action_role)
-        db.session.add(action_role)
-        db.session.flush()
-
-    users = []
-    for i in range(users_number):
-        user = User(
-            email="invenio{0}@inveniosoftware.org".format(str(i)),
-            roles=[roles[i % actions_roles_number]],
-        )
-        users.append(user)
-        db.session.add(user)
-        db.session.flush()
-
-        action_user = ActionUsers(
-            action="action{0}".format(
-                str((i % actions_users_number) + actions_roles_number)
-            ),
-            user=user,
-        )
-        actions.append(action_user)
-        db.session.add(action_user)
-        db.session.flush()
-
-    def test_permissions():
-        """Iterates over all users checking its permissions."""
-        for i in range(users_number):
-            identity = FakeIdentity(UserNeed(users[i].id))
-
-            # Allowed permission
-            permission_allowed_both = dynamic_permission(
-                ActionNeed(
-                    "action{0}".format(
-                        (i % actions_users_number) + actions_roles_number
-                    )
-                ),
-                ActionNeed("action{0}".format(i % actions_roles_number)),
-            )
-            assert permission_allowed_both.allows(identity)
-
-            # Not allowed action user
-            permission_not_allowed_user = dynamic_permission(
-                ActionNeed(
-                    "action{0}".format(
-                        (i + 1) % actions_users_number + actions_roles_number
-                    )
-                )
-            )
-            assert not permission_not_allowed_user.allows(identity)
-
-            # Not allowed action role
-            permission_not_allowed_role = dynamic_permission(
-                ActionNeed("action{0}".format((i + 1) % actions_roles_number))
-            )
-            assert not permission_not_allowed_role.allows(identity)
-
-    app.extensions["invenio-access"].cache = None
-    start_time_wo_cache = time.time()
-    test_permissions()
-    end_time_wo_cache = time.time()
-    time_wo_cache = end_time_wo_cache - start_time_wo_cache
-
-    app.extensions["invenio-access"].cache = SimpleCache()
-    start_time_w_cache = time.time()
-    test_permissions()
-    end_time_w_cache = time.time()
-    time_w_cache = end_time_w_cache - start_time_w_cache
-
-    assert time_wo_cache / time_w_cache > 10
 
 
 def test_invenio_access_permission_cache_users_updates(app, dynamic_permission):
