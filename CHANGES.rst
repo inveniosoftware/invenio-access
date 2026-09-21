@@ -8,6 +8,20 @@
 Changes
 =======
 
+Version v7.1.0 (released 2026-09-21)
+
+- tests: remove obsolete performance test
+    * With the performance improvements from the previous two commits the
+      ratio between w/ and w/o cache is closer to 1.2-1.5x compared to the
+      old 10x improvement. Leaving this kind of test thus, doesn't make
+      sense anymore, since there's no way to disable the request cache.
+
+- perf(cache): reuse action expansions within requests
+    * Per-result permission checks caused thousands of repeated shared-cache reads in a single search response.
+    * Request scoping removes repeated work while keeping writes, deletes, and cross-request invalidation coherent.
+
+- perf: evaluate needs/excludes once per Permission.allows()
+
 Version v7.0.2 (released 2026-08-04)
 
 - fix(build): include mo files
