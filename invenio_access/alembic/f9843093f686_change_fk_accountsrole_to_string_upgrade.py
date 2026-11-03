@@ -45,4 +45,3 @@ def upgrade():
 
 def downgrade():
     """Downgrade database."""
-    pass

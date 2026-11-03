@@ -13,7 +13,7 @@ from . import config
 from .loaders import load_permissions_on_identity_loaded
 
 
-class _AccessState(object):
+class _AccessState:
     """Access state storing registered actions."""
 
     def __init__(
@@ -152,7 +152,7 @@ class _AccessState(object):
             self.register_system_role(ep.load())
 
 
-class InvenioAccess(object):
+class InvenioAccess:
     """Invenio Access extension."""
 
     def __init__(self, app=None, **kwargs):

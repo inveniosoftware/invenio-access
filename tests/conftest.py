@@ -11,7 +11,6 @@ import warnings
 import pytest
 from cachelib import RedisCache
 from flask import Flask
-from flask.cli import ScriptInfo
 from flask_mail import Mail
 from flask_principal import ActionNeed, identity_loaded
 from invenio_accounts import InvenioAccounts
@@ -148,5 +147,5 @@ class DynamicPermission(Permission):
 
     def __init__(self, *args, **kwargs):
         """Constructor."""
-        super(DynamicPermission, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         warnings.warn("DynamicPermission is scheduled for removal.", DeprecationWarning)

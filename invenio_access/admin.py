@@ -40,16 +40,16 @@ class ActionUsersView(ModelView):
 
     form_columns = ("user", "action", "argument", "exclude")
 
-    form_args = dict(
-        action=dict(
-            choices=LocalProxy(
-                lambda: [(action, action) for action in current_access.actions.keys()]
+    form_args = {
+        "action": {
+            "choices": LocalProxy(
+                lambda: [(action, action) for action in current_access.actions]
             )
-        )
-    )
-    form_overrides = dict(
-        action=SelectField,
-    )
+        }
+    }
+    form_overrides = {
+        "action": SelectField,
+    }
 
 
 class ActionRolesView(ModelView):
@@ -72,17 +72,17 @@ class ActionRolesView(ModelView):
 
     form_columns = ("role", "action", "argument", "exclude")
 
-    form_args = dict(
-        action=dict(
-            choices=LocalProxy(
-                lambda: [(action, action) for action in current_access.actions.keys()]
+    form_args = {
+        "action": {
+            "choices": LocalProxy(
+                lambda: [(action, action) for action in current_access.actions]
             )
-        )
-    )
+        }
+    }
 
-    form_overrides = dict(
-        action=SelectField,
-    )
+    form_overrides = {
+        "action": SelectField,
+    }
 
 
 class ActionSystemRolesView(ModelView):
@@ -103,26 +103,24 @@ class ActionSystemRolesView(ModelView):
         "exclude": _("Deny"),
     }
 
-    form_args = dict(
-        action=dict(
-            choices=LocalProxy(
-                lambda: [(action, action) for action in current_access.actions.keys()]
+    form_args = {
+        "action": {
+            "choices": LocalProxy(
+                lambda: [(action, action) for action in current_access.actions]
             )
-        ),
-        role_name=dict(
-            choices=LocalProxy(
-                lambda: [
-                    (action, action) for action in current_access.system_roles.keys()
-                ]
+        },
+        "role_name": {
+            "choices": LocalProxy(
+                lambda: [(action, action) for action in current_access.system_roles]
             )
-        ),
-    )
+        },
+    }
 
     form_columns = ("role_name", "action", "argument", "exclude")
-    form_overrides = dict(
-        action=SelectField,
-        role_name=SelectField,
-    )
+    form_overrides = {
+        "action": SelectField,
+        "role_name": SelectField,
+    }
 
 
 action_roles_adminview = {
@@ -147,7 +145,7 @@ action_system_roles_adminview = {
 }
 
 __all__ = (
-    "action_users_adminview",
     "action_roles_adminview",
     "action_system_roles_adminview",
+    "action_users_adminview",
 )

@@ -4,8 +4,6 @@
 
 """Sphinx configuration."""
 
-import os
-
 from invenio_access import __version__
 
 # -- General configuration ------------------------------------------------
