@@ -3,9 +3,6 @@
 
 """Create access branch."""
 
-import sqlalchemy as sa
-from alembic import op
-
 # revision identifiers, used by Alembic.
 revision = "67ba0de65fbb"
 down_revision = None

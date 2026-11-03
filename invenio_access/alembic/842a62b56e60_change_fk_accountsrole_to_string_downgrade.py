@@ -15,7 +15,6 @@ depends_on = None
 
 def upgrade():
     """Upgrade database."""
-    pass
 
 
 def downgrade():

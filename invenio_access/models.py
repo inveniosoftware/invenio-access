@@ -16,7 +16,7 @@ from sqlalchemy.orm.attributes import get_history
 from .proxies import current_access
 
 
-class ActionNeedMixin(object):
+class ActionNeedMixin:
     """Define common attributes for Action needs."""
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -197,7 +197,7 @@ class ActionSystemRoles(ActionNeedMixin, db.Model):
         if role:
             assert role.method == "system_role"
             kwargs["role_name"] = role.value
-        return super(ActionSystemRoles, cls).create(action, **kwargs)
+        return super().create(action, **kwargs)
 
     @validates("role_name")
     def validate_role_name(self, key, role_name):

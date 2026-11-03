@@ -412,7 +412,8 @@ try:
     # Werkzeug <2.1
     from werkzeug import security
 
-    security.safe_str_cmp
+    # used to trigger the AttributeError
+    security.safe_str_cmp  # noqa: B018
 except AttributeError:
     # Werkzeug >=2.1
     import hmac
@@ -439,15 +440,18 @@ from .proxies import current_access
 __version__ = "7.1.0"
 
 __all__ = (
-    "__version__",
-    "any_user",
-    "authenticated_user",
-    "action_factory",
-    "current_access",
     "ActionNeed",
+    "ActionRoles",
+    "ActionSystemRoles",
+    "ActionUsers",
     "InvenioAccess",
     "ParameterizedActionNeed",
     "Permission",
-    "superuser_access",
     "SystemRoleNeed",
+    "__version__",
+    "action_factory",
+    "any_user",
+    "authenticated_user",
+    "current_access",
+    "superuser_access",
 )

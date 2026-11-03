@@ -70,7 +70,7 @@ def test_version():
 def test_init(base_app):
     """Test extension initialization."""
     app = base_app
-    ext = InvenioAccess(app)
+    InvenioAccess(app)
     assert "invenio-access" in app.extensions
 
 

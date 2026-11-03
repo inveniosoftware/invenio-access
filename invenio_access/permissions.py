@@ -227,10 +227,7 @@ class Permission(_Permission):
             return False
 
         excludes = self.excludes
-        if excludes and excludes.intersection(identity.provides):
-            return False
-
-        return True
+        return not (excludes and excludes.intersection(identity.provides))
 
 
 system_permission = Permission(system_process)

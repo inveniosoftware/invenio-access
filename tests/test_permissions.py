@@ -47,7 +47,7 @@ from invenio_access.permissions import (
 # 15. allow_by_default = True/False
 
 
-class WithUserIdentity(object):
+class WithUserIdentity:
     """Helper class to mock Flask identity and provide needs."""
 
     def __init__(self, user, *provides):
@@ -69,7 +69,7 @@ def create_users(*names):
     """Helper to create users."""
     users = []
     for name in names:
-        user = User(email="{}@inveniosoftware.org".format(name))
+        user = User(email=f"{name}@inveniosoftware.org")
         db.session.add(user)
         users.append(user)
     db.session.commit()
@@ -116,11 +116,11 @@ def expand(action_need, *user_or_roles):
         is_user = isinstance(user_role, WithUserIdentity)
         if is_user:
             # User
-            kwargs = dict(user=user_role.user)
+            kwargs = {"user": user_role.user}
             method = ActionUsers.allow if allow_deny == "allow" else ActionUsers.deny
         elif isinstance(user_role, Need) and user_role.method == "system_role":
             # SystemRoleNeed
-            kwargs = dict(role=user_role)
+            kwargs = {"role": user_role}
             method = (
                 ActionSystemRoles.allow
                 if allow_deny == "allow"
@@ -128,7 +128,7 @@ def expand(action_need, *user_or_roles):
             )
         else:
             # Role
-            kwargs = dict(role=user_role)
+            kwargs = {"role": user_role}
             method = ActionRoles.allow if allow_deny == "allow" else ActionRoles.deny
 
         obj = method(action=action_need, argument=argument, **kwargs)
