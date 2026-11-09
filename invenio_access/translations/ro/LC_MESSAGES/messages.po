@@ -9,7 +9,6 @@
 # Nicolaie Constantinescu, 2023
 # Corina Ionascu <icorina@nipne.ro>, 2023
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-access 2.0.0\n"

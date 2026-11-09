@@ -7,7 +7,6 @@
 # Translators:
 # Andrea Dömötör, 2022
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-access 2.0.0\n"
