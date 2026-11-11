@@ -7,7 +7,6 @@
 # Translators:
 # Vitalii Kindrat, 2025
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-access 2.0.0\n"
