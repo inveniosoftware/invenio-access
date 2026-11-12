@@ -4,7 +4,6 @@
 
 """Invenio module for common role based access control."""
 
-import six
 from flask_principal import identity_loaded
 from invenio_base.utils import entry_points
 from werkzeug.utils import cached_property, import_string
@@ -41,7 +40,7 @@ class _AccessState(object):
     def cache(self):
         """Return a cache instance."""
         cache = self._cache or self.app.config.get("ACCESS_CACHE")
-        return import_string(cache) if isinstance(cache, six.string_types) else cache
+        return import_string(cache) if isinstance(cache, str) else cache
 
     def set_action_cache(self, action_key, data):
         """Store action needs and excludes.
