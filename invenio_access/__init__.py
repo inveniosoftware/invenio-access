@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2015-2022 CERN.
+# SPDX-FileCopyrightText: 2015-2026 CERN.
 # SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
 # SPDX-FileCopyrightText: 2025 KTH Royal Institute of Technology.
 # SPDX-FileCopyrightText: 2026 TU Wien.
@@ -418,7 +418,7 @@ from .permissions import (
 )
 from .proxies import current_access
 
-__version__ = "7.1.1"
+__version__ = "7.2.0"
 
 __all__ = (
     "ActionNeed",
