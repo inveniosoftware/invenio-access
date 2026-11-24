@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v7.1.1 (released 2026-11-24)
+
+- chore: drop compat hack for old versions of werkzeug and flask-login
+- chore: apply `ruff` linter fixes
+- chore: remove `six` library usage
+
 Version v7.1.0 (released 2026-09-21)
 
 - tests: remove obsolete performance test
